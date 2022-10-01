@@ -192,7 +192,7 @@ static double potential_element(const bim_zone_t    *receiving_zone,  // при�
                                 const bim_transit_t *transit)
 {
     double p = sqrt(giver_zone->area) / speed_at_exit(receiving_zone, giver_zone, transit->width);
-    if (receiving_zone->potential >= __FLT_MAX__) return p;
+    if (receiving_zone->potential >= FLT_MAX) return p;
     return receiving_zone->potential + p;
 }
 
@@ -248,7 +248,7 @@ static void reset_zones(const ArrayList *zones)
     {
         bim_zone_t *zone = zones->data[i];
         zone->is_visited = false;
-        zone->potential = (zone->sign == OUTSIDE) ? 0 : __FLT_MAX__;
+        zone->potential = (zone->sign == OUTSIDE) ? 0 : FLT_MAX;
     }
 }
 

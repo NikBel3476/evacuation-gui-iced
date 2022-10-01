@@ -88,14 +88,6 @@ typedef struct
 } bim_json_object_t;
 
 /*!
-Создает новый объект типа bim_object_t
-
-\param[in] filename Имя файла
-\returns Указатель на объект типа bim_object_t
-*/
-const bim_json_object_t*  bim_json_new        (const char *filename);
-
-/*!
 Копирует объект типа bim_object_t и возвращает указатель на новый объект
 
 \param[in] bim_object Объект для копирования

@@ -16,6 +16,7 @@
 #define BIM_OUTPUT_H
 
 #include <stdio.h>
+#include <string.h>
 #include "bim_tools.h"
 
 // Separator
@@ -25,6 +26,8 @@
 // Part of the output file name
 #define OUTPUT_DETAIL_FILE  "_detailed"
 #define OUTPUT_SHORT_FILE   "_short"
+// Directory name
+#define OUTPUT_DIR "result"
 
 void bim_output_head  (const bim_t *const bim, FILE *fp);
 void bim_output_body  (const bim_t *const bim, float time, FILE *fp);

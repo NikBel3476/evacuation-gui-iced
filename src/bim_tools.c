@@ -162,7 +162,7 @@ bim_t* bim_tools_new(const bim_json_object_t *const bim_json)
                 zone->is_blocked = false;
                 zone->is_visited = false;
                 zone->is_safe    = false;
-                zone->potential  = __FLT_MAX__;
+                zone->potential  = FLT_MAX;
                 zone->hazard_level = 0;
                 arraylist_append(zones_list, zone);
                 numofzones++;
@@ -517,7 +517,7 @@ bim_zone_t* _outside_init(const bim_json_object_t * bim_json)
     outside->polygon = NULL;
     strcpy((void *)outside->uuid.x, "outside0-safe-zone-0000-000000000000");
     outside->z_level = 0;
-    outside->size_z = __FLT_MAX__;
+    outside->size_z = FLT_MAX;
     outside->numofpeople = 0;
     outside->hazard_level = 0;
     outside->is_safe = true;
@@ -552,7 +552,7 @@ bim_zone_t* _outside_init(const bim_json_object_t * bim_json)
     outside->is_blocked = false;
     outside->is_visited = false;
     outside->potential = 0;
-    outside->area = __FLT_MAX__;
+    outside->area = FLT_MAX;
     outside->numofpeople = 0;
 
     return outside;
@@ -573,8 +573,8 @@ void bim_tools_free (bim_t* bim)
     }
     free(bim->levels);
     bim_zone_t *outside = (bim_zone_t *)bim->zones->data[0];
-    free(outside->name);
-    free(outside->outputs);
+//    free(outside->name);
+//    free(outside->outputs);
 //    free(outside);
 
     free(bim->name);

@@ -16,28 +16,29 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include "logger.h"
 #include "loggerconf.h"
 
 #include "bim_json_object.h"
+#include "bim_json_object/src/bim_json_object_rust.h"
 #include "bim_tools.h"
 #include "bim_graph.h"
 #include "bim_evac.h"
-#include "bim_cli.h"
+#include "bim_cli/src/bim_cli.h"
 #include "bim_configure.h"
+#include "bim_configure/src/bim_configure_rust.h"
 #include "bim_output.h"
 
 void applying_scenario_bim_params(bim_t* bim, const bim_cfg_scenario_t* cfg_scenario);
 
-int main (int argc, char** argv)
+int run ()
 {
 // TODO: разобраться с кодировкой в windows
 #ifdef _WIN32
     system("chcp 65001");
 #endif
 
-    const cli_params_t       *cli_params       = read_cl_args(argc, argv);
+    const cli_params_t       *cli_params       = read_cl_args();
     const bim_cfg_scenario_t *bim_cfg_scenario = bim_cfg_load(cli_params->scenario_file);
 
     // Настройки с-logger
@@ -51,6 +52,7 @@ int main (int argc, char** argv)
         // Чтение файла и разворачивание его в структуру
         LOG_TRACE("Use module `bim_json_object`. Read the file of bim and create a programming structure");
         const bim_json_object_t * bim_json = bim_json_new(bim_cfg_scenario->bim_jsons[bim_idx].x);
+
         {
             LOG_TRACE("Name of building: %s", bim_json->name);
 
@@ -130,7 +132,7 @@ int main (int argc, char** argv)
                 bim_zone_t *zone = zones->data[i];
                 if (zone->is_visited)
                 {
-                   num_of_people += zone->numofpeople;
+                    num_of_people += zone->numofpeople;
                 }
             }
 
@@ -157,6 +159,9 @@ int main (int argc, char** argv)
         bim_graph_free(graph);
         bim_tools_free(bim);
     }
+#ifdef _WIN32
+    system("chcp 866");
+#endif
 }
 
 void applying_scenario_bim_params(bim_t* bim, const bim_cfg_scenario_t* cfg_scenario)

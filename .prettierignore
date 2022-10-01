@@ -1,0 +1,6 @@
+*
+
+!vite.config.ts
+!index.html
+!src-ui/
+!src-ui/**/*

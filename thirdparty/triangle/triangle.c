@@ -4907,7 +4907,8 @@ void exactinit()
 #ifdef SINGLE
   _control87(_PC_24, _MCW_PC); /* Set FPU control word for single precision. */
 #else /* not SINGLE */
-  _control87(_PC_53, _MCW_PC); /* Set FPU control word for double precision. */
+    // FIXME: разобраться с функцией (_MCW_PC не поддерживается на x64 и ARM в msvc)
+//  _control87(_PC_53, _MCW_PC); /* Set FPU control word for double precision. */
 #endif /* not SINGLE */
 #endif /* CPU86 */
 #ifdef LINUX

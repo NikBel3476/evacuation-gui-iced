@@ -16,6 +16,7 @@
 #pragma once
 
 #include "math.h"
+#include "float.h"
 #include "bim_graph.h"
 #include "logger.h"
 
