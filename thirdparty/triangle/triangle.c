@@ -4061,9 +4061,6 @@ struct memorypool *pool;
     pool->maxitems++;
   }
   pool->items++;
-
-  int s = sizeof(unsigned long long);
-
   return newitem;
 }
 
@@ -4910,7 +4907,8 @@ void exactinit()
 #ifdef SINGLE
   _control87(_PC_24, _MCW_PC); /* Set FPU control word for single precision. */
 #else /* not SINGLE */
-  _control87(_PC_53, _MCW_PC); /* Set FPU control word for double precision. */
+    // FIXME: разобраться с функцией (_MCW_PC не поддерживается на x64 и ARM в msvc)
+//  _control87(_PC_53, _MCW_PC); /* Set FPU control word for double precision. */
 #endif /* not SINGLE */
 #endif /* CPU86 */
 #ifdef LINUX
@@ -7499,7 +7497,7 @@ struct behavior *b;
 /*  WARNING:  This routine is designed for convex triangulations, and will   */
 /*  not generally work after the holes and concavities have been carved.     */
 /*  However, it can still be used to find the circumcenter of a triangle, as */
-/*  long long as the search is begun from the triangle in question.               */
+/*  long as the search is begun from the triangle in question.               */
 /*                                                                           */
 /*****************************************************************************/
 

@@ -3,29 +3,44 @@
 !.gitignore
 !.gitmodules
 
+!.editorconfig
+
+!Cargo.toml
+!Cargo.lock
+!build.rs
+
+!evacuationc.conf
+!LICENSE
+!logger.conf
+!scenario.json
+
+!README.md
+
 !CMakeLists.txt
 
 !src/
-!src/*.c
-!src/*.h
-!src/CMakeLists.txt
-!src/bim/
-!src/bim/*.c
-!src/bim/*.h
-!src/bim/CMakeLists.txt
+!src/**/*
+
+!src-tauri/
+!src-tauri/**/*
+
+!package*.json
+!vite.config.ts
+!tsconfig*.json
+!.prettier*
+!.husky
+!.husky/**/*
+
+!index.html
+!src-ui/config/index.html
+!src-ui/
+!src-ui/**/*
 
 !res/
 !res/*.json
 
 !thirdparty/
-!thirdparty/arraylist/
-!thirdparty/arraylist/*.c
-!thirdparty/arraylist/*.h
-!thirdparty/arraylist/CMakeLists.txt
-!thirdparty/triangle/
-!thirdparty/triangle/*.c
-!thirdparty/triangle/*.h
-!thirdparty/triangle/CMakeLists.txt
+!thirdparty/**/*
 
 !test/
 !test/*.c

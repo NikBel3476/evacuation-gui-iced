@@ -1,8 +1,3 @@
-[submodule "thirdparty/json-c"]
-	path = thirdparty/json-c
-	url = https://github.com/json-c/json-c.git
-	branch = json-c-0.16-20220414
 [submodule "thirdparty/c-logger"]
 	path = thirdparty/c-logger
-	url = https://github.com/yksz/c-logger.git
-	branch = master
+	url = https://github.com/NikBel3476/c-logger.git
