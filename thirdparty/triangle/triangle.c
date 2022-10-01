@@ -8711,7 +8711,7 @@ int triflaws;
             } else {
               /* Take the average of the two triangles' area constraints.    */
               /*   This prevents small area constraints from migrating a     */
-              /*   long, long way from their original location due to flips. */
+              /*   long long, long long way from their original location due to flips. */
               area = 0.5 * (areabound(top) + areabound(horiz));
             }
             setareabound(top, area);
@@ -15438,7 +15438,7 @@ struct behavior *b;
         trilongest2 = edgelength[i];
       }
       if (edgelength[i] > longest) {
-        longest = edgelength[i];
+          longest = edgelength[i];
       }
       if (edgelength[i] < shortest) {
         shortest = edgelength[i];
