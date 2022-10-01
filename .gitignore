@@ -21,6 +21,21 @@
 !src/
 !src/**/*
 
+!src-tauri/
+!src-tauri/**/*
+
+!package*.json
+!vite.config.ts
+!tsconfig*.json
+!.prettier*
+!.husky
+!.husky/**/*
+
+!index.html
+!src-ui/config/index.html
+!src-ui/
+!src-ui/**/*
+
 !res/
 !res/*.json
 
