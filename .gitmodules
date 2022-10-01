@@ -1,4 +1,3 @@
 [submodule "thirdparty/c-logger"]
 	path = thirdparty/c-logger
-	url = https://github.com/yksz/c-logger.git
-	branch = v0.4.2
+	url = https://github.com/NikBel3476/c-logger.git
