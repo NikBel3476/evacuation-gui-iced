@@ -1,10 +1,9 @@
 extern crate serde_json;
 
-use std::error::Error;
 use std::fs;
 use std::path::Path;
 use serde::{Serialize, Deserialize};
-
+ 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all(deserialize = "snake_case"))]
 pub enum DistributionType {
