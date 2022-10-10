@@ -9,13 +9,20 @@ const MainPage: FC<mainPageProps> = () => {
 		invoke('open_configuration_window');
 	};
 
+	const handleOpenPeopleTrafficButtonClick = () => {
+		invoke('open_people_traffic_window');
+	};
+
 	return (
 		<main>
 			<h1>Main page</h1>
 			<Link to="configuration">Configuration page</Link>
 			<div>
-				<button onClick={handleOpenConfigurationButtonClick}>
-					Open configuration window
+				<button onClick={handleOpenConfigurationButtonClick}>Открыть окно настроек</button>
+			</div>
+			<div>
+				<button onClick={handleOpenPeopleTrafficButtonClick}>
+					Открыть окно моделирования эвакуации
 				</button>
 			</div>
 		</main>

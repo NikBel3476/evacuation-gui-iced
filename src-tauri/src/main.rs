@@ -32,7 +32,8 @@ fn main() {
 		.invoke_handler(
 			tauri::generate_handler![
 				read_config,
-				open_configuration_window
+				open_configuration_window,
+				open_people_traffic_window
 			]
 		)
 		.run(tauri::generate_context!())
@@ -49,6 +50,18 @@ async fn open_configuration_window(handle: tauri::AppHandle) {
 	let configuration_window = WindowBuilder::new(
         &handle,
         "configuration",
-        tauri::WindowUrl::App("src-ui/config/index.html".into()),
+        tauri::WindowUrl::App("src-ui/config/index.html".into())
 	).build().unwrap();
+}
+
+#[tauri::command]
+async fn open_people_traffic_window(handle: tauri::AppHandle) {
+	let people_traffic_window = WindowBuilder::new(
+		&handle,
+		"people_traffic",
+		tauri::WindowUrl::App("src-ui/peopleTraffic/index.html".into())
+	)
+	.min_inner_size(1000.0, 800.0)
+	.build()
+	.unwrap();
 }
