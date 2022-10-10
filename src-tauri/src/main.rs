@@ -3,7 +3,7 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use tauri::{CustomMenuItem, Menu, MenuItem, Submenu};
+use tauri::{CustomMenuItem, Menu, WindowBuilder};
 
 use cli;
 use configuration;
@@ -12,13 +12,12 @@ use bim_cli;
 use bim_configure;
 use bim_json_object;
 
-mod run_bindings;
-
 fn main() {
 	let configuration = CustomMenuItem::new(
 		"configuration",
 		"Configuration"
 	);
+
 	let menu = Menu::new()
 		.add_item(configuration);
 
@@ -26,11 +25,16 @@ fn main() {
 		.menu(menu)
 		.on_menu_event(|event| {
 			match event.menu_item_id() {
-				"configuration" => {}
+				"configuration" => {},
 				_ => {}
 			}
 		})
-		.invoke_handler(tauri::generate_handler![read_config])
+		.invoke_handler(
+			tauri::generate_handler![
+				read_config,
+				open_configuration_window
+			]
+		)
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }
@@ -41,10 +45,10 @@ fn read_config() -> Result<configuration::ScenarioCfg, String> {
 }
 
 #[tauri::command]
-async fn open_config_window(handle: tauri::AppHandle) {
-	let config_windows = tauri::WindowBuilder::new(
-		&handle,
-		"runtime",
-		tauri::WindowUrl::External("https://tauri.app/".parse().unwrap())
+async fn open_configuration_window(handle: tauri::AppHandle) {
+	let configuration_window = WindowBuilder::new(
+        &handle,
+        "configuration",
+        tauri::WindowUrl::App("src-ui/config/index.html".into()),
 	).build().unwrap();
 }
