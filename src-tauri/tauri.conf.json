@@ -62,15 +62,6 @@
         "label": "evacuation",
         "width": 800,
         "height": 600
-      },
-      {
-        "url": "src-ui/config/index.html",
-        "fullscreen": false,
-        "resizable": true,
-        "title": "configuration",
-        "label": "configuration",
-        "width": 800,
-        "height": 600
       }
     ]
   }

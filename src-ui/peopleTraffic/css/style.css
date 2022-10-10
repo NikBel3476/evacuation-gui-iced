@@ -1,0 +1,120 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: 'Roboto', sans-serif;
+}
+
+.canvas {
+	margin: 0;
+	padding: 0;
+}
+
+.app_container {
+	max-width: 100%;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.app_main {
+	display: flex;
+	flex: 11 1;
+	margin: 10px;
+}
+
+.floor_statistics {
+	width: 100%;
+	flex: 2 1;
+	background-color: #0abde3;
+	margin-right: 10px;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	border-radius: 5px;
+}
+
+.sidebar_header {
+	font-size: 38px;
+	color: #fff;
+	padding: 10px;
+	margin-left: 20px;
+	margin-top: 40px;
+}
+
+.statistics_container {
+	border-radius: 3px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+	width: 85%;
+	background-color: #25ccf7;
+	padding: 0 10px;
+	margin: 40px auto 0px auto;
+	color: #fff;
+}
+
+.statistics_info {
+	width: 100%;
+	padding: 15px 0;
+}
+
+.side_pause_button {
+	background-color: #3c40c6;
+	color: #fff;
+	padding: 22px 12px;
+	border-radius: 50%;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+	display: block;
+	float: right;
+	margin-top: 10px;
+	margin-right: 15px;
+	border: none;
+	font-size: 14px;
+	cursor: pointer;
+	font-family: 'Roboto';
+}
+
+.floor_image {
+	flex: 9 1;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.15);
+	overflow: hidden;
+	border-radius: 5px;
+}
+
+.app_controler {
+	flex: 0.6 1;
+	margin: 0px 10px 10px 10px;
+	background-color: #0abde3;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	border-radius: 5px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.btn_container {
+	display: flex;
+	flex: 0.5 1;
+	justify-content: center;
+}
+
+.info_container {
+	display: flex;
+	flex: 3 1;
+}
+
+.button {
+	margin-left: 20px;
+}
+
+.button > i {
+	color: #fff;
+	padding: 10px;
+	background-color: #3c40c6;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.moving_time,
+.person_count,
+.person_exited {
+	color: #fff;
+	font-size: 14px;
+	margin-left: 100px;
+}
