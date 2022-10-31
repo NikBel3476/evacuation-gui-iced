@@ -12,6 +12,8 @@ use bim_cli;
 use bim_configure;
 use bim_json_object;
 
+mod run_bindings;
+
 fn main() {
 	let configuration = CustomMenuItem::new(
 		"configuration",
@@ -33,7 +35,8 @@ fn main() {
 			tauri::generate_handler![
 				read_config,
 				open_configuration_window,
-				open_people_traffic_window
+				open_people_traffic_window,
+				bim_start
 			]
 		)
 		.run(tauri::generate_context!())
@@ -64,4 +67,9 @@ async fn open_people_traffic_window(handle: tauri::AppHandle) {
 	.min_inner_size(1000.0, 800.0)
 	.build()
 	.unwrap();
+}
+
+#[tauri::command]
+async fn bim_start() {
+	unsafe { run_bindings::run() };
 }

@@ -11,8 +11,8 @@
 
 !evacuationc.conf
 !LICENSE
-!logger.conf
-!scenario.json
+!src-tauri/logger.conf
+!src-tauri/scenario.json
 
 !README.md
 
@@ -36,7 +36,7 @@
 !src-ui/
 !src-ui/**/*
 
-!res/
+!src-tauri/res/
 !res/*.json
 
 !thirdparty/
