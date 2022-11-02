@@ -68,17 +68,17 @@ void bim_output_body  (const bim_t *const bim, float time, FILE *fp)
 //    return out_file;
 //}
 
-char *bim_create_file_name  (const char* bfn, const char* middle_name, const char* suffix)
-{
-    char *fn = (char*)calloc((strlen(bfn) + strlen(middle_name) + strlen(suffix) + 1), sizeof (char));
-    if (!fn)
-    {
-        return NULL;
-    }
-
-    strcat(fn, bfn);
-    strcat(fn, middle_name);
-    strcat(fn, suffix);
-
-    return fn;
-}
+//char *bim_create_file_name  (const char* bfn, const char* middle_name, const char* suffix)
+//{
+//    char *fn = (char*)calloc((strlen(bfn) + strlen(middle_name) + strlen(suffix) + 1), sizeof (char));
+//    if (!fn)
+//    {
+//        return NULL;
+//    }
+//
+//    strcat(fn, bfn);
+//    strcat(fn, middle_name);
+//    strcat(fn, suffix);
+//
+//    return fn;
+//}
