@@ -11,6 +11,7 @@ use json_object;
 use bim_cli;
 use bim_configure;
 use bim_json_object;
+use bim_output;
 
 mod run_bindings;
 
@@ -50,7 +51,7 @@ fn read_config() -> Result<configuration::ScenarioCfg, String> {
 
 #[tauri::command]
 async fn open_configuration_window(handle: tauri::AppHandle) {
-	let configuration_window = WindowBuilder::new(
+	let _configuration_window = WindowBuilder::new(
         &handle,
         "configuration",
         tauri::WindowUrl::App("src-ui/config/index.html".into())
@@ -59,7 +60,7 @@ async fn open_configuration_window(handle: tauri::AppHandle) {
 
 #[tauri::command]
 async fn open_people_traffic_window(handle: tauri::AppHandle) {
-	let people_traffic_window = WindowBuilder::new(
+	let _people_traffic_window = WindowBuilder::new(
 		&handle,
 		"people_traffic",
 		tauri::WindowUrl::App("src-ui/peopleTraffic/index.html".into())

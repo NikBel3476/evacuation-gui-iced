@@ -35,38 +35,38 @@ void bim_output_body  (const bim_t *const bim, float time, FILE *fp)
     fflush(fp);
 }
 
-char* bim_basename    (char *path_to_file)
-{
-    char *fn;
-    char *suffix;
-    char *out_file;
-
-    (fn = strrchr(path_to_file, '/')) ? ++fn : (fn = path_to_file);
-    (suffix = strrchr(fn, '.')) ? suffix : (suffix = fn);
-
-    char *s = (char*)calloc(strlen(fn) - strlen(suffix) + 1, sizeof (char));
-    if (!s)
-    {
-        return NULL;
-    }
-    strncpy(s, fn, strlen(fn) - strlen(suffix));
-
-#if defined(_WIN32) || defined(_WIN64)
-    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 7, sizeof(char));
-    strcpy(out_file, "..\\\\");
-    strcat(out_file, OUTPUT_DIR);
-    strcat(out_file, "\\\\");
-#else
-    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 5, sizeof(char));
-    strcpy(out_file, "../");
-    strcat(out_file, OUTPUT_DIR);
-    strcat(out_file, "/");
-#endif
-    strcat(out_file,  s);
-    free(s);
-
-    return out_file;
-}
+//char* bim_basename    (char *path_to_file)
+//{
+//    char *fn;
+//    char *suffix;
+//    char *out_file;
+//
+//    (fn = strrchr(path_to_file, '/')) ? ++fn : (fn = path_to_file);
+//    (suffix = strrchr(fn, '.')) ? suffix : (suffix = fn);
+//
+//    char *s = (char*)calloc(strlen(fn) - strlen(suffix) + 1, sizeof (char));
+//    if (!s)
+//    {
+//        return NULL;
+//    }
+//    strncpy(s, fn, strlen(fn) - strlen(suffix));
+//
+//#if defined(_WIN32) || defined(_WIN64)
+//    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 7, sizeof(char));
+//    strcpy(out_file, "..\\");
+//    strcat(out_file, OUTPUT_DIR);
+//    strcat(out_file, "\\");
+//#else
+//    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 5, sizeof(char));
+//    strcpy(out_file, "../");
+//    strcat(out_file, OUTPUT_DIR);
+//    strcat(out_file, "/");
+//#endif
+//    strcat(out_file,  s);
+//    free(s);
+//
+//    return out_file;
+//}
 
 char *bim_create_file_name  (const char* bfn, const char* middle_name, const char* suffix)
 {

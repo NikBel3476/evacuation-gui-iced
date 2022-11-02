@@ -28,6 +28,7 @@
 #include "bim_configure.h"
 #include "bim_configure/src/bim_configure_rust.h"
 #include "bim_output.h"
+#include "bim_output/src/bim_output_rust.h"
 
 void applying_scenario_bim_params(bim_t* bim, const bim_cfg_scenario_t* cfg_scenario);
 
