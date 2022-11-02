@@ -38,8 +38,9 @@ int run ()
     system("chcp 65001");
 #endif
 
+    // TODO: delete mock file path
 //    const cli_params_t       *cli_params       = read_cl_args();
-    cli_params_t params = { "scenario.json" };
+    cli_params_t params = { "../scenario.json" };
     const cli_params_t       *cli_params       = &params;
     const bim_cfg_scenario_t *bim_cfg_scenario = bim_cfg_load(cli_params->scenario_file);
 
@@ -48,7 +49,6 @@ int run ()
 
     for (size_t bim_idx = 0; bim_idx < bim_cfg_scenario->num_of_bim_jsons; bim_idx++)
     {
-        LOG_INFO(bim_cfg_scenario->bim_jsons[bim_idx].x);
         char *filename = bim_basename((char *)bim_cfg_scenario->bim_jsons[bim_idx].x);
         LOG_INFO("The file name of the used bim `%s.json`", filename);
 

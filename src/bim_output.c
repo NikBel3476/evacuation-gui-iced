@@ -52,15 +52,17 @@ char* bim_basename    (char *path_to_file)
     strncpy(s, fn, strlen(fn) - strlen(suffix));
 
 #if defined(_WIN32) || defined(_WIN64)
-    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 3, sizeof(char));
-        strcpy(out_file, OUTPUT_DIR);
-        strcat(out_file, "\\\\");
+    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 7, sizeof(char));
+    strcpy(out_file, "..\\\\");
+    strcat(out_file, OUTPUT_DIR);
+    strcat(out_file, "\\\\");
 #else
-    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 2, sizeof(char));
-    strcpy(out_file, OUTPUT_DIR);
+    out_file = (char *)calloc(strlen(OUTPUT_DIR) + strlen(s) + 5, sizeof(char));
+    strcpy(out_file, "../");
+    strcat(out_file, OUTPUT_DIR);
     strcat(out_file, "/");
 #endif
-    strcat(out_file, s);
+    strcat(out_file,  s);
     free(s);
 
     return out_file;
