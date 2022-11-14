@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use bim_json_object::bim_json_object_t_rust;
+use json_object::BuildingStruct;
 
 /// Количество символов в UUID + NUL символ
 #[repr(C)]
@@ -68,15 +68,15 @@ pub struct bim_t {
 	numoflevels: u8               ///< Количество уровней в здании
 }
 
-// #[no_mangle]
-// pub extern "C" fn bim_tools_new(building: *const bim_json_object_t_rust) -> *mut bim_t {
-// 	let bim = bim_json_object_t_rust {
-// 		numoflevels: building.levels.len(),
-// 		levels: bim_level_t {
-// 			z_level:
-// 		}
-// 	};
-//
-// 	std::memory::forget(bim);
-// 	bim.as_ptr()
-// }
+/*#[no_mangle]
+pub extern "C" fn bim_tools_new(building: &mut BuildingStruct) -> *const bim_t {
+	let bim = BuildingStruct {
+		numoflevels: building.levels.len(),
+		levels: bim_level_t {
+			z_level:
+		}
+	};
+
+	std::memory::forget(bim);
+	bim.as_ptr()
+}*/
