@@ -6,4 +6,4 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bim_json_object = { path = "../bim_json_object" }
+json_object = { path = "../json_object" }

@@ -28,7 +28,6 @@
 #include "bim_configure.h"
 #include "bim_configure/src/bim_configure_rust.h"
 #include "bim_output.h"
-#include "bim_output/src/bim_output_rust.h"
 
 void applying_scenario_bim_params(bim_t* bim, const bim_cfg_scenario_t* cfg_scenario);
 
@@ -39,10 +38,7 @@ int run ()
     system("chcp 65001");
 #endif
 
-    // TODO: delete mock file path
-//    const cli_params_t       *cli_params       = read_cl_args();
-    cli_params_t params = { "../scenario.json" };
-    const cli_params_t       *cli_params       = &params;
+    const cli_params_t       *cli_params       = read_cl_args();
     const bim_cfg_scenario_t *bim_cfg_scenario = bim_cfg_load(cli_params->scenario_file);
 
     // Настройки с-logger
