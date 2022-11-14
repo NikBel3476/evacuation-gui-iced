@@ -1,4 +1,6 @@
 fn main() {
+	println!("cargo:rerun-if-changed=../src/*");
+
 	let files = [
 		"../thirdparty/arraylist/arraylist.c",
 		"../thirdparty/triangle/triangle.c",
