@@ -9,6 +9,10 @@ const MainPage: FC<mainPageProps> = () => {
 		invoke('open_configuration_window');
 	};
 
+	const handleOpenConfigurationRescriptButtonClick = () => {
+		invoke('open_configuration_rescript_window');
+	};
+
 	const handleOpenPeopleTrafficButtonClick = () => {
 		invoke('open_people_traffic_window');
 	};
@@ -23,6 +27,11 @@ const MainPage: FC<mainPageProps> = () => {
 			<Link to="configuration">Configuration page</Link>
 			<div>
 				<button onClick={handleOpenConfigurationButtonClick}>Открыть окно настроек</button>
+			</div>
+			<div>
+				<button onClick={handleOpenConfigurationRescriptButtonClick}>
+					Открыть окно настроек(Rescript)
+				</button>
 			</div>
 			<div>
 				<button onClick={handleOpenPeopleTrafficButtonClick}>

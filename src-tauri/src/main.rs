@@ -36,6 +36,7 @@ fn main() {
 			tauri::generate_handler![
 				read_config,
 				open_configuration_window,
+				open_configuration_rescript_window,
 				open_people_traffic_window,
 				bim_start
 			]
@@ -55,6 +56,15 @@ async fn open_configuration_window(handle: tauri::AppHandle) {
         &handle,
         "configuration",
         tauri::WindowUrl::App("src-ui/config/index.html".into())
+	).build().unwrap();
+}
+
+#[tauri::command]
+async fn open_configuration_rescript_window(handle: tauri::AppHandle) {
+	let _configuration_window = WindowBuilder::new(
+		&handle,
+		"configurationRescript",
+		tauri::WindowUrl::App("src-ui/configRescript/index.html".into())
 	).build().unwrap();
 }
 

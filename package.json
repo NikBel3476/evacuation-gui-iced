@@ -3,30 +3,40 @@
     "private": true,
     "version": "0.1.0",
     "type": "module",
+    "license": "MIT",
     "description": "**EvacuationC** -- программа моделирования движения людей в здании.",
     "scripts": {
-        "dev": "vite",
-        "build": "tsc && vite build",
+        "dev": "concurrently \"npm run dev:*\"",
+        "dev:vite": "vite",
+        "dev:rescript": "rescript build -w",
+        "build": "rescript && tsc && vite build",
         "preveiw": "vite preview",
         "tauri": "tauri",
+        "clean": "rescript clean -with-deps",
         "prepare": "husky install"
     },
     "devDependencies": {
+        "@rescript/react": "^0.10.3",
         "@tauri-apps/cli": "^1.1.1",
         "@types/node": "^18.8.3",
         "@types/react": "^18.0.17",
         "@types/react-dom": "^18.0.6",
         "@vitejs/plugin-react": "^2.0.1",
-        "husky": "^8.0.0",
+        "concurrently": "^7.5.0",
+        "gentype": "^4.5.0",
+        "husky": "^8.0.2",
         "prettier": "^2.7.1",
         "pretty-quick": "^3.1.3",
+        "rescript": "^10.0.1",
         "typescript": "^4.8.4",
         "vite": "^3.1.6"
     },
     "dependencies": {
+        "@ryyppy/rescript-promise": "^2.1.0",
         "@tauri-apps/api": "^1.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-router-dom": "^6.4.2"
+        "react-router-dom": "^6.4.2",
+        "rescript-webapi": "^0.7.0"
     }
 }
