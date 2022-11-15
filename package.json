@@ -13,7 +13,7 @@
         "preveiw": "vite preview",
         "tauri": "tauri",
         "clean": "rescript clean -with-deps",
-        "prepare": "husky install"
+        "pretty-quick": "pretty-quick"
     },
     "devDependencies": {
         "@rescript/react": "^0.10.3",
@@ -38,5 +38,10 @@
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.4.2",
         "rescript-webapi": "^0.7.0"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
     }
 }
