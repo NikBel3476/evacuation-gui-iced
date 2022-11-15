@@ -13,7 +13,7 @@
         "preveiw": "vite preview",
         "tauri": "tauri",
         "clean": "rescript clean -with-deps",
-        "pretty-quick": "pretty-quick"
+        "prepare": "husky install"
     },
     "devDependencies": {
         "@rescript/react": "^0.10.3",
@@ -24,7 +24,7 @@
         "@vitejs/plugin-react": "^2.0.1",
         "concurrently": "^7.5.0",
         "gentype": "^4.5.0",
-        "husky": "^8.0.0",
+        "husky": "^8.0.2",
         "prettier": "^2.7.1",
         "pretty-quick": "^3.1.3",
         "rescript": "^10.0.1",
@@ -38,10 +38,5 @@
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.4.2",
         "rescript-webapi": "^0.7.0"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "pretty-quick --staged"
-        }
     }
 }
