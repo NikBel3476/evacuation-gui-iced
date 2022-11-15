@@ -24,7 +24,13 @@ export default defineConfig({
 		rollupOptions: {
 			input: {
 				main: path.resolve(__dirname, 'index.html'),
-				configuration: path.resolve(__dirname, 'src-ui', 'config', 'index.html')
+				configuration: path.resolve(__dirname, 'src-ui', 'config', 'index.html'),
+				configurationRescript: path.resolve(
+					__dirname,
+					'src-ui',
+					'configRescript',
+					'index.html'
+				)
 			}
 		}
 	}

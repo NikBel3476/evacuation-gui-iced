@@ -1,0 +1,21 @@
+{
+    "name": "evacuation",
+    "version": "0.1.0",
+    "sources": {
+        "dir": "src-ui",
+        "subdirs": true
+    },
+    "package-specs": {
+        "module": "es6",
+        "in-source": true
+    },
+    "suffix": ".bs.js",
+    "bsc-flags": ["-bs-super-errors"],
+    "warnings": {
+        "error" : "+101"
+    },
+    "bs-dependencies": [
+        "@ryyppy/rescript-promise",
+        "rescript-webapi"
+    ]
+}
