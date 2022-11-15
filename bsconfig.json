@@ -14,8 +14,25 @@
     "warnings": {
         "error" : "+101"
     },
+    "reason": { "react-jsx": 3 },
     "bs-dependencies": [
+        "@rescript/react",
         "@ryyppy/rescript-promise",
         "rescript-webapi"
-    ]
+    ],
+    "gentypeconfig": {
+        "language": "typescript",
+        "module": "es6",
+        "importPath": "relative",
+        "shims": {
+            "Js": "Js",
+            "ReactEvent": "ReactEvent",
+            "RescriptPervasives": "RescriptPervasives",
+            "ReasonReact": "ReactShim"
+        },
+        "debug": {
+            "all": false,
+            "basic": false
+        }
+    }
 }
