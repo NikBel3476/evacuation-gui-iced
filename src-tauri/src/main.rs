@@ -3,7 +3,7 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use tauri::{CustomMenuItem, Menu, WindowBuilder};
+use tauri::{WindowBuilder, AppHandle};
 
 use cli;
 use configuration;
@@ -16,22 +16,7 @@ use bim_output;
 mod run_bindings;
 
 fn main() {
-	let configuration = CustomMenuItem::new(
-		"configuration",
-		"Configuration"
-	);
-
-	let menu = Menu::new()
-		.add_item(configuration);
-
 	tauri::Builder::default()
-		.menu(menu)
-		.on_menu_event(|event| {
-			match event.menu_item_id() {
-				"configuration" => {},
-				_ => {}
-			}
-		})
 		.invoke_handler(
 			tauri::generate_handler![
 				read_config,
@@ -51,7 +36,7 @@ fn read_config() -> Result<configuration::ScenarioCfg, String> {
 }
 
 #[tauri::command]
-async fn open_configuration_window(handle: tauri::AppHandle) {
+async fn open_configuration_window(handle: AppHandle) {
 	let _configuration_window = WindowBuilder::new(
         &handle,
         "configuration",
@@ -60,7 +45,7 @@ async fn open_configuration_window(handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn open_configuration_rescript_window(handle: tauri::AppHandle) {
+async fn open_configuration_rescript_window(handle: AppHandle) {
 	let _configuration_window = WindowBuilder::new(
 		&handle,
 		"configurationRescript",
@@ -69,7 +54,7 @@ async fn open_configuration_rescript_window(handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn open_people_traffic_window(handle: tauri::AppHandle) {
+async fn open_people_traffic_window(handle: AppHandle) {
 	let _people_traffic_window = WindowBuilder::new(
 		&handle,
 		"people_traffic",
