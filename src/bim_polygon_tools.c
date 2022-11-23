@@ -71,8 +71,7 @@ double geom_tools_area_polygon(const polygon_t *const polygon)
 {
     size_t numof_triangle_corner = (polygon->numofpoints - 2) * 3;
 
-    int *trianglelist = (int*)NULL;
-    trianglelist = (int*)calloc(numof_triangle_corner, sizeof (int));
+    int *trianglelist = (int*)calloc(numof_triangle_corner, sizeof (int));
     if (!trianglelist) {
         return -1;
     }

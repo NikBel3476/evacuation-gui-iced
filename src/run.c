@@ -166,6 +166,8 @@ int run ()
 #ifdef _WIN32
     system("chcp 866");
 #endif
+
+    return 0;
 }
 
 void applying_scenario_bim_params(bim_t* bim, const bim_cfg_scenario_t* cfg_scenario)

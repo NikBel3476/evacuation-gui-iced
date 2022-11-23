@@ -391,9 +391,13 @@ double _width_door_way(const polygon_t *zone1, const polygon_t *zone2, const lin
     return (d12 + d34) / 2;
 }
 
-// Вычисление ширины проема по данным из модели здания
-int _calculate_transits_width(ArrayList *zones,    // Список всех зон
-                              ArrayList *transits) // Список всех переходов
+/*
+Вычисление ширины проема по данным из модели здания
+\param[in] zones Список всех зон
+\param[in] transits - Список всех переходов
+\return Ширина проёма
+*/
+int _calculate_transits_width(ArrayList *zones, ArrayList *transits)
 {
     for (size_t i = 0; i < transits->length; i++)
     {
@@ -463,7 +467,7 @@ int _calculate_transits_width(ArrayList *zones,    // Список всех зо
         }
 
         double width = -1;
-        if (numofpoints_edge1 || numofpoints_edge1)
+        if (numofpoints_edge1)
         {
             LOG_ERROR("Невозможно вычислить ширину двери: id=%lu, uuid=%s [name=%s]",
                       transit->id, transit->uuid.x, transit->name);
@@ -492,7 +496,7 @@ int _calculate_transits_width(ArrayList *zones,    // Список всех зо
         {
             LOG_ERROR("Ширина проема не определена: id=%lu, name=%s [%s], width=%f",
                      transit->id, transit->name, transit->uuid.x, transit->width);
-            fprintf(stderr, "[func: %s() | line: %u] :: Ширина проема не определена: id=%lu, name=%s [%s], width=%f\n",
+            fprintf(stderr, "[func: %s() | line: %u] :: Ширина проема не определена: id=%llu, name=%s [%s], width=%f\n",
                     __func__, __LINE__, transit->id, transit->name, transit->uuid.x, transit->width);
         }
         else if (transit->width < 0.5)
@@ -572,7 +576,7 @@ void bim_tools_free (bim_t* bim)
         free(lvl_ptr->transits);
     }
     free(bim->levels);
-    bim_zone_t *outside = (bim_zone_t *)bim->zones->data[0];
+//    bim_zone_t *outside = (bim_zone_t *)bim->zones->data[0];
 //    free(outside->name);
 //    free(outside->outputs);
 //    free(outside);
@@ -625,7 +629,7 @@ double bim_tools_get_area_bim(const bim_t * const bim)
 void bim_tools_print_element(const bim_zone_t *zone)
 {
     printf("Zone 'base' info: %p\n", zone);
-    printf("\t%s: %lu\n", "ID", zone->id);
+    printf("\t%s: %llu\n", "ID", zone->id);
     printf("\t%s: %s\n", "Name", zone->name);
     printf("\t%s: %u\n", "Sign", zone->sign);
     printf("\t%s: %f\n", "Level", zone->z_level);

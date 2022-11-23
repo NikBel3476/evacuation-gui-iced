@@ -28,6 +28,7 @@
 #define BIM_JSON_OBJECT_H
 
 #include <stdint.h>
+#include <string.h>
 #include "bim_polygon_tools.h"
 #include "logger.h"
 #include "bim_uuid.h"
