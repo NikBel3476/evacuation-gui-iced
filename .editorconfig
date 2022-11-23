@@ -10,10 +10,7 @@ trim_trailing_whitespace = true
 
 [*.{c,h,rs,html,css,js,ts,tsx}]
 indent_style = tab
-
-[*.{rs,html,css,js,ts,tsx}]
 max_line_length = 100
 
 [*.md]
 trim_trailing_whitespace = false
-insert_final_newline = false
