@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use libc::{c_ulong}
+use libc::{c_ulong};
 
 #[repr(C)]
 pub struct bim_graph_t {
