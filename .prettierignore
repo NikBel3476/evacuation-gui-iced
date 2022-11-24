@@ -2,7 +2,7 @@ node_modules/
 
 dist/
 lib/
-target/
+**/target/
 
 src-ui/peopleTraffic/
 /thirdparty

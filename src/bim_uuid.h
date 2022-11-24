@@ -17,8 +17,7 @@
 /// Количество символов в UUID + NUL символ
 #define UUID_SIZE 36 + 1
 
-typedef struct
-{
+typedef struct {
     const char x[UUID_SIZE];
 } uuid_t;
 

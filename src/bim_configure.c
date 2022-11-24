@@ -15,8 +15,7 @@
 
 #include "bim_configure.h"
 
-void                        bim_cfg_unload  (bim_cfg_scenario_t* bim_cfg_scenario)
-{
+void bim_cfg_unload(bim_cfg_scenario_t *bim_cfg_scenario) {
     free(bim_cfg_scenario->bim_jsons);
     free(bim_cfg_scenario);
 }
