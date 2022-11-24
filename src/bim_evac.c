@@ -318,18 +318,18 @@ void evac_set_modeling_step(double val) {
     evac_modeling_step = val;
 }
 
-double evac_get_time_s(void) {
+double evac_get_time_s() {
     return _evac_time * 60;
 }
 
-double evac_get_time_m(void) {
+double evac_get_time_m() {
     return _evac_time;
 }
 
-void evac_time_inc(void) {
+void evac_time_inc() {
     _evac_time += evac_modeling_step;
 }
 
-void evac_time_reset(void) {
+void evac_time_reset() {
     _evac_time = 0;
 }
