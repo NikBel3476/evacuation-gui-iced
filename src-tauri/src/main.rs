@@ -10,6 +10,7 @@ use configuration;
 use json_object;
 use bim_cli;
 use bim_configure;
+use bim_evac;
 use bim_json_object;
 use bim_output;
 

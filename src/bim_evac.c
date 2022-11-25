@@ -51,7 +51,7 @@ static inline double velocity(double v0, double a, double d, double d0) {
  * @param density_in_zone   плотность в элементе, чел/м2
  * @return                  скорость потока в проеме в зависимости от плотности, м/мин
  */
-static double speed_through_transit(double transit_width, double density_in_zone, double v_max) {
+/*static double speed_through_transit(double transit_width, double density_in_zone, double v_max) {
     double v0 = v_max;
     double d0 = 0.65;
     double a = 0.295;
@@ -72,7 +72,7 @@ static double speed_through_transit(double transit_width, double density_in_zone
         LOG_ERROR("Скорость движения через переход меньше 0");
 
     return v0k;
-}
+}*/
 
 /**
  * @param density_in_zone плотность в элементе, из которого выходит поток
@@ -153,7 +153,7 @@ static double speed_at_exit(const bim_zone_t *receiving_zone,  // принима
     // Определение скорости на выходе из отдающего помещения
     double zone_speed = speed_in_element(receiving_zone, giver_zone);
     double density_in_giver_element = giver_zone->numofpeople / giver_zone->area;
-    double transition_speed = speed_through_transit(transit_width, density_in_giver_element,
+    double transition_speed = speed_through_transit_rust(transit_width, density_in_giver_element,
                                                     evac_speed_max);
     double exit_speed = fmin(zone_speed, transition_speed);
 
