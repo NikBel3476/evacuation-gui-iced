@@ -9,13 +9,37 @@ static mut EVAC_MODELING_STEP: f64 = 0.01;
 static mut EVAC_TIME: f64 = 0.0;
 
 // TODO: change parameters naming
+/// Функция скорости. Базовая зависимость, которая позволяет определить скорость
+/// людского потока по его плотности
+///
+/// # Arguments
+/// * `v0` - начальная скорость потока
+/// * `a` - коэффициент вида пути
+/// * `d` - текущая плотность людского потока на участке, чел./м2
+/// * `d0` - допустимая плотность людского потока на участке, чел./м2
+///
+/// # Returns
+/// скорость, м/мин.
 #[no_mangle]
 fn velocity_rust(v0: c_double, a: c_double, d: c_double, d0: c_double) -> c_double {
     v0 * (1.0 - a * ((d / d0) as f64).ln())
 }
 
+/// Скорость потока в проёме
+///
+/// # Arguments
+/// * `transit_width` - ширина проема, м
+/// * `density_in_zone` - плотность в элементе, чел/м2
+/// * `v_max` - максимальная скорость потока
+///
+/// # Returns
+/// скорость потока в проеме в зависимости от плотности, м/мин
 #[no_mangle]
-pub extern "C" fn speed_through_transit_rust(transit_width: c_double, density_in_zone: c_double, v_max: c_double) -> c_double {
+pub extern "C" fn speed_through_transit_rust(
+	transit_width: c_double,
+	density_in_zone: c_double,
+	v_max: c_double
+) -> c_double {
 	let v0 = v_max;
 	let d0 = 0.65;
 	let a = 0.295;
@@ -38,6 +62,14 @@ pub extern "C" fn speed_through_transit_rust(transit_width: c_double, density_in
 	}
 }
 
+/// Скорость потока в комнате
+///
+/// # Arguments
+/// * `density_in_zone` - плотность в элементе, из которого выходит поток
+/// * `v_max` - максимальная скорость потока
+///
+/// # Returns
+/// Скорость потока по горизонтальному пути, м/мин
 #[no_mangle]
 pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double) -> c_double {
 	let d0 = 0.51;
@@ -48,6 +80,14 @@ pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double)
 	}
 }
 
+/// Скорость потока на лестнице
+///
+/// # Arguments
+/// * `density_in_zone` - плотность в элементе, из которого выходит поток
+/// * `direction` - направление движения (1 - вверх, -1 - вниз)
+///
+/// # Returns
+/// Скорость потока при движении по лестнице в зависимости от плотности, м/мин
 #[no_mangle]
 pub extern "C" fn evac_speed_on_stair_rust(density_in_zone: c_double, direction: c_int) -> c_double {
 	let mut d0: c_double = 0.0;
