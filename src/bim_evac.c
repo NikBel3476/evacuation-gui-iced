@@ -78,13 +78,13 @@ static inline double velocity(double v0, double a, double d, double d0) {
  * @param density_in_zone плотность в элементе, из которого выходит поток
  * @return Скорость потока по горизонтальному пути, м/мин
  */
-static double speed_in_room(double density_in_zone, double v_max) {
+/*static double speed_in_room(double density_in_zone, double v_max) {
     double v0 = v_max; // м/мин
     double d0 = 0.51;
     double a = 0.295;
 
     return density_in_zone > d0 ? velocity(v0, a, density_in_zone, d0) : v0;
-}
+}*/
 
 /**
  * @param direction направление движения (direct = 1 - вверх, = -1 - вниз)
@@ -120,7 +120,7 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
 {
     double density_in_giver_zone = giver_zone->numofpeople / giver_zone->area;
     // По умолчанию, используется скорость движения по горизонтальной поверхности
-    double v_zone = speed_in_room(density_in_giver_zone, evac_speed_max);
+    double v_zone = speed_in_room_rust(density_in_giver_zone, evac_speed_max);
 
     double dh = receiving_zone->z_level - giver_zone->z_level;   // Разница высот зон
 

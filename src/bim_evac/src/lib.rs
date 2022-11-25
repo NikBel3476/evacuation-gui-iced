@@ -36,6 +36,16 @@ pub extern "C" fn speed_through_transit_rust(transit_width: c_double, density_in
 }
 
 #[no_mangle]
+pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double) -> c_double {
+	let d0 = 0.51;
+
+	match density_in_zone > d0 {
+		true => velocity_rust(v_max, 0.295, density_in_zone, d0),
+		false => v_max
+	}
+}
+
+#[no_mangle]
 pub extern "C" fn evac_set_speed_max_rust(speed: c_double) {
 	unsafe { EVAC_SPEED_MAX = speed; }
 }

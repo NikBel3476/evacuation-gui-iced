@@ -21,4 +21,6 @@ void evac_time_inc_rust(void);
 
 void evac_time_reset_rust(void);
 
+double speed_in_room_rust(double density_in_zone, double v_max);
+
 double speed_through_transit_rust(double transit_width, double density_in_zone, double v_max);
