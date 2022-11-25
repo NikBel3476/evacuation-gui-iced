@@ -17,6 +17,8 @@ void evac_set_modeling_step_rust(double step);
 
 void evac_set_speed_max_rust(double speed);
 
+double evac_speed_on_stair_rust(double density_in_zone, int direction);
+
 void evac_time_inc_rust(void);
 
 void evac_time_reset_rust(void);

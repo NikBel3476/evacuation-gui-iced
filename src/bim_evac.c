@@ -92,7 +92,7 @@ static inline double velocity(double v0, double a, double d, double d0) {
  * @return Скорость потока при движении по лестнице в зависимости от
  * плотности, м/мин
  */
-static double evac_speed_on_stair(double density_in_zone, int direction) {
+/*static double evac_speed_on_stair(double density_in_zone, int direction) {
     double d0 = 0, v0 = 0, a = 0;
 
     if (direction > 0) {
@@ -106,7 +106,7 @@ static double evac_speed_on_stair(double density_in_zone, int direction) {
     }
 
     return density_in_zone > d0 ? velocity(v0, a, density_in_zone, d0) : v0;
-}
+}*/
 
 /**
  * Метод определения скорости движения людского потока по разным зонам
@@ -138,7 +138,7 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
          *        \______   aGiverItem
          */
         int direction = (dh > 0) ? -1 : 1;
-        v_zone = evac_speed_on_stair(density_in_giver_zone, direction);
+        v_zone = evac_speed_on_stair_rust(density_in_giver_zone, direction);
     }
 
     if (v_zone < 0)

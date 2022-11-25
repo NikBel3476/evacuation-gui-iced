@@ -1,4 +1,6 @@
-use libc::{c_double};
+use std::borrow::Borrow;
+use std::cmp::Ordering;
+use libc::{c_double, c_int};
 
 static mut EVAC_SPEED_MAX: f64 = 100.0;
 static mut EVAC_DENSITY_MIN: f64 = 0.1;
@@ -6,6 +8,7 @@ static mut EVAC_DENSITY_MAX: f64 = 5.0;
 static mut EVAC_MODELING_STEP: f64 = 0.01;
 static mut EVAC_TIME: f64 = 0.0;
 
+// TODO: change parameters naming
 #[no_mangle]
 fn velocity_rust(v0: c_double, a: c_double, d: c_double, d0: c_double) -> c_double {
     v0 * (1.0 - a * ((d / d0) as f64).ln())
@@ -42,6 +45,32 @@ pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double)
 	match density_in_zone > d0 {
 		true => velocity_rust(v_max, 0.295, density_in_zone, d0),
 		false => v_max
+	}
+}
+
+#[no_mangle]
+pub extern "C" fn evac_speed_on_stair_rust(density_in_zone: c_double, direction: c_int) -> c_double {
+	let mut d0: c_double = 0.0;
+	let mut v0: c_double = 0.0;
+	let mut a: c_double = 0.0;
+
+	match direction.cmp(0.borrow()) {
+		Ordering::Greater => {
+			d0 = 0.67;
+			v0 = 50.0;
+			a = 0.305;
+		}
+		Ordering::Less => {
+			d0 = 0.89;
+			v0 = 80.0;
+			a = 0.4;
+		}
+		Ordering::Equal => {}
+	}
+
+	match density_in_zone > d0 {
+		true => velocity_rust(v0, a, density_in_zone, d0),
+		false => v0
 	}
 }
 
