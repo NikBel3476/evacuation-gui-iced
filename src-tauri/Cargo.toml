@@ -24,6 +24,7 @@ configuration = { path = "../src/configuration" }
 json_object = { path = "../src/json_object" }
 bim_cli = { path = "../src/bim_cli" }
 bim_configure = { path = "../src/bim_configure" }
+bim_evac = { path = "../src/bim_evac" }
 bim_json_object = { path = "../src/bim_json_object" }
 bim_output = { path = "../src/bim_output" }
 

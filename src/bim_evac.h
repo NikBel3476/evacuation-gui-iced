@@ -19,6 +19,7 @@
 #include "float.h"
 #include "bim_graph.h"
 #include "logger.h"
+#include "bim_evac/src/bim_evac_rust.h"
 
 void evac_def_modeling_step(const bim_t *bim);
 

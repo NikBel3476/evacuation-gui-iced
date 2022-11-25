@@ -59,6 +59,7 @@ version = "0.1.0"
 dependencies = [
  "bim_cli",
  "bim_configure",
+ "bim_evac",
  "bim_json_object",
  "bim_output",
  "cc",
@@ -132,6 +133,13 @@ name = "bim_configure"
 version = "0.1.0"
 dependencies = [
  "configuration",
+ "libc",
+]
+
+[[package]]
+name = "bim_evac"
+version = "0.1.0"
+dependencies = [
  "libc",
 ]
 

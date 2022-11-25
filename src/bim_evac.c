@@ -32,83 +32,6 @@ void evac_def_modeling_step(const bim_t *bim) {
 }
 
 /**
- * Функция скорости. Базовая зависимость, которая позволяет определить скорость людского
- * потока по его плотности
- * @brief _velocity
- * @param v0   начальная скорость потока
- * @param a    коэффициент вида пути
- * @param d    текущая плотность людского потока на участке, чел./м2
- * @param d0   допустимая плотность людского потока на участке, чел./м2
- * @return      скорость, м/мин.
- */
-static inline double velocity(double v0, double a, double d, double d0) {
-    return v0 * (1.0 - a * log(d / d0));
-}
-
-/**
- * @brief _speed_through_door
- * @param transit_width     ширина проема, м
- * @param density_in_zone   плотность в элементе, чел/м2
- * @return                  скорость потока в проеме в зависимости от плотности, м/мин
- */
-static double speed_through_transit(double transit_width, double density_in_zone, double v_max) {
-    double v0 = v_max;
-    double d0 = 0.65;
-    double a = 0.295;
-    double v0k = -1;
-
-    if (density_in_zone > d0) {
-        double m = (density_in_zone > 5) ? (1.25 - 0.05 * density_in_zone) : 1;
-        v0k = velocity(v0, a, density_in_zone, d0) * m;
-
-        if (density_in_zone >= 9 && transit_width < 1.6) {
-            v0k = 10 * (2.5 + 3.75 * transit_width) / d0;
-        }
-    } else {
-        v0k = v0;
-    }
-
-    if (v0k < 0)
-        LOG_ERROR("Скорость движения через переход меньше 0");
-
-    return v0k;
-}
-
-/**
- * @param density_in_zone плотность в элементе, из которого выходит поток
- * @return Скорость потока по горизонтальному пути, м/мин
- */
-static double speed_in_room(double density_in_zone, double v_max) {
-    double v0 = v_max; // м/мин
-    double d0 = 0.51;
-    double a = 0.295;
-
-    return density_in_zone > d0 ? velocity(v0, a, density_in_zone, d0) : v0;
-}
-
-/**
- * @param direction направление движения (direct = 1 - вверх, = -1 - вниз)
- * @param density_in_zone  плотность в элементе
- * @return Скорость потока при движении по лестнице в зависимости от
- * плотности, м/мин
- */
-static double evac_speed_on_stair(double density_in_zone, int direction) {
-    double d0 = 0, v0 = 0, a = 0;
-
-    if (direction > 0) {
-        d0 = 0.67;
-        v0 = 50;
-        a = 0.305;
-    } else if (direction < 0) {
-        d0 = 0.89;
-        v0 = 80;
-        a = 0.4;
-    }
-
-    return density_in_zone > d0 ? velocity(v0, a, density_in_zone, d0) : v0;
-}
-
-/**
  * Метод определения скорости движения людского потока по разным зонам
  *
  * @param aReceivingElement    зона, в которую засасываются люди
@@ -120,7 +43,7 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
 {
     double density_in_giver_zone = giver_zone->numofpeople / giver_zone->area;
     // По умолчанию, используется скорость движения по горизонтальной поверхности
-    double v_zone = speed_in_room(density_in_giver_zone, evac_speed_max);
+    double v_zone = speed_in_room_rust(density_in_giver_zone, evac_speed_max);
 
     double dh = receiving_zone->z_level - giver_zone->z_level;   // Разница высот зон
 
@@ -138,7 +61,7 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
          *        \______   aGiverItem
          */
         int direction = (dh > 0) ? -1 : 1;
-        v_zone = evac_speed_on_stair(density_in_giver_zone, direction);
+        v_zone = evac_speed_on_stair_rust(density_in_giver_zone, direction);
     }
 
     if (v_zone < 0)
@@ -153,7 +76,7 @@ static double speed_at_exit(const bim_zone_t *receiving_zone,  // принима
     // Определение скорости на выходе из отдающего помещения
     double zone_speed = speed_in_element(receiving_zone, giver_zone);
     double density_in_giver_element = giver_zone->numofpeople / giver_zone->area;
-    double transition_speed = speed_through_transit(transit_width, density_in_giver_element,
+    double transition_speed = speed_through_transit_rust(transit_width, density_in_giver_element,
                                                     evac_speed_max);
     double exit_speed = fmin(zone_speed, transition_speed);
 
