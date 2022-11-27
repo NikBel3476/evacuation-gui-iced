@@ -141,10 +141,12 @@ int run() {
             if (num_of_people <= remainder) break;
         }
 
+        double num_of_evacuated_people = bim_tools_get_numofpeople(bim);
+        double evacuation_time = evac_get_time_m();
         LOG_INFO("Длительность эвакуации: %.2f с. (%.2f мин.)", evac_get_time_s(),
-                 evac_get_time_m());
+                 evacuation_time);
         LOG_INFO("Количество человек: в здании - %.2f (в безопасной зоне - %.2f) чел.",
-                 bim_tools_get_numofpeople(bim),
+                 num_of_evacuated_people,
                  ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->numofpeople);
         LOG_INFO("---------------------------------------");
 
@@ -153,15 +155,15 @@ int run() {
             LOG_TRACE("Created file for shorted information about evacuation: %s", output_short);
             LOG_TRACE(
                 "[Total] Time - %.2f, Number of people in the build - %.2f, Number of people in the outside - %.2f",
-                evac_get_time_m(), bim_tools_get_numofpeople(bim),
+                evacuation_time, num_of_evacuated_people,
                 ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->numofpeople
             );
 
             fprintf(
                 fp_short,
                 "%.2f,%.2f,%.2f",
-                evac_get_time_m(),
-                bim_tools_get_numofpeople(bim),
+                evacuation_time,
+                num_of_evacuated_people,
                 ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->numofpeople
             );
             fflush(fp_short);
