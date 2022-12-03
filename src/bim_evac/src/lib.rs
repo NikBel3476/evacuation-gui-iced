@@ -1,6 +1,6 @@
+use libc::{c_double, c_int};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
-use libc::{c_double, c_int};
 
 static mut EVAC_SPEED_MAX: f64 = 100.0;
 static mut EVAC_DENSITY_MIN: f64 = 0.1;
@@ -22,7 +22,7 @@ static mut EVAC_TIME: f64 = 0.0;
 /// скорость, м/мин.
 #[no_mangle]
 fn velocity_rust(v0: c_double, a: c_double, d: c_double, d0: c_double) -> c_double {
-    v0 * (1.0 - a * ((d / d0) as f64).ln())
+	v0 * (1.0 - a * ((d / d0) as f64).ln())
 }
 
 /// Скорость потока в проёме
@@ -38,7 +38,7 @@ fn velocity_rust(v0: c_double, a: c_double, d: c_double, d0: c_double) -> c_doub
 pub extern "C" fn speed_through_transit_rust(
 	transit_width: c_double,
 	density_in_zone: c_double,
-	v_max: c_double
+	v_max: c_double,
 ) -> c_double {
 	let v0 = v_max;
 	let d0 = 0.65;
@@ -49,7 +49,7 @@ pub extern "C" fn speed_through_transit_rust(
 		true => {
 			let m = match density_in_zone > 5.0 {
 				true => 1.25 - 0.05 * density_in_zone,
-				false => 1.0
+				false => 1.0,
 			};
 
 			if density_in_zone >= 9.0 && transit_width < 1.6 {
@@ -58,7 +58,7 @@ pub extern "C" fn speed_through_transit_rust(
 
 			velocity_rust(v0, a, density_in_zone, d0) * m
 		}
-		false => v0
+		false => v0,
 	}
 }
 
@@ -76,7 +76,7 @@ pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double)
 
 	match density_in_zone > d0 {
 		true => velocity_rust(v_max, 0.295, density_in_zone, d0),
-		false => v_max
+		false => v_max,
 	}
 }
 
@@ -89,7 +89,10 @@ pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double)
 /// # Returns
 /// Скорость потока при движении по лестнице в зависимости от плотности, м/мин
 #[no_mangle]
-pub extern "C" fn evac_speed_on_stair_rust(density_in_zone: c_double, direction: c_int) -> c_double {
+pub extern "C" fn evac_speed_on_stair_rust(
+	density_in_zone: c_double,
+	direction: c_int,
+) -> c_double {
 	let mut d0: c_double = 0.0;
 	let mut v0: c_double = 0.0;
 	let mut a: c_double = 0.0;
@@ -110,28 +113,36 @@ pub extern "C" fn evac_speed_on_stair_rust(density_in_zone: c_double, direction:
 
 	match density_in_zone > d0 {
 		true => velocity_rust(v0, a, density_in_zone, d0),
-		false => v0
+		false => v0,
 	}
 }
 
 #[no_mangle]
 pub extern "C" fn evac_set_speed_max_rust(speed: c_double) {
-	unsafe { EVAC_SPEED_MAX = speed; }
+	unsafe {
+		EVAC_SPEED_MAX = speed;
+	}
 }
 
 #[no_mangle]
 pub extern "C" fn evac_set_density_min_rust(density: c_double) {
-	unsafe { EVAC_DENSITY_MIN = density; }
+	unsafe {
+		EVAC_DENSITY_MIN = density;
+	}
 }
 
 #[no_mangle]
 pub extern "C" fn evac_set_density_max_rust(density: c_double) {
-	unsafe { EVAC_DENSITY_MAX = density; }
+	unsafe {
+		EVAC_DENSITY_MAX = density;
+	}
 }
 
 #[no_mangle]
 pub extern "C" fn evac_set_modeling_step_rust(step: c_double) {
-	unsafe { EVAC_MODELING_STEP = step; }
+	unsafe {
+		EVAC_MODELING_STEP = step;
+	}
 }
 
 #[no_mangle]
@@ -146,10 +157,14 @@ pub extern "C" fn evac_get_time_m_rust() -> c_double {
 
 #[no_mangle]
 pub extern "C" fn evac_time_inc_rust() {
-	unsafe { EVAC_TIME += EVAC_MODELING_STEP; }
+	unsafe {
+		EVAC_TIME += EVAC_MODELING_STEP;
+	}
 }
 
 #[no_mangle]
 pub extern "C" fn evac_time_reset_rust() {
-	unsafe { EVAC_TIME = 0.0; }
+	unsafe {
+		EVAC_TIME = 0.0;
+	}
 }
