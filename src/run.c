@@ -13,25 +13,11 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include <string.h>
-#include "../thirdparty/c-logger/src/logger.h"
-#include "../thirdparty/c-logger/src/loggerconf.h"
-
-#include "bim_json_object.h"
-#include "bim_json_object/src/bim_json_object_rust.h"
-#include "bim_tools.h"
-#include "bim_graph.h"
-#include "bim_evac.h"
-#include "bim_cli/src/bim_cli.h"
-#include "bim_configure.h"
-#include "bim_configure/src/bim_configure_rust.h"
-#include "bim_output.h"
-#include "bim_output/src/bim_output_rust.h"
+#include "run.h"
 
 void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scenario);
 
-int run() {
+void run() {
 // TODO: разобраться с кодировкой в windows
 #ifdef _WIN32
     system("chcp 65001");
@@ -178,8 +164,6 @@ int run() {
 #ifdef _WIN32
     system("chcp 866");
 #endif
-
-    return 0;
 }
 
 void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scenario) {
