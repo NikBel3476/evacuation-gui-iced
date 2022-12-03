@@ -8,10 +8,8 @@ indent_size = 4
 insert_final_newline = false
 trim_trailing_whitespace = true
 
-[*.{c,h,rs,html,css,ts,tsx}]
+[*.{c,h,rs,html,css,js,ts,tsx}]
 indent_style = tab
-
-[*.{rs,html,css,ts,tsx}]
 max_line_length = 100
 
 [*.md]

@@ -29,10 +29,8 @@
 // Directory name
 #define OUTPUT_DIR "result"
 
-void bim_output_head  (const bim_t *const bim, FILE *fp);
-void bim_output_body  (const bim_t *const bim, float time, FILE *fp);
+void bim_output_head(const bim_t *bim, FILE *fp);
 
-char* bim_basename          (char *path_to_file);
-char *bim_create_file_name  (const char* bfn, const char* middle_name, const char* suffix);
+void bim_output_body(const bim_t *bim, float time, FILE *fp);
 
 #endif //BIM_OUTPUT_H

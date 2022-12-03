@@ -1,6 +1,20 @@
-*
+node_modules/
 
-!vite.config.ts
-!index.html
-!src-ui/
-!src-ui/**/*
+dist/
+lib/
+**/target/
+
+src-ui/peopleTraffic/
+/thirdparty
+
+.idea/
+
+.prettierrc
+
+**/*.bs.js
+**/*.gen.tsx
+**/*.json
+**/*.md
+**/*.yml
+
+.clang-tidy

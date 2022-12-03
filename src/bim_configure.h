@@ -21,68 +21,58 @@
 #include <string.h>
 #include "bim_uuid.h"
 
-#define UUID_SIZE 36 + 1
-
-enum distribution_type
-{
+enum distribution_type {
     distribution_from_bim,
     distribution_uniform
 };
 
-enum transits_width_type
-{
+enum transits_width_type {
     transits_width_from_bim,
     transits_width_users
 };
 
-typedef struct
-{
-    uuid_t  *uuid;
+typedef struct {
+    uuid_t *uuid;
     uint8_t num_of_uuids;
-    float   value;
+    float value;
 } special_t;
 
-typedef struct
-{
-    enum distribution_type  type;
-    float                   density;
-    special_t               *special;
-    uint8_t                 num_of_special_blocks;
+typedef struct {
+    enum distribution_type type;
+    float density;
+    special_t *special;
+    uint8_t num_of_special_blocks;
 } bim_cfg_distribution_t;
 
-typedef struct
-{
-    enum transits_width_type    type;
-    float                       doorwayin;
-    float                       doorwayout;
-    special_t                   *special;
-    uint8_t                     num_of_special_blocks;
+typedef struct {
+    enum transits_width_type type;
+    float doorwayin;
+    float doorwayout;
+    special_t *special;
+    uint8_t num_of_special_blocks;
 } bim_cfg_transitions_width_t;
 
-typedef struct
-{
+typedef struct {
     float step;
     float speed_max;
     float density_min;
     float density_max;
 } bim_cfg_modeling_t;
 
-typedef struct
-{
+typedef struct {
     const char x[256];
 } bim_cfg_file_name_t;
 
-typedef struct
-{
-    bim_cfg_file_name_t         *bim_jsons;
-    bim_cfg_file_name_t         logger_configure;
-    uint8_t                     num_of_bim_jsons;
-    bim_cfg_distribution_t      distribution;
+typedef struct {
+    bim_cfg_file_name_t *bim_jsons;
+    bim_cfg_file_name_t logger_configure;
+    uint8_t num_of_bim_jsons;
+    bim_cfg_distribution_t distribution;
     bim_cfg_transitions_width_t transits;
-    bim_cfg_modeling_t          modeling;
+    bim_cfg_modeling_t modeling;
 } bim_cfg_scenario_t;
 
 
-void                        bim_cfg_unload  (bim_cfg_scenario_t* bim_cfg_scenario);
+void bim_cfg_unload(bim_cfg_scenario_t *bim_cfg_scenario);
 
 #endif /* BIMCONF_H */

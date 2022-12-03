@@ -40,54 +40,55 @@ type ScenarioCfg = {
 	};
 };
 
-(document.getElementById('start-btn') as HTMLElement).addEventListener('click', async _ => {
+document.getElementById('start-btn')!.addEventListener('click', async _ => {
 	try {
-		let config = (await invoke('read_config')) as ScenarioCfg;
-		(document.querySelector('.config__bim-files') as HTMLElement).innerHTML =
+		let config = await invoke<ScenarioCfg>('read_config');
+
+		document.querySelector<HTMLOListElement>('.config__bim-files')!.innerHTML =
 			config.files.reduce(
 				(filenameElements, pathToFile) => filenameElements.concat(`<li>${pathToFile}</li>`),
 				''
 			);
 
-		(document.querySelector('.config__logfile-path') as HTMLParagraphElement).innerText =
+		document.querySelector<HTMLParagraphElement>('.config__logfile-path')!.innerText =
 			config.logger_config;
 
-		(
-			document.querySelector('.distribution-type') as HTMLParagraphElement
-		).innerText = `Тип: ${config.distribution.distribution_type}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.distribution-type'
+		)!.innerText = `Тип: ${config.distribution.distribution_type}`;
 
-		(
-			document.querySelector('.distribution-density') as HTMLParagraphElement
-		).innerText = `Плотность: ${config.distribution.density}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.distribution-density'
+		)!.innerText = `Плотность: ${config.distribution.density}`;
 
-		(document.querySelector('.distribution-special') as HTMLUListElement).innerHTML =
-			config.distribution.special.reduce<string>(
+		document.querySelector<HTMLUListElement>('.distribution-special')!.innerHTML =
+			config.distribution.special.reduce(
 				(specialElements, special) =>
 					specialElements.concat(
 						`<li>
-						<ol>
-							${special.uuid.reduce((uuidElements, uuid) => uuidElements.concat(`<li>${uuid}</li>`), '')}
-						</ol>
-						<p>Плотность: ${special.density}</p>
-						<p>Комментарий: ${special.comment}</p>
-					</li>`
+							<ol>
+								${special.uuid.reduce((uuidElements, uuid) => uuidElements.concat(`<li>${uuid}</li>`), '')}
+							</ol>
+							<p>Плотность: ${special.density}</p>
+							<p>Комментарий: ${special.comment}</p>
+						</li>`
 					),
 				''
 			);
 
-		(
-			document.querySelector('.transitions-type') as HTMLParagraphElement
-		).innerText = `Тип: ${config.transition.transitions_type}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.transitions-type'
+		)!.innerText = `Тип: ${config.transition.transitions_type}`;
 
-		(
-			document.querySelector('.transitions-doorway-in') as HTMLParagraphElement
-		).innerText = `Doorway in: ${config.transition.doorway_in}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.transitions-doorway-in'
+		)!.innerText = `Doorway in: ${config.transition.doorway_in}`;
 
-		(
-			document.querySelector('.transitions-doorway-out') as HTMLParagraphElement
-		).innerText = `Doorway out: ${config.transition.doorway_out}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.transitions-doorway-out'
+		)!.innerText = `Doorway out: ${config.transition.doorway_out}`;
 
-		(document.querySelector('.transitions-special') as HTMLUListElement).innerHTML =
+		document.querySelector<HTMLUListElement>('.transitions-special')!.innerHTML =
 			config.transition.special.reduce(
 				(specialElements, special) =>
 					specialElements.concat(`
@@ -102,27 +103,27 @@ type ScenarioCfg = {
 				''
 			);
 
-		(
-			document.querySelector('.modeling-step') as HTMLParagraphElement
-		).innerText = `Шаг: ${config.modeling.step}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.modeling-step'
+		)!.innerText = `Шаг: ${config.modeling.step}`;
 
-		(
-			document.querySelector('.modeling-max-speed') as HTMLParagraphElement
-		).innerText = `Максимальная скорость: ${config.modeling.max_speed}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.modeling-max-speed'
+		)!.innerText = `Максимальная скорость: ${config.modeling.max_speed}`;
 
-		(
-			document.querySelector('.modeling-max-density') as HTMLParagraphElement
-		).innerText = `Максимальная плотность: ${config.modeling.max_density}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.modeling-max-density'
+		)!.innerText = `Максимальная плотность: ${config.modeling.max_density}`;
 
-		(
-			document.querySelector('.modeling-min-density') as HTMLParagraphElement
-		).innerText = `Минимальная плотность: ${config.modeling.min_density}`;
+		document.querySelector<HTMLParagraphElement>(
+			'.modeling-min-density'
+		)!.innerText = `Минимальная плотность: ${config.modeling.min_density}`;
 
-		(document.querySelector('.config-error') as HTMLElement).style.display = 'none';
-		(document.querySelector('.config') as HTMLDivElement).style.display = 'block';
+		document.querySelector<HTMLElement>('.config-error')!.style.display = 'none';
+		document.querySelector<HTMLDivElement>('.config')!.style.display = 'block';
 	} catch (errorMessage) {
-		(document.querySelector('.config') as HTMLElement).style.display = 'none';
-		(document.querySelector('.config-error') as HTMLElement).innerHTML = `
+		document.querySelector<HTMLElement>('.config')!.style.display = 'none';
+		document.querySelector<HTMLElement>('.config-error')!.innerHTML = `
 			<p>
 				${typeof errorMessage === 'string' ? errorMessage : 'Произошла неизвестная ошибка'}
 			</p>

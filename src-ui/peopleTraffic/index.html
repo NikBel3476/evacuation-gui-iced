@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title></title>
+		<link rel="stylesheet" href="css/style.css" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://kit.fontawesome.com/f6266ff04c.js" crossorigin="anonymous"></script>
+		<script src="js/vendor/jquery-3.3.1.min.js"></script>
+		<script src="udsu_b1_L4_v2_190701.js"></script>
+		<script src="udsu_b1_L4_v2_190701_mv_csv.js"></script>
+
+		<script type="text/javascript" src="js/vendor/toGif/LZWEncoder.js"></script>
+		<script type="text/javascript" src="js/vendor/toGif/NeuQuant.js"></script>
+		<script type="text/javascript" src="js/vendor/toGif/GIFEncoder.js"></script>
+		<script type="text/javascript" src="js/vendor/toGif/b64.js"></script>
+
+		<script src="js/BASE_SETTINGS.js"></script>
+
+		<script src="js/application/mathem/Mathem.js"></script>
+		<script src="js/application/canvas/Canvas.js"></script>
+		<script src="js/application/view/View.js"></script>
+		<script src="js/application/ui/UI.js"></script>
+		<script src="js/application/logic/Logic.js"></script>
+		<script src="js/application/server/Server.js"></script>
+
+		<script src="js/application/app.js"></script>
+
+		<script src="js/main.js"></script>
+	</head>
+	<body>
+		<div class="app_container">
+			<main class="app_main">
+				<div class="floor_statistics">
+					<h1 class="sidebar_header">Данные</h1>
+					<div class="statistics_container">
+						<div class="statistics_info" id="level">d</div>
+						<div class="statistics_info" id="sign">d</div>
+						<div class="statistics_info" id="name">d</div>
+						<div class="statistics_info" id="id">d</div>
+						<div class="statistics_info" id="numPeople">d</div>
+						<div class="statistics_info" id="area">d</div>
+					</div>
+				</div>
+				<div id="canvas_container" class="floor_image">
+					<canvas class="canvas" id="field" width="500" height="500"></canvas>
+				</div>
+			</main>
+			<aside class="app_controler">
+				<div class="btn_container">
+					<div class="button">
+						<i class="fas fa-pause" id="pause"></i>
+					</div>
+					<div class="button">
+						<i class="fas fa-play" id="play"></i>
+					</div>
+					<div class="button">
+						<i class="fas fa-arrow-down" id="speedDown"></i>
+					</div>
+					<div class="button">
+						<i class="fas fa-arrow-up" id="speedUp"></i>
+					</div>
+				</div>
+				<div class="info_container">
+					<div class="moving_time space" id="movingTime">
+						Длительность движения: 5 сек
+					</div>
+					<div class="person_count" id="personCount">Человек в здании: 228</div>
+					<div class="person_exited" id="personExited">Человек вышло: 18</div>
+				</div>
+			</aside>
+		</div>
+	</body>
+</html>
