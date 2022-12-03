@@ -19,15 +19,13 @@ const bim_json_object_t *bim_json_copy(const bim_json_object_t *bim_object) {
     bim_json_object_t *bim;
 
     uint8_t levels_count;
-    bim_json_level_t *levels = (bim_json_level_t *) NULL;
-    bim_json_address_t *address = (bim_json_address_t *) NULL;
 
     bim = (bim_json_object_t *) malloc(sizeof(bim_json_object_t));
     if (!bim) {
         LOG_ERROR("Не удалось выделить память для структуры `bim_json_object_t` при копировании");
         return NULL;
     }
-    levels = (bim_json_level_t *) malloc(sizeof(bim_json_level_t));
+    bim_json_level_t *levels = (bim_json_level_t *) malloc(sizeof(bim_json_level_t));
     if (!levels) {
         LOG_ERROR("Не удалось выделить память для структуры `bim_json_level_t` при копировании");
         free(bim);
@@ -35,7 +33,7 @@ const bim_json_object_t *bim_json_copy(const bim_json_object_t *bim_object) {
     }
     levels_count = bim_object->numoflevels;
 
-    address = (bim_json_address_t *) malloc(sizeof(bim_json_address_t));
+    bim_json_address_t *address = (bim_json_address_t *) malloc(sizeof(bim_json_address_t));
     if (!address) {
         free(levels);
         free(bim);
