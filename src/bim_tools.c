@@ -551,15 +551,15 @@ void bim_tools_set_people_to_zone(bim_zone_t *zone, float num_of_people) {
     zone->numofpeople = num_of_people;
 }
 
-double bim_tools_get_numofpeople(const bim_t *const bim) {
-    double numofpeople = 0;
+double bim_tools_get_num_of_people(const bim_t *const bim) {
+    double num_of_people = 0;
     for (size_t i = 0; i < bim->numoflevels; i++) {
         for (size_t j = 0; j < bim->levels[i].numofzones; j++) {
             const bim_zone_t *zone = &bim->levels[i].zones[j];
-            numofpeople += zone->numofpeople;
+            num_of_people += zone->numofpeople;
         }
     }
-    return numofpeople;
+    return num_of_people;
 }
 
 double bim_tools_get_area_bim(const bim_t *const bim) {

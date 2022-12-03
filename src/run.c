@@ -126,7 +126,7 @@ void run() {
             if (num_of_people <= remainder) break;
         }
 
-        double num_of_evacuated_people = bim_tools_get_numofpeople(bim);
+        double num_of_evacuated_people = bim_tools_get_num_of_people(bim);
         double evacuation_time = evac_get_time_m();
         LOG_INFO("Длительность эвакуации: %.2f с. (%.2f мин.)", evac_get_time_s(),
                  evacuation_time);
