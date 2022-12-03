@@ -20,7 +20,7 @@ static double evac_density_min;//= 0.1;  // чел/м^2
 static double evac_density_max;//= 5;    // чел/м^2
 static double evac_modeling_step;//= 0.01; // мин
 
-static double _evac_time = 0;
+static double evac_time = 0;
 
 void evac_def_modeling_step(const bim_t *bim) {
     double area = bim_tools_get_area_bim(bim);
@@ -77,13 +77,13 @@ static double speed_at_exit(const bim_zone_t *receiving_zone,  // принима
     double zone_speed = speed_in_element(receiving_zone, giver_zone);
     double density_in_giver_element = giver_zone->numofpeople / giver_zone->area;
     double transition_speed = speed_through_transit_rust(transit_width, density_in_giver_element,
-                                                    evac_speed_max);
+                                                         evac_speed_max);
     double exit_speed = fmin(zone_speed, transition_speed);
 
     return exit_speed;
 }
 
-static double change_numofpeople(const bim_zone_t *giver_zone,
+static double change_num_of_people(const bim_zone_t *giver_zone,
                                  double transit_width,
                                  double speed_at_exit)     // Скорость перехода в принимающую зону
 {
@@ -130,26 +130,26 @@ static double part_people_flow(const bim_zone_t *receiving_zone,  // прини�
 
     // Кол. людей, которые могут покинуть помещение
     double part_of_people_flow = (density_in_giver_zone > density_min_giver_zone)
-                                 ? change_numofpeople(giver_zone, door_width, speedatexit)
+                                 ? change_num_of_people(giver_zone, door_width, speedatexit)
                                  : people_in_giver_zone;
 
     // Т.к. зона вне здания принята безразмерной,
     // в нее может войти максимально возможное количество человек
     // Все другие зоны могут принять ограниченное количество человек.
     // Т.о. нужно проверить может ли принимающая зона вместить еще людей.
-    // capacity_reciving_zone - количество людей, которое еще может
+    // capacity_receiving_zone - количество людей, которое еще может
     // вместиться до достижения максимальной плотности
     // => если может вместить больше, чем может выйти, то вмещает всех вышедших,
     // иначе вмещает только возможное количество.
-    double max_numofpeople = evac_density_max * receiving_zone->area;
-    double capacity_reciving_zone = max_numofpeople - receiving_zone->numofpeople;
+    double max_num_of_people = evac_density_max * receiving_zone->area;
+    double capacity_receiving_zone = max_num_of_people - receiving_zone->numofpeople;
     // Такая ситуация возникает при плотности в принимающем помещении более Dmax чел./м2
-    // Фактически capacity_reciving_zone < 0 означает, что помещение не может принять людей
-    if (capacity_reciving_zone < 0) {
+    // Фактически capacity_receiving_zone < 0 означает, что помещение не может принять людей
+    if (capacity_receiving_zone < 0) {
         return 0;
     }
-    return (capacity_reciving_zone > part_of_people_flow) ? part_of_people_flow
-                                                          : capacity_reciving_zone;
+    return (capacity_receiving_zone > part_of_people_flow) ? part_of_people_flow
+                                                          : capacity_receiving_zone;
 }
 
 static void reset_zones(const ArrayList *zones) {
@@ -168,11 +168,11 @@ static void reset_transits(const ArrayList *transits) {
     }
 }
 
-static int elementideq_callback(const ArrayListValue value1, const ArrayListValue value2) {
+static int element_id_eq_callback(ArrayListValue value1, ArrayListValue value2) {
     return ((bim_zone_t *) value1)->id == ((bim_zone_t *) value2)->id;
 }
 
-static int potentialcmp_callback(const ArrayListValue value1, const ArrayListValue value2) {
+static int potential_cmp_callback(ArrayListValue value1, ArrayListValue value2) {
     return ((bim_zone_t *) value1)->potential < ((bim_zone_t *) value2)->potential;
 }
 
@@ -205,12 +205,12 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
             transit->is_visited = true;
 
             if (giver_zone->numofoutputs > 1 && !giver_zone->is_blocked
-                && arraylist_index_of(zones_to_process, elementideq_callback, giver_zone) < 0) {
+                && arraylist_index_of(zones_to_process, element_id_eq_callback, giver_zone) < 0) {
                 arraylist_append(zones_to_process, giver_zone);
             }
         }
 
-        arraylist_sort(zones_to_process, potentialcmp_callback);
+        arraylist_sort(zones_to_process, potential_cmp_callback);
 
         if (zones_to_process->length > 0) {
             receiving_zone = zones_to_process->data[0];
@@ -242,17 +242,17 @@ void evac_set_modeling_step(double val) {
 }
 
 double evac_get_time_s() {
-    return _evac_time * 60;
+    return evac_time * 60;
 }
 
 double evac_get_time_m() {
-    return _evac_time;
+    return evac_time;
 }
 
 void evac_time_inc() {
-    _evac_time += evac_modeling_step;
+    evac_time += evac_modeling_step;
 }
 
 void evac_time_reset() {
-    _evac_time = 0;
+    evac_time = 0;
 }
