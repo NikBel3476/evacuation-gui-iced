@@ -51,9 +51,9 @@ struct edge {
     size_t id;
 };
 
-bim_graph_t *bim_graph_new(const bim_t *const bim);
+bim_graph_t *bim_graph_new(const bim_t *bim);
 
-void bim_graph_print(const bim_graph_t *const graph);
+void bim_graph_print(const bim_graph_t *graph);
 
 void bim_graph_free(bim_graph_t *graph);
 

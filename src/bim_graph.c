@@ -15,12 +15,12 @@
 
 #include "bim_graph.h"
 
-bim_graph_t *_graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count);
+bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count);
 
-void _graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc callback,
-                         bim_edge_t edges[], const ArrayList *const zones);
+void graph_create_edges(const ArrayList *list_doors, ArrayListEqualFunc callback,
+                        bim_edge_t edges[], const ArrayList *zones);
 
-int32_t _arraylist_equal_callback(const ArrayListValue value1, const ArrayListValue value2);
+int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2);
 
 bim_graph_t *bim_graph_new(const bim_t *const bim) {
     bim_edge_t *edges = NULL;
@@ -29,10 +29,10 @@ bim_graph_t *bim_graph_new(const bim_t *const bim) {
         return NULL;
     }
 
-    _graph_create_edges(bim->transits, _arraylist_equal_callback, edges, bim->zones);
+    graph_create_edges(bim->transits, arraylist_equal_callback, edges, bim->zones);
 
     bim_graph_t *bim_graph = NULL;
-    bim_graph = _graph_create(edges, bim->transits->length, bim->zones->length);
+    bim_graph = graph_create(edges, bim->transits->length, bim->zones->length);
     free(edges);
     if (!bim_graph) {
         return NULL;
@@ -65,7 +65,7 @@ void bim_graph_free(bim_graph_t *graph) {
 }
 
 // Function to create an adjacency list from specified edges
-bim_graph_t *_graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count) {
+bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count) {
     if (!node_count || !edge_count) {
         return NULL;
     }
@@ -90,9 +90,9 @@ bim_graph_t *_graph_create(const bim_edge_t edges[], size_t edge_count, size_t n
     }
     graph->node_count = node_count;
 
-    size_t src = 0;
-    size_t dest = 0;
-    size_t eid = 0;
+    size_t src;
+    size_t dest;
+    size_t eid;
     // add edges to the directed graph one by one
     for (size_t i = 0; i < edge_count; ++i) {
         const bim_edge_t *edge = &edges[i];
@@ -139,8 +139,8 @@ bim_graph_t *_graph_create(const bim_edge_t edges[], size_t edge_count, size_t n
     return graph;
 }
 
-void _graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc callback,
-                         bim_edge_t edges[], const ArrayList *const zones) {
+void graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc callback,
+                        bim_edge_t edges[], const ArrayList *const zones) {
     for (size_t i = 0; i < list_doors->length; ++i) {
         bim_edge_t *edge = &edges[i];
         edge->id = i;
@@ -155,7 +155,7 @@ void _graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc c
     }
 }
 
-int32_t _arraylist_equal_callback(const ArrayListValue value1, const ArrayListValue value2) {
+int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2) {
     const bim_zone_t *element1 = (bim_zone_t *) value1;
     const bim_transit_t *element2 = (bim_transit_t *) value2;
 

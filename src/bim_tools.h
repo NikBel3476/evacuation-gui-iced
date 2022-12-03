@@ -32,7 +32,7 @@ bim_level_element_t, и функции для работы с моделью з�
 #include <stdbool.h>
 #include <float.h>
 
-#include "arraylist.h"          ///< https://github.com/fragglet/c-algorithms
+#include "../thirdparty/arraylist/arraylist.h"          ///< https://github.com/fragglet/c-algorithms
 #include "bim_json_object/src/bim_json_object_rust.h"
 
 #define OUTSIDE_IDX(x) (x->zones->length - 1)
@@ -94,9 +94,9 @@ typedef struct {
     uint8_t numoflevels;    ///< Количество уровней в здании
 } bim_t;
 
-bim_t *bim_tools_new(const bim_json_object_t *const bim_json);
+bim_t *bim_tools_new(const bim_json_object_t *bim_json);
 
-bim_t *bim_tools_copy(const bim_t *const bim);
+bim_t *bim_tools_copy(const bim_t *bim);
 
 void bim_tools_free(bim_t *bim);
 
@@ -104,11 +104,21 @@ void bim_tools_free(bim_t *bim);
 void bim_tools_set_people_to_zone(bim_zone_t *element, float num_of_people);
 
 // Подсчитывает количество людей в здании по расширенной структуре
-double bim_tools_get_numofpeople(const bim_t *const bim);
+double bim_tools_get_num_of_people(const bim_t *bim);
 
 //Подсчитывает суммарную площадь элементов всего здания
-double bim_tools_get_area_bim(const bim_t *const bim);
+double bim_tools_get_area_bim(const bim_t *bim);
 
 void bim_tools_print_element(const bim_zone_t *zone);
+
+void list_sort(ArrayList *list, ArrayListCompareFunc compare_func);
+
+int32_t zone_id_cmp(ArrayListValue value1, ArrayListValue value2);
+
+int32_t transit_id_cmp(ArrayListValue value1, ArrayListValue value2);
+
+bim_zone_t *outside_init(const bim_json_object_t *bim_json);
+
+int calculate_transits_width(ArrayList *zones, ArrayList *transits);
 
 #endif //BIM_TOOLS_H
