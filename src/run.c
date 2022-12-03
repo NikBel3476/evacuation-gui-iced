@@ -16,8 +16,8 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include "logger.h"
-#include "loggerconf.h"
+#include "../thirdparty/c-logger/src/logger.h"
+#include "../thirdparty/c-logger/src/loggerconf.h"
 
 #include "bim_json_object.h"
 #include "bim_json_object/src/bim_json_object_rust.h"

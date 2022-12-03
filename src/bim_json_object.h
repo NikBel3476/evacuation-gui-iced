@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "bim_polygon_tools.h"
-#include "logger.h"
+#include "../thirdparty/c-logger/src/logger.h"
 #include "bim_uuid.h"
 
 /// Набор возможных типов элеметов здания:

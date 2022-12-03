@@ -14,7 +14,7 @@
  */
 
 #include "bim_polygon_tools.h"
-#include "triangle.h"
+#include "../thirdparty/triangle/triangle.h"
 
 // https://userpages.umbc.edu/~rostamia/cbook/triangle.html
 /// @return Массив номеров точек треугольников
