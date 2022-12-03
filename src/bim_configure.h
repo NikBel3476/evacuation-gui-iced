@@ -21,8 +21,6 @@
 #include <string.h>
 #include "bim_uuid.h"
 
-#define UUID_SIZE 36 + 1
-
 enum distribution_type {
     distribution_from_bim,
     distribution_uniform
