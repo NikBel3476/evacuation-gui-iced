@@ -1,3 +1,4 @@
 hard_tabs = true
 indent_style = "Block"
 imports_indent = "Block"
+trailing_comma = "Never"
