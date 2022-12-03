@@ -15,7 +15,7 @@
 #pragma once
 
 /// Количество символов в UUID + NUL символ
-#define UUID_SIZE 36 + 1
+#define UUID_SIZE (36 + 1)
 
 typedef struct {
     const char x[UUID_SIZE];
