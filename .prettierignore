@@ -16,3 +16,5 @@ src-ui/peopleTraffic/
 **/*.json
 **/*.md
 **/*.yml
+
+.clang-tidy
