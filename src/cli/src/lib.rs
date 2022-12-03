@@ -1,7 +1,7 @@
 use std::error::Error;
 
 pub struct CliParams {
-	pub scenario_file: String
+	pub scenario_file: String,
 }
 
 pub fn read_cli_args() -> Result<CliParams, Box<dyn Error>> {
@@ -13,11 +13,14 @@ pub fn read_cli_args() -> Result<CliParams, Box<dyn Error>> {
 	}
 
 	if args[1] == "--help" || args[1] == "-h" {
-		println!("Использование: {} <путь к файлу сценария моделирования>", args[0]);
+		println!(
+			"Использование: {} <путь к файлу сценария моделирования>",
+			args[0]
+		);
 		std::process::exit(0);
 	}
 
 	Ok(CliParams {
-		scenario_file: args[1].clone()
+		scenario_file: args[1].clone(),
 	})
 }
