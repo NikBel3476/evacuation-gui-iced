@@ -13,6 +13,10 @@ export class App {
 	canvas: Canvas;
 	mathem: Mathem;
 	data;
+	view: View;
+	ui: UI;
+	logic: Logic;
+	encoder;
 
 	constructor() {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
@@ -102,7 +106,7 @@ export class App {
 			this.logic.updateBuildsInCamera();
 			this.logic.updatePeopleInCamera();
 		});
-		document.getElementById('canvas_container').addEventListener('wheel', event => {
+		document.getElementById('canvas_container')!.addEventListener('wheel', event => {
 			let dir = Math.sign(event.deltaY);
 			switch (dir) {
 				case -1: // Увеличить zoom
@@ -166,7 +170,7 @@ export class App {
 	}
 
 	// Инициализация настроек
-	gifInit(delayTimer) {
+	gifInit(delayTimer: number) {
 		this.encoder.start();
 		this.encoder.setRepeat(0);
 		this.encoder.setDelay(delayTimer);
