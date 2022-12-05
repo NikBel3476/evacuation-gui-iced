@@ -32,22 +32,21 @@ export class UI {
 				Math.floor(this.mathem.toCalculateBuildArea(this.data.choiceBuild)) +
 				' м^2';
 		}
+
 		document.getElementById('movingTime')!.textContent =
 			'Длительность движения, сек: ' + this.data.time;
-
 		document.getElementById('personCount')!.textContent =
 			'Количество людей в здании, чел: ' + this.data.label;
 		document.getElementById('personExited')!.textContent =
 			'Человек вышло: ' + this.data.exitedLabel;
 	}
 
-	getPeopleCountInChoiceRoom() {
-		for (let i = 0; i < this.data.peopleCoordinate.length; i++) {
-			if (this.data.choiceBuild.Id === this.data.peopleCoordinate[i].uuid) {
-				return this.data.peopleCoordinate[i].XY.length;
-			}
-		}
-		return 0;
+	getPeopleCountInChoiceRoom(): number {
+		const coordinates = this.data.peopleCoordinate.find(
+			coordinate => this.data.choiceBuild.Id === coordinate.uuid
+		);
+
+		return coordinates.length || 0;
 	}
 
 	init() {
@@ -62,14 +61,14 @@ export class UI {
 		document.getElementById('movingTime')!.textContent =
 			'Длительность движения, сек: ' + this.data.time;
 
-		document.getElementById('pause')!.addEventListener('click', () => {
-			if (this.data.timerTimeDataUpdatePause == false) {
+		document.getElementById('pause')!.addEventListener('click', _ => {
+			if (!this.data.timerTimeDataUpdatePause) {
 				this.data.timerTimeDataUpdatePause = true;
 				this.data.isGifStop = true;
 			}
 		});
-		document.getElementById('play')!.addEventListener('click', () => {
-			if (this.data.timerTimeDataUpdatePause == true) {
+		document.getElementById('play')!.addEventListener('click', _ => {
+			if (this.data.timerTimeDataUpdatePause) {
 				this.data.timerTimeDataUpdatePause = false;
 			}
 		});
