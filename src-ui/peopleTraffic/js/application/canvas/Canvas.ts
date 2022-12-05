@@ -64,8 +64,8 @@ export class Canvas {
 		this.memContext.stroke();
 	}
 
-	line_(x: number, y: number, color: CanvasFillStrokeStyles['strokeStyle']) {
-		this.memContext.strokeStyle = color || 'black';
+	line_(x: number, y: number, color: CanvasFillStrokeStyles['strokeStyle'] = 'black') {
+		this.memContext.strokeStyle = color;
 		this.memContext.lineTo(x, y);
 		this.memContext.stroke();
 	}
@@ -135,8 +135,8 @@ export class Canvas {
 		this.context.drawImage(this.memCanvas, 0, 0);
 	}
 
-	clear(color: CanvasFillStrokeStyles['fillStyle']) {
-		this.memContext.fillStyle = color || '#EAF0F1';
+	clear(color: CanvasFillStrokeStyles['fillStyle'] = '#EAF0F1') {
+		this.memContext.fillStyle = color;
 		this.memContext.fillRect(0, 0, this.memCanvas.width, this.memCanvas.height);
 	}
 

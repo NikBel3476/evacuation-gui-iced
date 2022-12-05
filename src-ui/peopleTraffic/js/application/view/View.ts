@@ -1,14 +1,19 @@
+import { Canvas } from '../canvas/Canvas';
+import { Mathem } from '../mathem/Mathem';
+
+type ViewConstructorParams = {
+	canvas: Canvas;
+	data: any;
+	mathem: Mathem;
+};
+
 export class View {
-	canvas;
+	canvas: Canvas;
 	data;
 	struct;
-	mathem;
+	mathem: Mathem;
 
-	constructor({
-		canvas,
-		data,
-		mathem
-	}) {
+	constructor({ canvas, data, mathem }: ViewConstructorParams) {
 		this.canvas = canvas;
 		this.data = data;
 		this.struct = this.data.struct;
@@ -16,7 +21,7 @@ export class View {
 	}
 
 	// Отрисовка "коробочек" элементов
-	drawBox(coordinates) {
+	drawBox(coordinates: Array<{ x: number; y: number }>) {
 		this.canvas.moveTo(
 			coordinates[0].x * this.data.scale - this.data.cameraXY.x,
 			coordinates[0].y * this.data.scale - this.data.cameraXY.y
