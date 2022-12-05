@@ -1,6 +1,6 @@
 export class Canvas {
 	constructor(options) {
-		this.canvasContainer = document.getElementById('canvas_container'); //я на вермя добавил если что
+		this.canvasContainer = document.getElementById('canvas_container'); //я на время добавил если что
 		this.canvas = document.getElementById(options.ID);
 		this.canvas.width = this.canvasContainer.offsetWidth;
 		this.canvas.height = this.canvasContainer.clientHeight;

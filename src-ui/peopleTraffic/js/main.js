@@ -1,5 +1,5 @@
 import {App} from "./application/app.js";
 
-$(document).ready(() => {
+window.onload = () => {
 	const app = new App();
-});
+};
