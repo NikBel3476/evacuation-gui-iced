@@ -1,7 +1,7 @@
 export class Mathem {
 	constructor() {}
 
-	toСalculateBuildArea(build) {
+	toCalculateBuildArea(build) {
 		const XY = build.XY[0].points;
 		let s = 0;
 		for (let i = 0; i < XY.length - 1; i++) {
@@ -13,15 +13,15 @@ export class Mathem {
 	}
 
 	toCalculateDensity(build) {
-		const s = this.toСalculateBuildArea(build);
+		const s = this.toCalculateBuildArea(build);
 		const density = build.NumPeople / s;
 		return density;
 	}
 
-	toСalculateRGB(build) {
+	toCalculateRGB(build) {
 		let R = 0;
 		let B = 255;
-		const s = this.toСalculateBuildArea(build);
+		const s = this.toCalculateBuildArea(build);
 		let val = Math.floor(((build.NumPeople / s) * 255) / 5);
 		if (val > 255) {
 			val = 255;
@@ -31,7 +31,7 @@ export class Mathem {
 		return 'rgb(' + R + ',0,' + B + ')';
 	}
 
-	toCalculateMinXY(XY) {
+	toCalculateMinXY(XY: Array<{ x: number; y: number }>) {
 		let minX = XY[0].x;
 		let minY = XY[0].y;
 		for (let i = 1; i < XY.length; i++) {
@@ -45,7 +45,7 @@ export class Mathem {
 		return { x: minX, y: minY };
 	}
 
-	toCalculateMaxXY(XY) {
+	toCalculateMaxXY(XY: Array<{ x: number; y: number }>) {
 		let maxX = XY[0].x;
 		let maxY = XY[0].y;
 		for (let i = 1; i < XY.length; i++) {
@@ -64,7 +64,7 @@ export class Mathem {
 	}
 
 	// Проверка на пересечение
-	inPoly(x, y, xp, yp) {
+	inPoly(x: number, y: number, xp: number[], yp: number[]) {
 		const npol = xp.length;
 		let j = npol - 1;
 		let c = 0;
