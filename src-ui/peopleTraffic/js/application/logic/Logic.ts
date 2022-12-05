@@ -1,15 +1,29 @@
 export class Logic {
-	constructor(options) {
-		this.view = options.view;
-		this.ui = options.ui;
-		this.data = options.data;
+	view;
+	ui;
+	data;
+	struct;
+	level;
+	choiceBuild;
+	scale;
+	mathem;
+
+	constructor({
+		view,
+		ui,
+		data,
+		mathem
+	}) {
+		this.view = view;
+		this.ui = ui;
+		this.data = data;
 
 		this.struct = this.data.struct;
 		this.level = this.data.level;
 		this.choiceBuild = this.data.choiceBuild;
 		this.scale = this.data.scale;
 
-		this.mathem = options.mathem;
+		this.mathem = mathem;
 	}
 
 	/**** ЛОГИКА VIEW ****/

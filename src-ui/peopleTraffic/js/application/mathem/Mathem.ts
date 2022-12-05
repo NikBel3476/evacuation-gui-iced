@@ -59,7 +59,7 @@ export class Mathem {
 		return { x: maxX, y: maxY };
 	}
 
-	getRandomArbitrary(min, max) {
+	getRandomArbitrary(min: number, max: number) {
 		return Math.random() * (max - min) + min;
 	}
 

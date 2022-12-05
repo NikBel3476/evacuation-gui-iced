@@ -1,9 +1,18 @@
 export class View {
-	constructor(options) {
-		this.canvas = options.canvas;
-		this.data = options.data;
+	canvas;
+	data;
+	struct;
+	mathem;
+
+	constructor({
+		canvas,
+		data,
+		mathem
+	}) {
+		this.canvas = canvas;
+		this.data = data;
 		this.struct = this.data.struct;
-		this.mathem = options.mathem;
+		this.mathem = mathem;
 	}
 
 	// Отрисовка "коробочек" элементов

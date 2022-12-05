@@ -1,4 +1,12 @@
 export class BASE_SETTINGS {
+	CANVAS: {
+		ID: string,
+		WIDTH: number,
+		HEIGHT: number
+	};
+	SERVER;
+	GIFGENERATOR;
+
 	constructor() {
 		this.CANVAS = {
 			ID: 'field',

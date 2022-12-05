@@ -1,7 +1,15 @@
 export class Canvas {
-	constructor(options) {
+	canvasContainer;
+	canvas;
+	context;
+	x0;
+	y0;
+	memCanvas;
+	memContext;
+
+	constructor({ ID }) {
 		this.canvasContainer = document.getElementById('canvas_container'); //я на время добавил если что
-		this.canvas = document.getElementById(options.ID);
+		this.canvas = document.getElementById(ID);
 		this.canvas.width = this.canvasContainer.offsetWidth;
 		this.canvas.height = this.canvasContainer.clientHeight;
 		this.context = this.canvas.getContext('2d');

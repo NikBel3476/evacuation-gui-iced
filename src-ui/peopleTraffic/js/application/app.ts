@@ -1,13 +1,19 @@
 import {Server} from './server/Server.js';
-import {timeData} from '../../udsu_b1_L4_v2_190701_mv_csv.js';
+import {timeData} from '../../udsu_b1_L4_v2_190701_mv_csv';
 import {View} from "./view/View.js";
 import {UI} from "./ui/UI.js";
 import {Mathem} from "./mathem/Mathem.js";
 import {Logic} from "./logic/Logic.js";
 import {Canvas} from "./canvas/Canvas.js";
-import {BASE_SETTINGS} from "../BASE_SETTINGS.js";
+import {BASE_SETTINGS} from "../BASE_SETTINGS";
 
 export class App {
+	BASE_SETTINGS;
+	server;
+	canvas;
+	mathem;
+	data;
+
 	constructor() {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
 		this.BASE_SETTINGS = new BASE_SETTINGS();
