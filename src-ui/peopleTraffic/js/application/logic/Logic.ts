@@ -135,8 +135,8 @@ export class Logic {
 			arrayX.push(XY[i].x);
 			arrayY.push(XY[i].y);
 		}
-		const minXY = this.mathem.toCalculateMinXY(XY);
-		const maxXY = this.mathem.toCalculateMaxXY(XY);
+		const minXY = this.mathem.findMinCoordinates(XY);
+		const maxXY = this.mathem.findMaxCoordinates(XY);
 		const diagonalXY = { x: maxXY.x - minXY.x, y: maxXY.y - minXY.y };
 		const centreXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
 		const peopleCount = Math.floor(density);

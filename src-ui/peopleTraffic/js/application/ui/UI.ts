@@ -29,7 +29,7 @@ export class UI {
 				'Название: ' + this.data.choiceBuild.Name;
 			document.getElementById('area')!.textContent =
 				'Площадь: ' +
-				Math.floor(this.mathem.toCalculateBuildArea(this.data.choiceBuild)) +
+				Math.floor(this.mathem.calculateBuildArea(this.data.choiceBuild)) +
 				' м^2';
 		}
 

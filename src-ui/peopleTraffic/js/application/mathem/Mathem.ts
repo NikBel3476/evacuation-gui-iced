@@ -1,70 +1,49 @@
 export class Mathem {
 	constructor() {}
 
-	toCalculateBuildArea(build) {
-		const XY = build.XY[0].points;
-		let s = 0;
-		for (let i = 0; i < XY.length - 1; i++) {
-			s += XY[i].x * XY[i + 1].y - XY[i].y * XY[i + 1].x;
-		}
-		s /= 2;
-		s = Math.abs(s);
-		return s;
+	calculateBuildArea(build): number {
+		const points = build.XY[0].points;
+		return points
+			.slice(0, -1)
+			.reduce(
+				(area, point, i) =>
+					area + Math.abs((point.x - points[i + 1].x) * (point.y - points[i + 1].y)),
+				0
+			);
 	}
 
-	toCalculateDensity(build) {
-		const s = this.toCalculateBuildArea(build);
-		const density = build.NumPeople / s;
-		return density;
+	calculateDensity(build): number {
+		return build.NumPeople / this.calculateBuildArea(build);
 	}
 
-	toCalculateRGB(build) {
-		let R = 0;
-		let B = 255;
-		const s = this.toCalculateBuildArea(build);
-		let val = Math.floor(((build.NumPeople / s) * 255) / 5);
-		if (val > 255) {
-			val = 255;
-		}
-		R += val;
-		B -= val;
-		return 'rgb(' + R + ',0,' + B + ')';
+	calculateRGB(build): string {
+		const area = this.calculateBuildArea(build);
+		let val = Math.floor(((build.NumPeople / area) * 255) / 5);
+		val = val > 255 ? 255 : val;
+
+		return `rgb(${val},0,${val - 255})`;
 	}
 
-	toCalculateMinXY(XY: Array<{ x: number; y: number }>) {
-		let minX = XY[0].x;
-		let minY = XY[0].y;
-		for (let i = 1; i < XY.length; i++) {
-			if (minX > XY[i].x) {
-				minX = XY[i].x;
-			}
-			if (minY > XY[i].y) {
-				minY = XY[i].y;
-			}
-		}
-		return { x: minX, y: minY };
+	findMinCoordinates(XY: Array<{ x: number; y: number }>): { x: number; y: number } {
+		return {
+			x: Math.min(...XY.map(point => point.x)),
+			y: Math.min(...XY.map(point => point.y))
+		};
 	}
 
-	toCalculateMaxXY(XY: Array<{ x: number; y: number }>) {
-		let maxX = XY[0].x;
-		let maxY = XY[0].y;
-		for (let i = 1; i < XY.length; i++) {
-			if (maxX < XY[i].x) {
-				maxX = XY[i].x;
-			}
-			if (maxY < XY[i].y) {
-				maxY = XY[i].y;
-			}
-		}
-		return { x: maxX, y: maxY };
+	findMaxCoordinates(XY: Array<{ x: number; y: number }>): { x: number; y: number } {
+		return {
+			x: Math.max(...XY.map(point => point.x)),
+			y: Math.max(...XY.map(point => point.y))
+		};
 	}
 
-	getRandomArbitrary(min: number, max: number) {
+	getRandomArbitrary(min: number, max: number): number {
 		return Math.random() * (max - min) + min;
 	}
 
 	// Проверка на пересечение
-	inPoly(x: number, y: number, xp: number[], yp: number[]) {
+	inPoly(x: number, y: number, xp: number[], yp: number[]): number {
 		const npol = xp.length;
 		let j = npol - 1;
 		let c = 0;
