@@ -1,23 +1,23 @@
-import {Server} from './server/Server.js';
-import {timeData} from '../../udsu_b1_L4_v2_190701_mv_csv';
-import {View} from "./view/View.js";
-import {UI} from "./ui/UI.js";
-import {Mathem} from "./mathem/Mathem.js";
-import {Logic} from "./logic/Logic.js";
-import {Canvas} from "./canvas/Canvas.js";
-import {BASE_SETTINGS} from "../BASE_SETTINGS";
+import { Server } from './server/Server.js';
+import { timeData } from '../../udsu_b1_L4_v2_190701_mv_csv';
+import { View } from './view/View.js';
+import { UI } from './ui/UI.js';
+import { Mathem } from './mathem/Mathem.js';
+import { Logic } from './logic/Logic.js';
+import { Canvas } from './canvas/Canvas.js';
+import { BASE_SETTINGS } from '../BASE_SETTINGS';
 
 export class App {
-	BASE_SETTINGS;
-	server;
-	canvas;
-	mathem;
+	BASE_SETTINGS: BASE_SETTINGS;
+	server: Server;
+	canvas: Canvas;
+	mathem: Mathem;
 	data;
 
 	constructor() {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
 		this.BASE_SETTINGS = new BASE_SETTINGS();
-		this.server = new Server(this.BASE_SETTINGS.SERVER);
+		this.server = new Server();
 		this.canvas = new Canvas(this.BASE_SETTINGS.CANVAS);
 		this.mathem = new Mathem();
 		this.data = {
@@ -80,10 +80,7 @@ export class App {
 			switch (event.keyCode) {
 				// Повысить этаж
 				case 38:
-					this.data.level +=
-						this.data.level + 1 < this.data.struct.Level.length
-							? 1
-							: 0;
+					this.data.level += this.data.level + 1 < this.data.struct.Level.length ? 1 : 0;
 					break;
 				// Понизить этаж
 				case 40:
@@ -105,21 +102,19 @@ export class App {
 			this.logic.updateBuildsInCamera();
 			this.logic.updatePeopleInCamera();
 		});
-		document
-			.getElementById('canvas_container')
-			.addEventListener('wheel', event => {
-				let dir = Math.sign(event.deltaY);
-				switch (dir) {
-					case -1: // Увеличить zoom
-						this.data.scale += 0.5;
-						break;
-					case +1: // Уменьшить zoom
-						this.data.scale -= 0.5;
-						break;
-				}
-				this.logic.updateBuildsInCamera();
-				this.logic.updatePeopleInCamera();
-			});
+		document.getElementById('canvas_container').addEventListener('wheel', event => {
+			let dir = Math.sign(event.deltaY);
+			switch (dir) {
+				case -1: // Увеличить zoom
+					this.data.scale += 0.5;
+					break;
+				case +1: // Уменьшить zoom
+					this.data.scale -= 0.5;
+					break;
+			}
+			this.logic.updateBuildsInCamera();
+			this.logic.updatePeopleInCamera();
+		});
 		this.canvas.canvas.addEventListener('mousedown', () => {
 			this.data.canMove = true;
 		});
@@ -139,10 +134,7 @@ export class App {
 		this.gifInit(1000); // Инициализация настроек
 
 		let timerRenderId = setInterval(() => this.updateField(), 100);
-		let timerTimeDataUpdateId = setInterval(
-			() => this.updateTimeData(),
-			500
-		);
+		let timerTimeDataUpdateId = setInterval(() => this.updateTimeData(), 500);
 		// Закончить GIF и создать её
 		// let timerGifFinish = setTimeout(() => {
 		//     this.data.gifFinish = true;
@@ -178,10 +170,7 @@ export class App {
 		this.encoder.start();
 		this.encoder.setRepeat(0);
 		this.encoder.setDelay(delayTimer);
-		this.encoder.setSize(
-			this.canvas.canvas.width,
-			this.canvas.canvas.height
-		);
+		this.encoder.setSize(this.canvas.canvas.width, this.canvas.canvas.height);
 	}
 
 	// Добавить новый кадр
