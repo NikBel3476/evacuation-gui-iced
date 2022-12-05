@@ -1,4 +1,4 @@
-class UI {
+export class UI {
 	constructor(options) {
 		this.data = options.data;
 		this.struct = this.data.struct;

@@ -1,4 +1,4 @@
-class Canvas {
+export class Canvas {
 	constructor(options) {
 		this.canvasContainer = document.getElementById('canvas_container'); //я на вермя добавил если что
 		this.canvas = document.getElementById(options.ID);

@@ -1,4 +1,4 @@
-class Mathem {
+export class Mathem {
 	constructor() {}
 
 	toСalculateBuildArea(build) {

@@ -1,4 +1,13 @@
-class App {
+import {Server} from './server/Server.js';
+import {timeData} from '../../udsu_b1_L4_v2_190701_mv_csv.js';
+import {View} from "./view/View.js";
+import {UI} from "./ui/UI.js";
+import {Mathem} from "./mathem/Mathem.js";
+import {Logic} from "./logic/Logic.js";
+import {Canvas} from "./canvas/Canvas.js";
+import {BASE_SETTINGS} from "../BASE_SETTINGS.js";
+
+export class App {
 	constructor() {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
 		this.BASE_SETTINGS = new BASE_SETTINGS();

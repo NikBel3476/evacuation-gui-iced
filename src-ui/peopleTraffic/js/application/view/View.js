@@ -1,4 +1,4 @@
-class View {
+export class View {
 	constructor(options) {
 		this.canvas = options.canvas;
 		this.data = options.data;

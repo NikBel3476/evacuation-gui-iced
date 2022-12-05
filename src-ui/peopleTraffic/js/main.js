@@ -1,4 +1,5 @@
+import {App} from "./application/app.js";
+
 $(document).ready(() => {
-	var struct;
 	const app = new App();
 });

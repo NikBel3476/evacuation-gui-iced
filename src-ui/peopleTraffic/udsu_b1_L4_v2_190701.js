@@ -1,4 +1,4 @@
-var data = {
+export const data = {
 	NameBuilding:
 		'\u0417\u0434\u0430\u043d\u0438\u0435 \u043d\u043e\u043c\u0435\u0440 1',
 	Level: [

@@ -1,9 +1,7 @@
-class Server {
-	constructor(options) {
-		this.data = data;
-	}
+import {data} from "../../../udsu_b1_L4_v2_190701.js";
 
-	getStruct() {
-		return this.strcut.app;
+export class Server {
+	constructor() {
+		this.data = data;
 	}
 }

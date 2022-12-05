@@ -1,4 +1,4 @@
-class Logic {
+export class Logic {
 	constructor(options) {
 		this.view = options.view;
 		this.ui = options.ui;

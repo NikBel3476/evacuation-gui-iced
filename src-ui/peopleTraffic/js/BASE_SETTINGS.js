@@ -1,4 +1,4 @@
-class BASE_SETTINGS {
+export class BASE_SETTINGS {
 	constructor() {
 		this.CANVAS = {
 			ID: 'field',
