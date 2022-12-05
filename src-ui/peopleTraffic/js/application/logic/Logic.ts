@@ -1,19 +1,25 @@
+import { View } from '../view/View';
+import { UI } from '../ui/UI';
+import { Mathem } from '../mathem/Mathem';
+
+type LogicConstructorParams = {
+	view: View;
+	ui: UI;
+	data: any;
+	mathem: Mathem;
+};
+
 export class Logic {
-	view;
-	ui;
+	view: View;
+	ui: UI;
 	data;
 	struct;
 	level;
 	choiceBuild;
 	scale;
-	mathem;
+	mathem: Mathem;
 
-	constructor({
-		view,
-		ui,
-		data,
-		mathem
-	}) {
+	constructor({ view, ui, data, mathem }: LogicConstructorParams) {
 		this.view = view;
 		this.ui = ui;
 		this.data = data;
@@ -29,30 +35,23 @@ export class Logic {
 	/**** ЛОГИКА VIEW ****/
 
 	// Проверка объектов находятся ли они в камере
-	isInCamera(XY) {
-		for (let i = 0; i < XY.length; i++) {
-			if (
-				XY[i].x * this.data.scale >= this.data.cameraXY.x &&
-				XY[i].x * this.data.scale <=
-					this.data.cameraXY.x + this.view.canvas.canvas.width &&
-				XY[i].y * this.data.scale >= this.data.cameraXY.y &&
-				XY[i].y * this.data.scale <=
-					this.data.cameraXY.y + this.view.canvas.canvas.height
-			) {
-				return true;
-			}
-		}
-		return false;
+	isInCamera(XY: Array<{ x: number; y: number }>): boolean {
+		return XY.some(point => {
+			return (
+				point.x * this.data.scale >= this.data.cameraXY.x &&
+				point.x * this.data.scale <= this.data.cameraXY.x + this.view.canvas.canvas.width &&
+				point.y * this.data.scale >= this.data.cameraXY.y &&
+				point.y * this.data.scale <= this.data.cameraXY.y + this.view.canvas.canvas.height
+			);
+		});
 	}
 
 	// Обновить список объектов в поле камеры
 	updateBuildsInCamera() {
 		this.data.activeBuilds = [];
 		const builds = this.struct.Level[this.data.level].BuildElement;
-		for (let i = 0; i < builds.length; i++) {
-			if (this.isInCamera(builds[i].XY[0].points)) {
-				this.data.activeBuilds.push(builds[i]);
-			}
+		for (const build of builds) {
+			if (this.isInCamera(build.XY[0].points)) this.data.activeBuilds.push(build);
 		}
 	}
 
@@ -127,7 +126,8 @@ export class Logic {
 		}
 	}
 
-	genPeopleCoordinate(build, density) {
+	// TODO: add type for build parameter
+	genPeopleCoordinate(build, density: number) {
 		const XY = build.XY[0].points;
 		let arrayX = [];
 		let arrayY = [];
@@ -173,7 +173,7 @@ export class Logic {
 	}
 
 	// Движение камеры
-	moveCamera(value, key) {
+	moveCamera(value: number, key: 'x' | 'y') {
 		this.updateBuildsInCamera();
 		this.updatePeopleInCamera();
 		if (key === 'x') {
@@ -192,7 +192,7 @@ export class Logic {
 	}
 
 	// Движение мышки
-	mouseMove(event) {
+	mouseMove(event: MouseEvent) {
 		if (this.data.canMove) {
 			if (event.movementX) {
 				this.moveCamera(event.movementX, 'x');
@@ -203,7 +203,7 @@ export class Logic {
 	}
 
 	// Выбрать объект
-	toChoiceBuild(event) {
+	toChoiceBuild(event: MouseEvent) {
 		const mouseX = event.offsetX + this.data.cameraXY.x;
 		const mouseY = event.offsetY + this.data.cameraXY.y;
 		console.log(mouseX, mouseY);
@@ -211,26 +211,11 @@ export class Logic {
 		for (let i = 0; i < this.data.activeBuilds.length; i++) {
 			let arrayX = [];
 			let arrayY = [];
-			for (
-				let j = 0;
-				j < this.data.activeBuilds[i].XY[0].points.length - 1;
-				j++
-			) {
-				arrayX.push(
-					this.data.activeBuilds[i].XY[0].points[j].x *
-						this.data.scale
-				);
-				arrayY.push(
-					this.data.activeBuilds[i].XY[0].points[j].y *
-						this.data.scale
-				);
+			for (let j = 0; j < this.data.activeBuilds[i].XY[0].points.length - 1; j++) {
+				arrayX.push(this.data.activeBuilds[i].XY[0].points[j].x * this.data.scale);
+				arrayY.push(this.data.activeBuilds[i].XY[0].points[j].y * this.data.scale);
 			}
-			const intersection = this.mathem.inPoly(
-				mouseX,
-				mouseY,
-				arrayX,
-				arrayY
-			);
+			const intersection = this.mathem.inPoly(mouseX, mouseY, arrayX, arrayY);
 			if (intersection != 0 && intersection % 2 != 0) {
 				if (!choiceBuild) {
 					choiceBuild = this.data.activeBuilds[i];
