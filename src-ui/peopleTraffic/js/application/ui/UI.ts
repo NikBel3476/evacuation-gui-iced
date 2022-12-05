@@ -1,9 +1,16 @@
+import { Mathem } from '../mathem/Mathem';
+
+type UIConstructorParams = {
+	data: any;
+	mathem: Mathem;
+};
+
 export class UI {
 	data;
 	struct;
-	mathem;
+	mathem: Mathem;
 
-	constructor({ data, mathem}) {
+	constructor({ data, mathem }: UIConstructorParams) {
 		this.data = data;
 		this.struct = this.data.struct;
 		this.mathem = mathem;
@@ -13,21 +20,16 @@ export class UI {
 	updateUI() {
 		if (this.data.choiceBuild) {
 			document.getElementById('level')!.textContent =
-				'Уровень этажа (метры): ' +
-				this.struct.Level[this.data.level].ZLevel;
-			document.getElementById('sign')!.textContent =
-				'Тип: ' + this.data.choiceBuild.Sign;
-			document.getElementById('id')!.textContent =
-				'ID: ' + this.data.choiceBuild.Id;
+				'Уровень этажа (метры): ' + this.struct.Level[this.data.level].ZLevel;
+			document.getElementById('sign')!.textContent = 'Тип: ' + this.data.choiceBuild.Sign;
+			document.getElementById('id')!.textContent = 'ID: ' + this.data.choiceBuild.Id;
 			document.getElementById('numPeople')!.textContent =
 				'Количество людей: ' + this.getPeopleCountInChoiceRoom();
 			document.getElementById('name')!.textContent =
 				'Название: ' + this.data.choiceBuild.Name;
 			document.getElementById('area')!.textContent =
 				'Площадь: ' +
-				Math.floor(
-					this.mathem.toСalculateBuildArea(this.data.choiceBuild)
-				) +
+				Math.floor(this.mathem.toCalculateBuildArea(this.data.choiceBuild)) +
 				' м^2';
 		}
 		document.getElementById('movingTime')!.textContent =
@@ -41,9 +43,7 @@ export class UI {
 
 	getPeopleCountInChoiceRoom() {
 		for (let i = 0; i < this.data.peopleCoordinate.length; i++) {
-			if (
-				this.data.choiceBuild.Id === this.data.peopleCoordinate[i].uuid
-			) {
+			if (this.data.choiceBuild.Id === this.data.peopleCoordinate[i].uuid) {
 				return this.data.peopleCoordinate[i].XY.length;
 			}
 		}
