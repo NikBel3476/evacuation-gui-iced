@@ -26,12 +26,14 @@ export class View {
 			coordinates[0].x * this.data.scale - this.data.cameraXY.x,
 			coordinates[0].y * this.data.scale - this.data.cameraXY.y
 		);
-		for (let i = 1; i < coordinates.length; i++) {
-			this.canvas.line_(
-				coordinates[i].x * this.data.scale - this.data.cameraXY.x,
-				coordinates[i].y * this.data.scale - this.data.cameraXY.y
+		coordinates
+			.slice(1)
+			.forEach(point =>
+				this.canvas.line_(
+					point.x * this.data.scale - this.data.cameraXY.x,
+					point.y * this.data.scale - this.data.cameraXY.y
+				)
 			);
-		}
 	}
 
 	// Отрисовка комнаты
@@ -45,18 +47,18 @@ export class View {
 
 	drawPeople(people, builds) {
 		this.canvas.beginPath();
-		for (let i = 0; i < builds.length; i++) {
-			if (builds[i].Id == people.uuid) {
-				for (let j = 0; j < people.XY.length; j++) {
-					this.canvas.circle(
-						people.XY[j].x * this.data.scale - this.data.cameraXY.x,
-						people.XY[j].y * this.data.scale - this.data.cameraXY.y,
-						this.data.peopleR * this.data.scale,
-						'red'
-					);
-				}
-				break;
-			}
+		const build = builds.find(build => build.Id === people.uuid);
+		if (build) {
+			people.XY.forEach(point =>
+				this.canvas.circle(
+					point.x * this.data.scale - this.data.cameraXY.x,
+					point.y * this.data.scale - this.data.cameraXY.y,
+					this.data.peopleR * this.data.scale,
+					'red'
+				)
+			);
+		} else {
+			throw new Error('Necessary build was not found');
 		}
 		this.canvas.closePath();
 	}
@@ -64,12 +66,8 @@ export class View {
 	// Отрисовка всего
 	render() {
 		this.canvas.clear();
-		for (let i = 0; i < this.data.activeBuilds.length; i++) {
-			this.drawBuild(this.data.activeBuilds[i]);
-		}
-		for (let i = 0; i < this.data.activePeople.length; i++) {
-			this.drawPeople(this.data.activePeople[i], this.data.activeBuilds);
-		}
+		this.data.activeBuilds.forEach(build => this.drawBuild(build));
+		this.data.activePeople.forEach(people => this.drawPeople(people, this.data.activeBuilds));
 		this.canvas.print();
 	}
 }
