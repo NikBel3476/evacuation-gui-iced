@@ -20,8 +20,6 @@ export class Canvas {
 		this.x0 = 0;
 		this.y0 = 0;
 
-		console.log(this.canvasContainer);
-
 		this.memCanvas = document.createElement('canvas');
 		console.log(this.memCanvas);
 		this.memCanvas.width = this.canvasContainer.clientWidth;
