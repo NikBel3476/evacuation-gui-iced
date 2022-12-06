@@ -57,8 +57,6 @@ export class View {
 					'red'
 				)
 			);
-		} else {
-			throw new Error('Necessary build was not found');
 		}
 		this.canvas.closePath();
 	}
