@@ -3,6 +3,7 @@ export class Mathem {
 
 	calculateBuildArea(build): number {
 		const points = build.XY[0].points;
+		// TODO: understand why length - 1 is needed
 		return points
 			.slice(0, -1)
 			.reduce(
@@ -26,8 +27,8 @@ export class Mathem {
 
 	findMinCoordinates(XY: Array<{ x: number; y: number }>): { x: number; y: number } {
 		return {
-			x: Math.min(...XY.map(point => point.x)),
-			y: Math.min(...XY.map(point => point.y))
+			x: XY.reduce((min, point) => Math.min(min, point.x), 0),
+			y: XY.reduce((min, point) => Math.min(min, point.y), 0)
 		};
 	}
 
