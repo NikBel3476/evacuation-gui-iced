@@ -4,7 +4,7 @@
     "version": "0.1.0",
     "type": "module",
     "license": "MIT",
-    "description": "**EvacuationC** -- программа моделирования движения людей в здании.",
+    "description": "Evacuation - программа моделирования движения людей в здании.",
     "scripts": {
         "dev": "concurrently \"npm run dev:*\"",
         "dev:vite": "vite",

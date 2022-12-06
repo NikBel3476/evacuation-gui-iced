@@ -30,7 +30,8 @@ export default defineConfig({
 					'src-ui',
 					'configRescript',
 					'index.html'
-				)
+				),
+				peopleTraffic: path.resolve(__dirname, 'src-ui', 'peopleTraffic', 'index.html')
 			}
 		}
 	}
