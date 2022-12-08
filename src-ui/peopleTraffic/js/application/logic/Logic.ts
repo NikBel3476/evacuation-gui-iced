@@ -75,26 +75,27 @@ export class Logic {
 	}
 
 	updatePeopleInBuilds(): void {
-		const rooms = this.data.timeData.items.find(
+		/*const rooms = this.data.timeData.items.find(
 			dateTime => this.data.time === Math.floor(dateTime.time)
 		).rooms;
 
 		this.data.peopleCoordinate = [];
-		if (rooms)
+		if (rooms) {
 			rooms.forEach(room => {
 				this.struct.Level.forEach(level => {
 					const buildingElement = level.BuildElement.find(
 						building => room.uuid === building.Id
 					);
 
-					if (buildingElement) {
-						this.data.peopleCoordinate.push({
-							uuid: room.uuid,
-							XY: this.genPeopleCoordinate(buildingElement, room.density)
-						});
-					}
+					// if (buildingElement) {
+					// 	this.data.peopleCoordinate.push({
+					// 		uuid: room.uuid,
+					// 		XY: this.genPeopleCoordinate(buildingElement, room.density)
+					// 	});
+					// }
 				});
 			});
+		}*/
 	}
 
 	// TODO: add type for build parameter

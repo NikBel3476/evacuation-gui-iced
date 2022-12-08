@@ -4,9 +4,6 @@ dist/
 lib/
 **/target/
 
-src-ui/peopleTraffic/udsu_b1_L4_v2_190701.ts
-src-ui/peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.ts
-
 /thirdparty
 
 .idea/

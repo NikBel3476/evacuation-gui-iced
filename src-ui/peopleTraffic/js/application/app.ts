@@ -1,5 +1,5 @@
 import { Server } from './server/Server.js';
-import { timeData } from '../../udsu_b1_L4_v2_190701_mv_csv';
+import timeData from '../../udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from './view/View.js';
 import { UI } from './ui/UI.js';
 import { Mathem } from './mathem/Mathem.js';
@@ -80,7 +80,6 @@ export class App {
 		this.logic.updateLabel();
 		// Вешаем слушатели событий
 		document.addEventListener('keydown', event => {
-			console.log(event.keyCode);
 			switch (event.keyCode) {
 				// Повысить этаж
 				case 38:
@@ -137,9 +136,8 @@ export class App {
 
 		this.gifInit(1000); // Инициализация настроек
 
-		window.requestAnimationFrame(this.updateField.bind(this));
-
 		let timerTimeDataUpdateId = setInterval(() => this.updateTimeData(), 500);
+		window.requestAnimationFrame(() => this.updateField());
 		// Закончить GIF и создать её
 		// let timerGifFinish = setTimeout(() => {
 		//     this.data.gifFinish = true;
@@ -151,7 +149,7 @@ export class App {
 	updateField() {
 		console.log('Go!');
 		this.logic.updateField();
-		window.requestAnimationFrame(this.updateField.bind(this));
+		window.requestAnimationFrame(() => this.updateField());
 	}
 
 	updateTimeData() {
