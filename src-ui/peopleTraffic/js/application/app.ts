@@ -137,7 +137,7 @@ export class App {
 		this.gifInit(1000); // Инициализация настроек
 
 		let timerTimeDataUpdateId = setInterval(() => this.updateTimeData(), 500);
-		window.requestAnimationFrame(() => this.updateField());
+		this.updateField();
 		// Закончить GIF и создать её
 		// let timerGifFinish = setTimeout(() => {
 		//     this.data.gifFinish = true;
