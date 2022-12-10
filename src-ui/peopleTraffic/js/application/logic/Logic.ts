@@ -105,15 +105,51 @@ export class Logic {
 	}
 
 	updatePeopleInCamera(): void {
+		this.data.activePeople = [];
 		this.data.activeBuilds.forEach(building => {
 			const coordinates = this.data.peopleCoordinate.find(
 				coordinate => building.Id === coordinate.uuid
 			);
-			if (coordinates) this.data.activePeople.push(coordinates);
+			if (coordinates) {
+				this.data.activePeople.push(coordinates);
+			}
 		});
 	}
 
-	updatePeopleInBuilds(): void {
+	updatePeopleInBuilds() {
+		this.data.peopleCoordinate = [];
+		const levels = this.struct.Level;
+		const timeData = this.data.timeData.items;
+		let rooms;
+		for (let i = 0; i < timeData.length; i++) {
+			if (this.data.time == Math.floor(timeData[i].time)) {
+				rooms = timeData[i].rooms;
+				break;
+			}
+		}
+		if (rooms) {
+			for (let i = 0; i < rooms.length; i++) {
+				for (let j = 0; j < levels.length; j++) {
+					let ok = false;
+					for (let k = 0; k < levels[j].BuildElement.length; k++) {
+						if (rooms[i].uuid == levels[j].BuildElement[k].Id) {
+							const XY = this.genPeopleCoordinate(
+								levels[j].BuildElement[k],
+								rooms[i].density
+							);
+							this.data.peopleCoordinate.push({ uuid: rooms[i].uuid, XY: XY });
+							ok = true;
+							break;
+						}
+					}
+					if (ok) {
+						break;
+					}
+				}
+			}
+		}
+	}
+	/*updatePeopleInBuilds(): void {
 		const rooms = this.data.timeData.items.find(
 			dateTime => this.data.time === Math.floor(dateTime.time)
 		)?.rooms;
@@ -133,9 +169,47 @@ export class Logic {
 				});
 			});
 		}
-	}
+	}*/
 
-	genPeopleCoordinate(build: BuildingElement, density: number): Array<Point> {
+	genPeopleCoordinate(build, density) {
+		const XY = build.XY[0].points;
+		let arrayX = [];
+		let arrayY = [];
+		for (let i = 0; i < XY.length - 1; i++) {
+			arrayX.push(XY[i].x);
+			arrayY.push(XY[i].y);
+		}
+		const minXY = this.mathem.findMinCoordinates(XY);
+		const maxXY = this.mathem.findMaxCoordinates(XY);
+		const diagonalXY = { x: maxXY.x - minXY.x, y: maxXY.y - minXY.y };
+		const centreXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
+		const peopleCount = Math.floor(density);
+		let peopleXY = [];
+		for (let i = 0; i <= peopleCount; i++) {
+			let randX = this.mathem.getRandomArbitrary(
+				centreXY.x - centreXY.x / 2 + minXY.x,
+				centreXY.x + centreXY.x / 2 + minXY.x
+			);
+			let randY = this.mathem.getRandomArbitrary(
+				centreXY.y - centreXY.y / 2 + minXY.y,
+				centreXY.y + centreXY.y / 2 + minXY.y
+			);
+			let intersection;
+			let ok = true;
+			// while (ok) {
+			// 	intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
+			// 	if (intersection != 0 && intersection % 2 != 0) {
+			// 		ok = false;
+			// 	} else {
+			// 		randX = this.mathem.getRandomArbitrary(centreXY.x - centreXY.x / 2 + minXY.x, centreXY.x + centreXY.x / 2 + minXY.x);
+			// 		randY = this.mathem.getRandomArbitrary(centreXY.y - centreXY.y / 2 + minXY.y, centreXY.y + centreXY.y / 2 + minXY.y);
+			// 	}
+			// }
+			peopleXY.push({ x: randX, y: randY });
+		}
+		return peopleXY;
+	}
+	/*genPeopleCoordinate(build: BuildingElement, density: number): Array<Point> {
 		const XY = build.XY[0].points;
 		let arrayX = Array(XY.length - 1);
 		let arrayY = Array(XY.length - 1);
@@ -162,7 +236,7 @@ export class Logic {
 		let peopleXY = Array<{ x: number; y: number }>(peopleCount + 1);
 		for (let i = 0; i <= peopleCount; i++) {
 			let intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
-			/*while (!Boolean(intersection & 1)) {
+			/!*while (!Boolean(intersection & 1)) {
 				randX = this.mathem.getRandomArbitrary(
 					centerXY.x - centerXY.x / 2 + minXY.x,
 					centerXY.x + centerXY.x / 2 + minXY.x
@@ -172,16 +246,16 @@ export class Logic {
 					centerXY.y + centerXY.y / 2 + minXY.y
 				);
 				intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
-			}*/
+			}*!/
 			peopleXY[i] = { x: randX, y: randY };
 		}
 		return peopleXY;
-	}
+	}*/
 
 	// Движение камеры
 	moveCamera(value: number, key: 'x' | 'y'): void {
-		// this.updateBuildsInCamera();
-		// this.updatePeopleInCamera();
+		this.updateBuildsInCamera();
+		this.updatePeopleInCamera();
 		switch (key) {
 			case 'x':
 				this.data.cameraXY.x =
@@ -227,7 +301,43 @@ export class Logic {
 			}) ?? null;
 	}
 
-	toInitialCoordination(): void {
+	toInitialCoordination() {
+		const rooms = this.struct.Level[this.data.level].BuildElement;
+		let leftX = rooms[0].XY[0].points[0].x;
+		let topY = rooms[0].XY[0].points[0].y;
+		let rightX = rooms[0].XY[0].points[0].x;
+		let botY = rooms[0].XY[0].points[0].y;
+		for (let i = 0; i < rooms.length; i++) {
+			for (let j = 0; j < rooms[i].XY[0].points.length; j++) {
+				const point = rooms[i].XY[0].points[j];
+				if (point.x < leftX) {
+					leftX = point.x;
+				}
+				if (point.x > rightX) {
+					rightX = point.x;
+				}
+				if (point.y < topY) {
+					topY = point.y;
+				}
+				if (point.y > botY) {
+					botY = point.y;
+				}
+			}
+		}
+		const xLength = Math.abs(rightX - leftX);
+		const yLength = Math.abs(botY - topY);
+		console.log(this.data.fieldWidth, this.data.fieldHeight);
+		const diagonal = Math.sqrt(xLength * xLength + yLength * yLength);
+		const fieldDiagonal = Math.sqrt(
+			this.data.fieldWidth * this.data.fieldWidth +
+				this.data.fieldHeight * this.data.fieldHeight
+		);
+		this.data.scale = fieldDiagonal / diagonal;
+		this.data.cameraXY.x = leftX * this.data.scale;
+		this.data.cameraXY.y = topY * this.data.scale;
+		console.log(this.data.scale);
+	}
+	/*toInitialCoordination(): void {
 		const rooms = this.struct.Level[this.data.level].BuildElement;
 		let leftX = rooms[0].XY[0].points[0].x;
 		let topY = rooms[0].XY[0].points[0].y;
@@ -253,7 +363,7 @@ export class Logic {
 		this.data.scale = fieldDiagonal / diagonal;
 		this.data.cameraXY.x = leftX * this.data.scale;
 		this.data.cameraXY.y = topY * this.data.scale;
-	}
+	}*/
 
 	toScreenAdjustment() {
 		this.updateBuildsInCamera();
