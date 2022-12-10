@@ -7,6 +7,7 @@ import { Mathem } from './mathem/Mathem.js';
 import { Logic } from './logic/Logic.js';
 import { Canvas } from './canvas/Canvas.js';
 import { BASE_SETTINGS } from '../BASE_SETTINGS';
+import { Building, BuildingElement, Point } from './Interfaces/Building';
 
 export class App {
 	BASE_SETTINGS: BASE_SETTINGS;
@@ -14,7 +15,7 @@ export class App {
 	canvas: Canvas;
 	mathem: Mathem;
 	data: {
-		struct: any;
+		struct: Building;
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
@@ -26,17 +27,17 @@ export class App {
 		passFrame: number;
 
 		cameraXY: { x: number; y: number };
-		canMove: false;
+		canMove: boolean;
 		scale: number;
 		fieldWidth: number;
 		fieldHeight: number;
 
 		level: number;
-		choiceBuild: any;
-		activeBuilds: any[];
+		choiceBuild: BuildingElement | null;
+		activeBuilds: BuildingElement[];
 
-		activePeople: any[];
-		peopleCoordinate: any[];
+		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
+		peopleCoordinate: Point[];
 		maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;

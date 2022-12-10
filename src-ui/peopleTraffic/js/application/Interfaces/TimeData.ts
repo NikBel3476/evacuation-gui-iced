@@ -1,23 +1,20 @@
 export interface TimeData {
 	items: Array<TimeState>;
-	timeStep: number;
-	timerSpeedUp: number;
-	timerTimeDataUpdatePause: boolean;
 }
 
-interface TimeState {
+export interface TimeState {
 	doors: Array<DoorTimeState>;
 	rooms: Array<RoomTimeState>;
 	time: number;
 }
 
-interface DoorTimeState {
+export interface DoorTimeState {
 	uuid: string;
 	from: string;
 	nfrom: number;
 }
 
-interface RoomTimeState {
+export interface RoomTimeState {
 	uuid: string;
 	density: number;
 }

@@ -4,19 +4,19 @@ export interface Building {
 	Address: Address;
 }
 
-interface Address {
+export interface Address {
 	City: string;
 	StreetAddress: string;
 	AddInfo: string;
 }
 
-interface Level {
+export interface Level {
 	NameLevel: string;
 	ZLevel: number;
 	BuildElement: Array<BuildingElement>;
 }
 
-interface BuildingElement {
+export interface BuildingElement {
 	'@': string;
 	Name: string;
 	SizeZ: number;
@@ -28,11 +28,11 @@ interface BuildingElement {
 	Id: string;
 }
 
-interface BuildingElementPoints {
+export interface BuildingElementPoints {
 	points: Array<Point>;
 }
 
-interface Point {
+export interface Point {
 	x: number;
 	y: number;
 }
