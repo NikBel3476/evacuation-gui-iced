@@ -1,22 +1,53 @@
 import { View } from '../view/View';
 import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
+import { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
+import { TimeData } from '../Interfaces/TimeData';
 
 type LogicConstructorParams = {
 	view: View;
 	ui: UI;
-	data: any;
+	data: {
+		struct: Building;
+		timerTimeDataUpdatePause: boolean;
+		timerSpeedUp: number;
+		timeData: TimeData;
+		time: number;
+		timeStep: number;
+
+		gifFinish: boolean;
+		isGifStop: boolean;
+		passFrame: number;
+
+		cameraXY: { x: number; y: number };
+		canMove: boolean;
+		scale: number;
+		fieldWidth: number;
+		fieldHeight: number;
+
+		level: number;
+		choiceBuild: BuildingElement | null;
+		activeBuilds: BuildingElement[];
+
+		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
+		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
+		maxNumPeople: number;
+		peopleDen: number;
+		peopleR: number;
+		label: number;
+		exitedLabel: number;
+	};
 	mathem: Mathem;
 };
 
 export class Logic {
 	view: View;
 	ui: UI;
-	data;
-	struct;
-	level;
-	choiceBuild;
-	scale;
+	data: LogicConstructorParams['data'];
+	struct: Building;
+	level: number;
+	choiceBuild: BuildingElement | null;
+	scale: number;
 	mathem: Mathem;
 
 	constructor({ view, ui, data, mathem }: LogicConstructorParams) {
@@ -35,7 +66,7 @@ export class Logic {
 	/**** ЛОГИКА VIEW ****/
 
 	// Проверка объектов находятся ли они в камере
-	isInCamera(XY: Array<{ x: number; y: number }>): boolean {
+	isInCamera(XY: Array<Point>): boolean {
 		return XY.some(point => {
 			return (
 				point.x * this.data.scale >= this.data.cameraXY.x &&
@@ -54,15 +85,23 @@ export class Logic {
 	}
 
 	updateLabel(): void {
-		const label = Math.floor(
-			this.data.timeData.items
-				.find(dateTime => this.data.time === Math.floor(dateTime.time))
-				.rooms.reduce((totalDensity, room) => totalDensity + room.density, 0)
-		);
+		let rooms = this.data.timeData.items.find(
+			dateTime => this.data.time === Math.floor(dateTime.time)
+		)?.rooms;
 
-		if (this.data.label !== 0) this.data.exitedLabel += this.data.label - label;
+		if (rooms) {
+			const label = Math.floor(
+				rooms.reduce((totalDensity, room) => totalDensity + room.density, 0)
+			);
 
-		this.data.label = label;
+			if (this.data.label !== 0) {
+				this.data.exitedLabel += this.data.label - label;
+			}
+
+			this.data.label = label;
+		} else {
+			this.data.label = 0;
+		}
 	}
 
 	updatePeopleInCamera(): void {
@@ -77,7 +116,7 @@ export class Logic {
 	updatePeopleInBuilds(): void {
 		const rooms = this.data.timeData.items.find(
 			dateTime => this.data.time === Math.floor(dateTime.time)
-		).rooms;
+		)?.rooms;
 
 		this.data.peopleCoordinate = [];
 		if (rooms) {
@@ -96,8 +135,7 @@ export class Logic {
 		}
 	}
 
-	// TODO: add type for build parameter
-	genPeopleCoordinate(build, density: number) {
+	genPeopleCoordinate(build: BuildingElement, density: number): Array<Point> {
 		const XY = build.XY[0].points;
 		let arrayX = Array(XY.length - 1);
 		let arrayY = Array(XY.length - 1);
@@ -175,20 +213,21 @@ export class Logic {
 		const mouseX = event.offsetX + this.data.cameraXY.x;
 		const mouseY = event.offsetY + this.data.cameraXY.y;
 
-		this.data.choiceBuild = this.data.activeBuilds.find(building => {
-			let arrayX = Array(building.XY[0].points.length - 1);
-			let arrayY = Array(building.XY[0].points.length - 1);
-			building.XY[0].points.slice(0, -1).forEach((point, i) => {
-				arrayX[i] = point.x * this.data.scale;
-				arrayY[i] = point.y * this.data.scale;
-			});
+		this.data.choiceBuild =
+			this.data.activeBuilds.find(building => {
+				let arrayX = Array(building.XY[0].points.length - 1);
+				let arrayY = Array(building.XY[0].points.length - 1);
+				building.XY[0].points.slice(0, -1).forEach((point, i) => {
+					arrayX[i] = point.x * this.data.scale;
+					arrayY[i] = point.y * this.data.scale;
+				});
 
-			const intersection = this.mathem.inPoly(mouseX, mouseY, arrayX, arrayY);
-			return (
-				Boolean(intersection & 1) &&
-				(building.sign == 'DoorWayInt' || building.sign == 'DoorWay')
-			);
-		});
+				const intersection = this.mathem.inPoly(mouseX, mouseY, arrayX, arrayY);
+				return (
+					Boolean(intersection & 1) &&
+					(building.Sign == 'DoorWayInt' || building.Sign == 'DoorWay')
+				);
+			}) ?? null;
 	}
 
 	toInitialCoordination(): void {
