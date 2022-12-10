@@ -9773,6 +9773,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (00 : 64f5) 8e6b<->70d5",
                     "Up": "e5abcecc-dbd8-4d5c-a243-bcf8ff270d59",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "5a1b3092-2adb-4992-bf3b-6cd89918e6b3",
                     "XY": [
@@ -9811,6 +9812,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (00 : 21f2) b6e6<->f9bd",
                     "Up": "f80a7f7d-af9a-4ad7-8c3e-9f450c8f9bd7",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "37c07b91-16af-449e-ae96-4422614b6e64",
                     "XY": [
@@ -9849,6 +9851,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (00 : 7651) af25<->babe",
                     "Up": "038b3d8e-b9d2-4f18-8b83-db9e4afbabe1",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "af73c867-8819-4b79-aca5-4ba9914af25f",
                     "XY": [
@@ -20190,6 +20193,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (01 : 9682) 70d5<->96d5",
                     "Up": "dd88e910-ba73-4872-b56b-b2d0e7396d54",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "e5abcecc-dbd8-4d5c-a243-bcf8ff270d59",
                     "XY": [
@@ -20228,6 +20232,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (01 : 9b26) 92a7<->2462",
                     "Up": "b26692fe-da9c-4c3b-9da0-db3f9af2462f",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "d86f90f8-9432-4f29-832e-b666c4792a7c",
                     "XY": [
@@ -20266,6 +20271,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (01 : 6f63) f9bd<->8ffb",
                     "Up": "728019da-483e-4644-baf6-ceccb548ffb1",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "f80a7f7d-af9a-4ad7-8c3e-9f450c8f9bd7",
                     "XY": [
@@ -20304,6 +20310,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (01 : d736) babe<->10cb",
                     "Up": "3c067e19-ca6a-48ae-aa23-e2b4f6910cb5",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "038b3d8e-b9d2-4f18-8b83-db9e4afbabe1",
                     "XY": [
@@ -27537,6 +27544,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (02 : fd85) 10cb<->0be1",
                     "Up": "dd6836b8-2ec1-4227-b613-7fbfefc0be1b",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "3c067e19-ca6a-48ae-aa23-e2b4f6910cb5",
                     "XY": [
@@ -27575,6 +27583,7 @@
                     "@": "39baaad1-3bea-4220-ac34-70e3021e4cc8",
                     "Name": "\u041c\u0435\u0436\u044d\u0442\u0430\u0436\u043d\u044b\u0439 \u043f\u0440\u043e\u0435\u043c (02 : 97c8) 8ffb<->8e0c",
                     "Up": "489906e5-b7ac-4e5e-bb6a-549f3848e0c4",
+                    "SizeZ": 2.0,
                     "Sign": "DoorWay",
                     "Down": "728019da-483e-4644-baf6-ceccb548ffb1",
                     "XY": [
