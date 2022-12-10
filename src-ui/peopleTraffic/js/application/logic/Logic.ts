@@ -180,31 +180,31 @@ export class Logic {
 
 	// Движение камеры
 	moveCamera(value: number, key: 'x' | 'y'): void {
-		this.updateBuildsInCamera();
-		this.updatePeopleInCamera();
-		if (key === 'x') {
-			if (value > 0) {
-				this.data.cameraXY.x -= 0.2 * this.data.scale;
-			} else if (value < 0) {
-				this.data.cameraXY.x += 0.2 * this.data.scale;
-			}
-		} else if (key === 'y') {
-			if (value > 0) {
-				this.data.cameraXY.y -= 0.2 * this.data.scale;
-			} else if (value < 0) {
-				this.data.cameraXY.y += 0.2 * this.data.scale;
-			}
+		// this.updateBuildsInCamera();
+		// this.updatePeopleInCamera();
+		switch (key) {
+			case 'x':
+				this.data.cameraXY.x =
+					value > 0
+						? this.data.cameraXY.x - 0.2 * this.data.scale
+						: this.data.cameraXY.x + 0.2 * this.data.scale;
+				break;
+			case 'y':
+				this.data.cameraXY.y =
+					value > 0
+						? this.data.cameraXY.y - 0.2 * this.data.scale
+						: this.data.cameraXY.y + 0.2 * this.data.scale;
+				break;
 		}
 	}
 
 	// Движение мышки
 	mouseMove(event: MouseEvent): void {
-		if (this.data.canMove) {
-			if (event.movementX) {
-				this.moveCamera(event.movementX, 'x');
-			} else if (event.movementY) {
-				this.moveCamera(event.movementY, 'y');
-			}
+		if (event.movementX) {
+			this.moveCamera(event.movementX, 'x');
+		}
+		if (event.movementY) {
+			this.moveCamera(event.movementY, 'y');
 		}
 	}
 
@@ -223,10 +223,7 @@ export class Logic {
 				});
 
 				const intersection = this.mathem.inPoly(mouseX, mouseY, arrayX, arrayY);
-				return (
-					Boolean(intersection & 1) &&
-					(building.Sign == 'DoorWayInt' || building.Sign == 'DoorWay')
-				);
+				return Boolean(intersection & 1);
 			}) ?? null;
 	}
 
@@ -258,7 +255,22 @@ export class Logic {
 		this.data.cameraXY.y = topY * this.data.scale;
 	}
 
-	toScreenAdjustment(): void {
+	toScreenAdjustment() {
+		this.updateBuildsInCamera();
+		let ok = true;
+		while (ok) {
+			if (
+				this.data.activeBuilds.length !=
+				this.struct.Level[this.data.level].BuildElement.length
+			) {
+				this.data.scale -= 1;
+				this.updateBuildsInCamera();
+			} else {
+				ok = false;
+			}
+		}
+	}
+	/*toScreenAdjustment(): void {
 		this.updateBuildsInCamera();
 		while (true) {
 			if (
@@ -271,7 +283,7 @@ export class Logic {
 				break;
 			}
 		}
-	}
+	}*/
 	/****************************************************************************************************/
 
 	// Обновить экран

@@ -1,6 +1,6 @@
 import { Server } from './server/Server.js';
 import { TimeData } from './Interfaces/TimeData';
-import timeData from '../../udsu_b1_L4_v2_190701_mv_csv.json';
+import * as timeData from '../../udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from './view/View.js';
 import { UI } from './ui/UI.js';
 import { Mathem } from './mathem/Mathem.js';
@@ -137,8 +137,7 @@ export class App {
 			this.logic.updatePeopleInCamera();
 		});
 		document.getElementById('canvas_container')!.addEventListener('wheel', event => {
-			let dir = Math.sign(event.deltaY);
-			switch (dir) {
+			switch (Math.sign(event.deltaY)) {
 				case -1: // Увеличить zoom
 					this.data.scale += 0.5;
 					break;
@@ -159,7 +158,9 @@ export class App {
 			this.data.canMove = false;
 		});
 		this.canvas.canvas.addEventListener('mousemove', event => {
-			this.logic.mouseMove(event);
+			if (this.data.canMove) {
+				this.logic.mouseMove(event);
+			}
 		});
 		this.canvas.canvas.addEventListener('dblclick', event => {
 			this.logic.toChoiceBuild(event);

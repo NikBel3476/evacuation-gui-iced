@@ -76,7 +76,24 @@ export class View {
 		this.canvas.closePath();
 	}
 
-	drawPeople(people: { uuid: string; XY: Array<Point> }, buildings: BuildingElement[]) {
+	drawPeople(people, builds) {
+		this.canvas.beginPath();
+		for (let i = 0; i < builds.length; i++) {
+			if (builds[i].Id == people.uuid) {
+				for (let j = 0; j < people.XY.length; j++) {
+					this.canvas.circle(
+						people.XY[j].x * this.data.scale - this.data.cameraXY.x,
+						people.XY[j].y * this.data.scale - this.data.cameraXY.y,
+						this.data.peopleR * this.data.scale,
+						'red'
+					);
+				}
+				break;
+			}
+		}
+		this.canvas.closePath();
+	}
+	/*drawPeople(people: { uuid: string; XY: Array<Point> }, buildings: BuildingElement[]) {
 		this.canvas.beginPath();
 		const building = buildings.find(building => building.Id === people.uuid);
 		if (building) {
@@ -90,7 +107,7 @@ export class View {
 			);
 		}
 		this.canvas.closePath();
-	}
+	}*/
 
 	// Отрисовка всего
 	render() {
