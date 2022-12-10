@@ -231,43 +231,7 @@ export class Logic {
 			}) ?? null;
 	}
 
-	toInitialCoordination() {
-		const rooms = this.struct.Level[this.data.level].BuildElement;
-		let leftX = rooms[0].XY[0].points[0].x;
-		let topY = rooms[0].XY[0].points[0].y;
-		let rightX = rooms[0].XY[0].points[0].x;
-		let botY = rooms[0].XY[0].points[0].y;
-		for (let i = 0; i < rooms.length; i++) {
-			for (let j = 0; j < rooms[i].XY[0].points.length; j++) {
-				const point = rooms[i].XY[0].points[j];
-				if (point.x < leftX) {
-					leftX = point.x;
-				}
-				if (point.x > rightX) {
-					rightX = point.x;
-				}
-				if (point.y < topY) {
-					topY = point.y;
-				}
-				if (point.y > botY) {
-					botY = point.y;
-				}
-			}
-		}
-		const xLength = Math.abs(rightX - leftX);
-		const yLength = Math.abs(botY - topY);
-		console.log(this.data.fieldWidth, this.data.fieldHeight);
-		const diagonal = Math.sqrt(xLength * xLength + yLength * yLength);
-		const fieldDiagonal = Math.sqrt(
-			this.data.fieldWidth * this.data.fieldWidth +
-				this.data.fieldHeight * this.data.fieldHeight
-		);
-		this.data.scale = fieldDiagonal / diagonal;
-		this.data.cameraXY.x = leftX * this.data.scale;
-		this.data.cameraXY.y = topY * this.data.scale;
-		console.log(this.data.scale);
-	}
-	/*toInitialCoordination(): void {
+	toInitialCoordination(): void {
 		const rooms = this.struct.Level[this.data.level].BuildElement;
 		let leftX = rooms[0].XY[0].points[0].x;
 		let topY = rooms[0].XY[0].points[0].y;
@@ -293,24 +257,9 @@ export class Logic {
 		this.data.scale = fieldDiagonal / diagonal;
 		this.data.cameraXY.x = leftX * this.data.scale;
 		this.data.cameraXY.y = topY * this.data.scale;
-	}*/
-
-	toScreenAdjustment() {
-		this.updateBuildsInCamera();
-		let ok = true;
-		while (ok) {
-			if (
-				this.data.activeBuilds.length !=
-				this.struct.Level[this.data.level].BuildElement.length
-			) {
-				this.data.scale -= 1;
-				this.updateBuildsInCamera();
-			} else {
-				ok = false;
-			}
-		}
 	}
-	/*toScreenAdjustment(): void {
+
+	toScreenAdjustment(): void {
 		this.updateBuildsInCamera();
 		while (true) {
 			if (
@@ -323,7 +272,7 @@ export class Logic {
 				break;
 			}
 		}
-	}*/
+	}
 	/****************************************************************************************************/
 
 	// Обновить экран
