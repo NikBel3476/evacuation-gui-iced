@@ -66,7 +66,20 @@ export class Logic {
 	/**** ЛОГИКА VIEW ****/
 
 	// Проверка объектов находятся ли они в камере
-	isInCamera(XY: Array<Point>): boolean {
+	isInCamera(XY) {
+		for (let i = 0; i < XY.length; i++) {
+			if (
+				XY[i].x * this.data.scale >= this.data.cameraXY.x &&
+				XY[i].x * this.data.scale <= this.data.cameraXY.x + this.view.canvas.canvas.width &&
+				XY[i].y * this.data.scale >= this.data.cameraXY.y &&
+				XY[i].y * this.data.scale <= this.data.cameraXY.y + this.view.canvas.canvas.height
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
+	/*isInCamera(XY: Array<Point>): boolean {
 		return XY.some(point => {
 			return (
 				point.x * this.data.scale >= this.data.cameraXY.x &&
@@ -75,16 +88,44 @@ export class Logic {
 				point.y * this.data.scale <= this.data.cameraXY.y + this.view.canvas.canvas.height
 			);
 		});
-	}
+	}*/
 
 	// Обновить список объектов в поле камеры
-	updateBuildsInCamera(): void {
+	updateBuildsInCamera() {
+		this.data.activeBuilds = [];
+		const builds = this.struct.Level[this.data.level].BuildElement;
+		for (let i = 0; i < builds.length; i++) {
+			if (this.isInCamera(builds[i].XY[0].points)) {
+				this.data.activeBuilds.push(builds[i]);
+			}
+		}
+	}
+	/*updateBuildsInCamera(): void {
 		this.data.activeBuilds = this.struct.Level[this.data.level].BuildElement.filter(building =>
 			this.isInCamera(building.XY[0].points)
 		);
-	}
+	}*/
 
-	updateLabel(): void {
+	updateLabel() {
+		const timeData = this.data.timeData.items;
+		let rooms;
+		for (let i = 0; i < timeData.length; i++) {
+			if (this.data.time == Math.floor(timeData[i].time)) {
+				rooms = timeData[i].rooms;
+				break;
+			}
+		}
+		let label = 0;
+		for (let i = 0; i < rooms.length; i++) {
+			label += rooms[i].density;
+		}
+		label = Math.floor(label);
+		if (this.data.label !== 0) {
+			this.data.exitedLabel += this.data.label - label;
+		}
+		this.data.label = label;
+	}
+	/*updateLabel(): void {
 		let rooms = this.data.timeData.items.find(
 			dateTime => this.data.time === Math.floor(dateTime.time)
 		)?.rooms;
@@ -102,7 +143,7 @@ export class Logic {
 		} else {
 			this.data.label = 0;
 		}
-	}
+	}*/
 
 	updatePeopleInCamera(): void {
 		this.data.activePeople = [];
@@ -196,15 +237,21 @@ export class Logic {
 			);
 			let intersection;
 			let ok = true;
-			// while (ok) {
-			// 	intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
-			// 	if (intersection != 0 && intersection % 2 != 0) {
-			// 		ok = false;
-			// 	} else {
-			// 		randX = this.mathem.getRandomArbitrary(centreXY.x - centreXY.x / 2 + minXY.x, centreXY.x + centreXY.x / 2 + minXY.x);
-			// 		randY = this.mathem.getRandomArbitrary(centreXY.y - centreXY.y / 2 + minXY.y, centreXY.y + centreXY.y / 2 + minXY.y);
-			// 	}
-			// }
+			while (ok) {
+				intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
+				if (intersection != 0 && intersection % 2 != 0) {
+					ok = false;
+				} else {
+					randX = this.mathem.getRandomArbitrary(
+						centreXY.x - centreXY.x / 2 + minXY.x,
+						centreXY.x + centreXY.x / 2 + minXY.x
+					);
+					randY = this.mathem.getRandomArbitrary(
+						centreXY.y - centreXY.y / 2 + minXY.y,
+						centreXY.y + centreXY.y / 2 + minXY.y
+					);
+				}
+			}
 			peopleXY.push({ x: randX, y: randY });
 		}
 		return peopleXY;

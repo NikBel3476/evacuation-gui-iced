@@ -3,7 +3,17 @@ import { BuildingElement } from '../Interfaces/Building';
 export class Mathem {
 	constructor() {}
 
-	calculateBuildArea(build: BuildingElement): number {
+	calculateBuildArea(build) {
+		const XY = build.XY[0].points;
+		let s = 0;
+		for (let i = 0; i < XY.length - 1; i++) {
+			s += XY[i].x * XY[i + 1].y - XY[i].y * XY[i + 1].x;
+		}
+		s /= 2;
+		s = Math.abs(s);
+		return s;
+	}
+	/*calculateBuildArea(build: BuildingElement): number {
 		const points = build.XY[0].points;
 		// TODO: understand why length - 1 is needed
 		return points
@@ -13,7 +23,7 @@ export class Mathem {
 					area + Math.abs((point.x - points[i + 1].x) * (point.y - points[i + 1].y)),
 				0
 			);
-	}
+	}*/
 
 	calculateDensity(build: BuildingElement & { NumPeople: number }): number {
 		return build.NumPeople / this.calculateBuildArea(build);
@@ -29,8 +39,8 @@ export class Mathem {
 
 	findMinCoordinates(XY: Array<{ x: number; y: number }>): { x: number; y: number } {
 		return {
-			x: XY.reduce((min, point) => Math.min(min, point.x), 0),
-			y: XY.reduce((min, point) => Math.min(min, point.y), 0)
+			x: Math.min(...XY.map(point => point.x)),
+			y: Math.min(...XY.map(point => point.y))
 		};
 	}
 
