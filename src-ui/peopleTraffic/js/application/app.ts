@@ -1,4 +1,5 @@
 import { Server } from './server/Server.js';
+import { TimeData } from './Interfaces/TimeData';
 import timeData from '../../udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from './view/View.js';
 import { UI } from './ui/UI.js';
@@ -12,7 +13,36 @@ export class App {
 	server: Server;
 	canvas: Canvas;
 	mathem: Mathem;
-	data;
+	data: {
+		struct: any;
+		timerTimeDataUpdatePause: boolean;
+		timerSpeedUp: number;
+		timeData: TimeData;
+		time: number;
+		timeStep: number;
+
+		gifFinish: false;
+		isGifStop: false;
+		passFrame: number;
+
+		cameraXY: { x: number; y: number };
+		canMove: false;
+		scale: number;
+		fieldWidth: number;
+		fieldHeight: number;
+
+		level: number;
+		choiceBuild: any;
+		activeBuilds: any[];
+
+		activePeople: any[];
+		peopleCoordinate: any[];
+		maxNumPeople: number;
+		peopleDen: number;
+		peopleR: number;
+		label: number;
+		exitedLabel: number;
+	};
 	view: View;
 	ui: UI;
 	logic: Logic;
