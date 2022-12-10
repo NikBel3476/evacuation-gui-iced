@@ -1,23 +1,22 @@
+import { BuildingElement } from '../Interfaces/Building';
+
 export class Mathem {
 	constructor() {}
 
-	calculateBuildArea(build): number {
-		const points = build.XY[0].points;
-		// TODO: understand why length - 1 is needed
-		return points
-			.slice(0, -1)
-			.reduce(
-				(area, point, i) =>
-					area + Math.abs((point.x - points[i + 1].x) * (point.y - points[i + 1].y)),
-				0
-			);
+	calculateBuildArea(build: BuildingElement): number {
+		const topLeftPoint = build.XY[0].points[0];
+		const downRightPoint = build.XY[0].points[2];
+		return (
+			Math.abs(topLeftPoint.x - downRightPoint.x) *
+			Math.abs(topLeftPoint.y - downRightPoint.y)
+		);
 	}
 
-	calculateDensity(build): number {
+	calculateDensity(build: BuildingElement & { NumPeople: number }): number {
 		return build.NumPeople / this.calculateBuildArea(build);
 	}
 
-	calculateRGB(build): string {
+	calculateRGB(build: BuildingElement & { NumPeople: number }): string {
 		const area = this.calculateBuildArea(build);
 		let val = Math.floor(((build.NumPeople / area) * 255) / 5);
 		val = val > 255 ? 255 : val;
@@ -27,8 +26,8 @@ export class Mathem {
 
 	findMinCoordinates(XY: Array<{ x: number; y: number }>): { x: number; y: number } {
 		return {
-			x: XY.reduce((min, point) => Math.min(min, point.x), 0),
-			y: XY.reduce((min, point) => Math.min(min, point.y), 0)
+			x: Math.min(...XY.map(point => point.x)),
+			y: Math.min(...XY.map(point => point.y))
 		};
 	}
 

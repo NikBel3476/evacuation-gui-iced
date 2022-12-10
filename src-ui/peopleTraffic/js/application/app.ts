@@ -1,18 +1,49 @@
 import { Server } from './server/Server.js';
-import timeData from '../../udsu_b1_L4_v2_190701_mv_csv.json';
+import { TimeData } from './Interfaces/TimeData';
+import * as timeData from '../../udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from './view/View.js';
 import { UI } from './ui/UI.js';
 import { Mathem } from './mathem/Mathem.js';
 import { Logic } from './logic/Logic.js';
 import { Canvas } from './canvas/Canvas.js';
 import { BASE_SETTINGS } from '../BASE_SETTINGS';
+import { Building, BuildingElement, Point } from './Interfaces/Building';
 
 export class App {
 	BASE_SETTINGS: BASE_SETTINGS;
 	server: Server;
 	canvas: Canvas;
 	mathem: Mathem;
-	data;
+	data: {
+		struct: Building;
+		timerTimeDataUpdatePause: boolean;
+		timerSpeedUp: number;
+		timeData: TimeData;
+		time: number;
+		timeStep: number;
+
+		gifFinish: boolean;
+		isGifStop: boolean;
+		passFrame: number;
+
+		cameraXY: { x: number; y: number };
+		canMove: boolean;
+		scale: number;
+		fieldWidth: number;
+		fieldHeight: number;
+
+		level: number;
+		choiceBuild: BuildingElement | null;
+		activeBuilds: BuildingElement[];
+
+		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
+		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
+		maxNumPeople: number;
+		peopleDen: number;
+		peopleR: number;
+		label: number;
+		exitedLabel: number;
+	};
 	view: View;
 	ui: UI;
 	logic: Logic;
@@ -106,8 +137,7 @@ export class App {
 			this.logic.updatePeopleInCamera();
 		});
 		document.getElementById('canvas_container')!.addEventListener('wheel', event => {
-			let dir = Math.sign(event.deltaY);
-			switch (dir) {
+			switch (Math.sign(event.deltaY)) {
 				case -1: // Увеличить zoom
 					this.data.scale += 0.5;
 					break;
@@ -128,7 +158,9 @@ export class App {
 			this.data.canMove = false;
 		});
 		this.canvas.canvas.addEventListener('mousemove', event => {
-			this.logic.mouseMove(event);
+			if (this.data.canMove) {
+				this.logic.mouseMove(event);
+			}
 		});
 		this.canvas.canvas.addEventListener('dblclick', event => {
 			this.logic.toChoiceBuild(event);
@@ -137,7 +169,7 @@ export class App {
 		this.gifInit(1000); // Инициализация настроек
 
 		let timerTimeDataUpdateId = setInterval(() => this.updateTimeData(), 500);
-		window.requestAnimationFrame(() => this.updateField());
+		this.updateField();
 		// Закончить GIF и создать её
 		// let timerGifFinish = setTimeout(() => {
 		//     this.data.gifFinish = true;

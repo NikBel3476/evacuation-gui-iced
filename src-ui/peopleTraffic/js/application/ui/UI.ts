@@ -1,73 +1,124 @@
 import { Mathem } from '../mathem/Mathem';
+import { Building, BuildingElement, Point } from '../Interfaces/Building';
+import { TimeData } from '../Interfaces/TimeData';
 
 type UIConstructorParams = {
-	data: any;
+	data: {
+		struct: Building;
+		timerTimeDataUpdatePause: boolean;
+		timerSpeedUp: number;
+		timeData: TimeData;
+		time: number;
+		timeStep: number;
+
+		gifFinish: boolean;
+		isGifStop: boolean;
+		passFrame: number;
+
+		cameraXY: { x: number; y: number };
+		canMove: boolean;
+		scale: number;
+		fieldWidth: number;
+		fieldHeight: number;
+
+		level: number;
+		choiceBuild: BuildingElement | null;
+		activeBuilds: BuildingElement[];
+
+		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
+		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
+		maxNumPeople: number;
+		peopleDen: number;
+		peopleR: number;
+		label: number;
+		exitedLabel: number;
+	};
 	mathem: Mathem;
 };
 
 export class UI {
-	data;
-	struct;
-	mathem: Mathem;
+	private data: UIConstructorParams['data'];
+	private struct: Building;
+	private mathem: Mathem;
+	private levelHTML: HTMLElement;
+	private buildingTypeHTML: HTMLElement;
+	private buildingIdHTML: HTMLElement;
+	private totalNumberOfPeopleHTML: HTMLElement;
+	private buildingNameHTML: HTMLElement;
+	private areaHTML: HTMLElement;
+	private movingTimeHTML: HTMLElement;
+	private numberOfPeopleInsideHTML: HTMLElement;
+	private numberOfPeopleOutsideHTML: HTMLElement;
+	private pauseButton: HTMLElement;
+	private playButton: HTMLElement;
 
 	constructor({ data, mathem }: UIConstructorParams) {
 		this.data = data;
 		this.struct = this.data.struct;
 		this.mathem = mathem;
+
+		this.levelHTML = document.getElementById('level')!;
+		this.buildingTypeHTML = document.getElementById('sign')!;
+		this.buildingIdHTML = document.getElementById('id')!;
+		this.totalNumberOfPeopleHTML = document.getElementById('numPeople')!;
+		this.buildingNameHTML = document.getElementById('name')!;
+		this.areaHTML = document.getElementById('area')!;
+		this.movingTimeHTML = document.getElementById('movingTime')!;
+		this.numberOfPeopleInsideHTML = document.getElementById('personCount')!;
+		this.numberOfPeopleOutsideHTML = document.getElementById('personExited')!;
+		this.pauseButton = document.getElementById('pause')!;
+		this.playButton = document.getElementById('play')!;
+
 		this.init();
 	}
 
 	updateUI() {
 		if (this.data.choiceBuild) {
-			document.getElementById('level')!.textContent =
+			this.levelHTML.textContent =
 				'Уровень этажа (метры): ' + this.struct.Level[this.data.level].ZLevel;
-			document.getElementById('sign')!.textContent = 'Тип: ' + this.data.choiceBuild.Sign;
-			document.getElementById('id')!.textContent = 'ID: ' + this.data.choiceBuild.Id;
-			document.getElementById('numPeople')!.textContent =
+			this.buildingTypeHTML.textContent = 'Тип: ' + this.data.choiceBuild.Sign;
+			this.buildingIdHTML.textContent = 'ID: ' + this.data.choiceBuild.Id;
+			this.totalNumberOfPeopleHTML.textContent =
 				'Количество людей: ' + this.getPeopleCountInChoiceRoom();
-			document.getElementById('name')!.textContent =
-				'Название: ' + this.data.choiceBuild.Name;
-			document.getElementById('area')!.textContent =
+			this.buildingNameHTML.textContent = 'Название: ' + this.data.choiceBuild.Name;
+			this.areaHTML.textContent =
 				'Площадь: ' +
 				Math.floor(this.mathem.calculateBuildArea(this.data.choiceBuild)) +
 				' м^2';
 		}
 
-		document.getElementById('movingTime')!.textContent =
-			'Длительность движения, сек: ' + this.data.time;
-		document.getElementById('personCount')!.textContent =
+		this.movingTimeHTML.textContent = 'Длительность движения, сек: ' + this.data.time;
+		this.numberOfPeopleInsideHTML.textContent =
 			'Количество людей в здании, чел: ' + this.data.label;
-		document.getElementById('personExited')!.textContent =
-			'Человек вышло: ' + this.data.exitedLabel;
+		this.numberOfPeopleOutsideHTML.textContent = 'Человек вышло: ' + this.data.exitedLabel;
 	}
 
 	getPeopleCountInChoiceRoom(): number {
 		const coordinates = this.data.peopleCoordinate.find(
-			coordinate => this.data.choiceBuild.Id === coordinate.uuid
+			coordinate => this.data.choiceBuild?.Id === coordinate.uuid
 		);
 
-		return coordinates.length || 0;
+		return coordinates?.XY.length ?? 0;
 	}
 
 	init() {
-		document.getElementById('level')!.textContent = 'Уровень этажа: ';
-		document.getElementById('sign')!.textContent = 'Тип: ';
-		document.getElementById('id')!.textContent = 'ID: ';
-		document.getElementById('numPeople')!.textContent = 'Количество людей:';
-		document.getElementById('name')!.textContent = 'Название: ';
-		document.getElementById('area')!.textContent = 'Площадь: ';
-		document.getElementById('personCount')!.textContent =
+		this.levelHTML.textContent = 'Уровень этажа: ';
+		this.buildingTypeHTML.textContent = 'Тип: ';
+		this.buildingIdHTML.textContent = 'ID: ';
+		this.totalNumberOfPeopleHTML.textContent = 'Количество людей:';
+		this.buildingNameHTML.textContent = 'Название: ';
+		this.areaHTML.textContent = 'Площадь: ';
+		this.numberOfPeopleInsideHTML.textContent =
 			'Количество людей в здании, чел: ' + this.data.label;
-		document.getElementById('movingTime')!.textContent =
-			'Длительность движения, сек: ' + this.data.time;
+		this.movingTimeHTML.textContent = 'Длительность движения, сек: ' + this.data.time;
 
-		document.getElementById('pause')!.addEventListener('click', _ => {
+		this.pauseButton.addEventListener('click', _ => {
 			if (!this.data.timerTimeDataUpdatePause) {
 				this.data.timerTimeDataUpdatePause = true;
 				this.data.isGifStop = true;
 			}
 		});
-		document.getElementById('play')!.addEventListener('click', _ => {
+		this.playButton.addEventListener('click', _ => {
 			if (this.data.timerTimeDataUpdatePause) {
 				this.data.timerTimeDataUpdatePause = false;
 			}
