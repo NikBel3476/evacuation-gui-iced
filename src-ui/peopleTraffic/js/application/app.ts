@@ -22,8 +22,8 @@ export class App {
 		time: number;
 		timeStep: number;
 
-		gifFinish: false;
-		isGifStop: false;
+		gifFinish: boolean;
+		isGifStop: boolean;
 		passFrame: number;
 
 		cameraXY: { x: number; y: number };
@@ -37,7 +37,7 @@ export class App {
 		activeBuilds: BuildingElement[];
 
 		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
-		peopleCoordinate: Point[];
+		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
 		maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;

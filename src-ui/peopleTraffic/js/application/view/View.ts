@@ -13,8 +13,8 @@ type ViewConstructorParams = {
 		time: number;
 		timeStep: number;
 
-		gifFinish: false;
-		isGifStop: false;
+		gifFinish: boolean;
+		isGifStop: boolean;
 		passFrame: number;
 
 		cameraXY: { x: number; y: number };
@@ -28,7 +28,7 @@ type ViewConstructorParams = {
 		activeBuilds: BuildingElement[];
 
 		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
-		peopleCoordinate: Point[];
+		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
 		maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
@@ -40,8 +40,8 @@ type ViewConstructorParams = {
 
 export class View {
 	canvas: Canvas;
-	data;
-	struct;
+	data: ViewConstructorParams['data'];
+	struct: Building;
 	mathem: Mathem;
 
 	constructor({ canvas, data, mathem }: ViewConstructorParams) {
