@@ -75,7 +75,7 @@ export class Logic {
 	}
 
 	updatePeopleInBuilds(): void {
-		/*const rooms = this.data.timeData.items.find(
+		const rooms = this.data.timeData.items.find(
 			dateTime => this.data.time === Math.floor(dateTime.time)
 		).rooms;
 
@@ -83,19 +83,17 @@ export class Logic {
 		if (rooms) {
 			rooms.forEach(room => {
 				this.struct.Level.forEach(level => {
-					const buildingElement = level.BuildElement.find(
-						building => room.uuid === building.Id
-					);
-
-					// if (buildingElement) {
-					// 	this.data.peopleCoordinate.push({
-					// 		uuid: room.uuid,
-					// 		XY: this.genPeopleCoordinate(buildingElement, room.density)
-					// 	});
-					// }
+					level.BuildElement.forEach(building => {
+						if (room.uuid === building.Id) {
+							this.data.peopleCoordinate.push({
+								uuid: room.uuid,
+								XY: this.genPeopleCoordinate(building, room.density)
+							});
+						}
+					});
 				});
 			});
-		}*/
+		}
 	}
 
 	// TODO: add type for build parameter
@@ -104,7 +102,7 @@ export class Logic {
 		let arrayX = Array(XY.length - 1);
 		let arrayY = Array(XY.length - 1);
 		// TODO: understand why length - 1 is needed
-		XY.slice(0, -1).forEach((point, i) => {
+		XY.slice(0, -1).forEach((point: { x: number; y: number }, i: number) => {
 			arrayX[i] = point.x;
 			arrayY[i] = point.y;
 		});
@@ -113,22 +111,20 @@ export class Logic {
 		const maxXY = this.mathem.findMaxCoordinates(XY);
 		const diagonalXY = { x: maxXY.x - minXY.x, y: maxXY.y - minXY.y };
 		const centerXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
+		let randX = this.mathem.getRandomArbitrary(
+			centerXY.x - centerXY.x / 2 + minXY.x,
+			centerXY.x + centerXY.x / 2 + minXY.x
+		);
+		let randY = this.mathem.getRandomArbitrary(
+			centerXY.y - centerXY.y / 2 + minXY.y,
+			centerXY.y + centerXY.y / 2 + minXY.y
+		);
 
 		const peopleCount = Math.floor(density);
-		let peopleXY = Array(peopleCount);
-		let intersection;
+		let peopleXY = Array<{ x: number; y: number }>(peopleCount + 1);
 		for (let i = 0; i <= peopleCount; i++) {
-			let randX = this.mathem.getRandomArbitrary(
-				centerXY.x - centerXY.x / 2 + minXY.x,
-				centerXY.x + centerXY.x / 2 + minXY.x
-			);
-			let randY = this.mathem.getRandomArbitrary(
-				centerXY.y - centerXY.y / 2 + minXY.y,
-				centerXY.y + centerXY.y / 2 + minXY.y
-			);
-
-			intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
-			while (!Boolean(intersection & 1)) {
+			let intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
+			/*while (!Boolean(intersection & 1)) {
 				randX = this.mathem.getRandomArbitrary(
 					centerXY.x - centerXY.x / 2 + minXY.x,
 					centerXY.x + centerXY.x / 2 + minXY.x
@@ -138,7 +134,7 @@ export class Logic {
 					centerXY.y + centerXY.y / 2 + minXY.y
 				);
 				intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
-			}
+			}*/
 			peopleXY[i] = { x: randX, y: randY };
 		}
 		return peopleXY;
