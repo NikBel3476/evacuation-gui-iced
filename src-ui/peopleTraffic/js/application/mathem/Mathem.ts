@@ -1,7 +1,9 @@
+import { BuildingElement } from '../Interfaces/Building';
+
 export class Mathem {
 	constructor() {}
 
-	calculateBuildArea(build): number {
+	calculateBuildArea(build: BuildingElement): number {
 		const points = build.XY[0].points;
 		// TODO: understand why length - 1 is needed
 		return points
@@ -13,11 +15,11 @@ export class Mathem {
 			);
 	}
 
-	calculateDensity(build): number {
+	calculateDensity(build: BuildingElement & { NumPeople: number }): number {
 		return build.NumPeople / this.calculateBuildArea(build);
 	}
 
-	calculateRGB(build): string {
+	calculateRGB(build: BuildingElement & { NumPeople: number }): string {
 		const area = this.calculateBuildArea(build);
 		let val = Math.floor(((build.NumPeople / area) * 255) / 5);
 		val = val > 255 ? 255 : val;
