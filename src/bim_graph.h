@@ -19,7 +19,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <malloc.h>
 #include <string.h>
 
 #include "bim_tools.h"
