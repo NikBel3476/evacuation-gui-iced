@@ -7,7 +7,7 @@
  * @version 0.1 AS3 implementation
  */
 
-GIFEncoder = function () {
+export const GIFEncoder = function () {
 	for (var i = 0, chr = {}; i < 256; i++) chr[i] = String.fromCharCode(i);
 
 	function ByteArray() {
@@ -15,8 +15,7 @@ GIFEncoder = function () {
 	}
 
 	ByteArray.prototype.getData = function () {
-		for (var v = '', l = this.bin.length, i = 0; i < l; i++)
-			v += chr[this.bin[i]];
+		for (var v = '', l = this.bin.length, i = 0; i < l; i++) v += chr[this.bin[i]];
 		return v;
 	};
 
@@ -25,13 +24,11 @@ GIFEncoder = function () {
 	};
 
 	ByteArray.prototype.writeUTFBytes = function (string) {
-		for (var l = string.length, i = 0; i < l; i++)
-			this.writeByte(string.charCodeAt(i));
+		for (var l = string.length, i = 0; i < l; i++) this.writeByte(string.charCodeAt(i));
 	};
 
 	ByteArray.prototype.writeBytes = function (array, offset, length) {
-		for (var l = length || array.length, i = offset || 0; i < l; i++)
-			this.writeByte(array[i]);
+		for (var l = length || array.length, i = offset || 0; i < l; i++) this.writeByte(array[i]);
 	};
 
 	var exports = {};
@@ -134,12 +131,7 @@ GIFEncoder = function () {
 
 		try {
 			if (!is_imageData) {
-				image = im.getImageData(
-					0,
-					0,
-					im.canvas.width,
-					im.canvas.height
-				).data;
+				image = im.getImageData(0, 0, im.canvas.width, im.canvas.height).data;
 				if (!sizeSet) setSize(im.canvas.width, im.canvas.height);
 			} else {
 				if (im instanceof ImageData) {
@@ -152,9 +144,7 @@ GIFEncoder = function () {
 					if (im.length == width * height * 4) {
 						image = im;
 					} else {
-						console.log(
-							'Please set the correct size: ImageData length mismatch'
-						);
+						console.log('Please set the correct size: ImageData length mismatch');
 						ok = false;
 					}
 				} else {
@@ -348,11 +338,7 @@ GIFEncoder = function () {
 		// map image pixels to new palette
 		var k = 0;
 		for (var j = 0; j < nPix; j++) {
-			var index = nq.map(
-				pixels[k++] & 0xff,
-				pixels[k++] & 0xff,
-				pixels[k++] & 0xff
-			);
+			var index = nq.map(pixels[k++] & 0xff, pixels[k++] & 0xff, pixels[k++] & 0xff);
 			usedEntry[index] = true;
 			indexedPixels[j] = index;
 		}
@@ -544,12 +530,7 @@ GIFEncoder = function () {
 	 */
 
 	var writePixels = function writePixels() {
-		var myencoder = new LZWEncoder(
-			width,
-			height,
-			indexedPixels,
-			colorDepth
-		);
+		var myencoder = new LZWEncoder(width, height, indexedPixels, colorDepth);
 		myencoder.encode(out);
 	};
 
@@ -561,10 +542,7 @@ GIFEncoder = function () {
 		return out;
 	});
 
-	var setProperties = (exports.setProperties = function setProperties(
-		has_start,
-		is_first
-	) {
+	var setProperties = (exports.setProperties = function setProperties(has_start, is_first) {
 		started = has_start;
 		firstFrame = is_first;
 	});
