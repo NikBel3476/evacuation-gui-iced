@@ -31,16 +31,16 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
-      - name: Sync node version and setup cache (ubuntu-16.04 only)
+      - name: Sync node version and setup cache (ubuntu-16.04/18.04 only)
         uses: actions/setup-node@v3
-        if: matrix.platform == 'ubuntu-16.04'
+        if: matrix.platform == 'ubuntu-16.04' || matrix.platform == 'ubuntu-18.04'
         with:
           node-version: 16
           cache: 'npm' # Set this to npm, yarn or pnpm.
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
-        if: matrix.platform != 'ubuntu-16.04'
+        if: matrix.platform != 'ubuntu-16.04' && matrix.platform != 'ubuntu-18.04'
         with:
           node-version: 'lts/*'
           cache: 'npm' # Set this to npm, yarn or pnpm.
