@@ -8,7 +8,7 @@ jobs:
     environment: test
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-latest]
+        platform: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04, ubuntu-22.04, ubuntu-22.10, windows-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
