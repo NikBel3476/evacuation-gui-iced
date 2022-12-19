@@ -30,11 +30,6 @@ jobs:
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
-
       - name: Sync node version and setup cache (ubuntu-18.04 only)
         uses: actions/setup-node@v3
         if: matrix.platform == 'ubuntu-18.04'
