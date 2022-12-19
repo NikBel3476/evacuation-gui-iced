@@ -8,6 +8,7 @@ import { Logic } from './logic/Logic.js';
 import { Canvas } from './canvas/Canvas.js';
 import { BASE_SETTINGS } from '../BASE_SETTINGS';
 import { Building, BuildingElement, Point } from './Interfaces/Building';
+import { GIFEncoder } from '../vendor/toGif/GIFEncoder';
 
 export class App {
 	BASE_SETTINGS: BASE_SETTINGS;
@@ -97,6 +98,7 @@ export class App {
 			data: this.data,
 			mathem: this.mathem
 		});
+		// @ts-ignore
 		this.encoder = new GIFEncoder();
 
 		// Инициализация первичных настроек
