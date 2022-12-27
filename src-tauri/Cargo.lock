@@ -157,6 +157,7 @@ dependencies = [
 name = "bim_polygon_tools"
 version = "0.1.0"
 dependencies = [
+ "cc",
  "libc",
 ]
 
