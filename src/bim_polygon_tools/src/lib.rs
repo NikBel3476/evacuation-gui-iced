@@ -221,3 +221,22 @@ pub extern "C" fn where_point_rust(
 		Ordering::Equal => 0,   // Точка на векторе, прямо по вектору или сзади вектора
 	}
 }
+
+#[no_mangle]
+pub extern "C" fn is_point_in_triangle_rust(
+	a_ax: c_double,
+	a_ay: c_double,
+	a_bx: c_double,
+	a_by: c_double,
+	a_cx: c_double,
+	a_cy: c_double,
+	a_px: c_double,
+	a_py: c_double,
+) -> u8 {
+	let q1 = where_point_rust(a_ax, a_ay, a_bx, a_by, a_px, a_py);
+	let q2 = where_point_rust(a_bx, a_by, a_cx, a_cy, a_px, a_py);
+	let q3 = where_point_rust(a_cx, a_cy, a_ax, a_ay, a_px, a_py);
+
+	u8::try_from(q1 >= 0 && q2 >= 0 && q3 >= 0)
+		.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
+}

@@ -47,6 +47,9 @@ double geom_tools_area_polygon_rust(const polygon_t *polygon);
 
 int where_point_rust(double aAx, double aAy, double aBx, double aBy, double aPx, double aPy);
 
+uint8_t is_point_in_triangle_rust(double aAx, double aAy, double aBx, double aBy, double aCx, double aCy,
+                                  double aPx, double aPy);
+
 uint8_t geom_tools_is_point_in_polygon(const point_t *point, const polygon_t *polygon);
 
 uint8_t geom_tools_is_intersect_line(const line_t *l1, const line_t *l2);

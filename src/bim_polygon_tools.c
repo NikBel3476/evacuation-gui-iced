@@ -122,7 +122,7 @@ uint8_t geom_tools_is_point_in_polygon(const point_t *const point, const polygon
         const point_t *a = &polygon->points[triangle_list[start_corner + 0]];
         const point_t *b = &polygon->points[triangle_list[start_corner + 1]];
         const point_t *c = &polygon->points[triangle_list[start_corner + 2]];
-        result = is_point_in_triangle(a->x, a->y, b->x, b->y, c->x, c->y, point->x, point->y);
+        result = is_point_in_triangle_rust(a->x, a->y, b->x, b->y, c->x, c->y, point->x, point->y);
         if (result == 1) break;
     }
     free(triangle_list);
