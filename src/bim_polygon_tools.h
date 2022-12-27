@@ -43,6 +43,8 @@ size_t triangle_polygon_rust(const polygon_t *polygon, int *triangle_list);
 
 double geom_tools_area_polygon(const polygon_t *polygon);
 
+double geom_tools_area_polygon_rust(const polygon_t *polygon);
+
 uint8_t geom_tools_is_point_in_polygon(const point_t *point, const polygon_t *polygon);
 
 uint8_t geom_tools_is_intersect_line(const line_t *l1, const line_t *l2);

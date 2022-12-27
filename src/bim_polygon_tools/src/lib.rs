@@ -169,8 +169,9 @@ pub extern "C" fn geom_tools_length_side_rust(p1: *const point_t, p2: *const poi
 	((point1.x - point2.x).powi(2) + (point1.y - point2.y).powi(2)).sqrt()
 }
 
-/*#[no_mangle]
-pub extern "C" fn geom_tools_area_polygon(polygon: *const polygon_t) -> c_double {
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn geom_tools_area_polygon_rust(polygon: *const polygon_t) -> c_double {
 	let polygon = unsafe {
 		polygon.as_ref().unwrap_or_else(||
 			panic!("Failed to dereference pointer polygon at geom_tools_area_polygon fn in bim_polygon_tools crate"))
@@ -178,13 +179,27 @@ pub extern "C" fn geom_tools_area_polygon(polygon: *const polygon_t) -> c_double
 
 	let num_of_triangle_corner = (polygon.numofpoints - 2) * 3;
 
-	let triangle_list = vec![0; usize::try_from(num_of_triangle_corner)
+	let mut triangle_list = vec![0; usize::try_from(num_of_triangle_corner)
 		.unwrap_or_else(|e|
 			panic!("Failed to convert num_of_triangle_corner to usize at geom_tools_area_polygon fn in bim_polygon_tools crate, {e}"))];
 
-	let mut areaElement = 0.0;
+	let number_of_triangles = triangle_polygon_rust(polygon, triangle_list.as_mut_ptr());
 
 	// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
 	// p=(ab+bc+ca)0.5
-	for i in 0..number_of_triangles {}
-}*/
+	let mut area_element = 0.0;
+	let points =
+		unsafe { std::slice::from_raw_parts(polygon.points, polygon.numofpoints as usize) };
+	for i in 0..number_of_triangles {
+		let a = &points[triangle_list[(i * 3) as usize] as usize];
+		let b = &points[triangle_list[(i * 3 + 1) as usize] as usize];
+		let c = &points[triangle_list[(i * 3 + 2) as usize] as usize];
+		let ab = geom_tools_length_side_rust(a, b);
+		let bc = geom_tools_length_side_rust(b, c);
+		let ca = geom_tools_length_side_rust(c, a);
+		let p = (ab + bc + ca) * 0.5;
+		area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
+	}
+
+	area_element
+}

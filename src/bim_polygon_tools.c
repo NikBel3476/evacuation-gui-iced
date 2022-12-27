@@ -62,7 +62,7 @@
     return sqrt(pow(p1->x - p2->x, 2) + pow(p1->y - p2->y, 2));
 }*/
 
-double geom_tools_area_polygon(const polygon_t *const polygon) {
+/*double geom_tools_area_polygon(const polygon_t *const polygon) {
     size_t num_of_triangle_corner = (polygon->numofpoints - 2) * 3;
 
     int *triangle_list = (int *) calloc(num_of_triangle_corner, sizeof(int));
@@ -88,7 +88,7 @@ double geom_tools_area_polygon(const polygon_t *const polygon) {
 
     free(triangle_list);
     return areaElement;
-}
+}*/
 
 static int where_point(double aAx, double aAy, double aBx, double aBy, double aPx, double aPy) {
     double s = (aBx - aAx) * (aPy - aAy) - (aBy - aAy) * (aPx - aAx);

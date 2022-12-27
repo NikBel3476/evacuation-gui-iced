@@ -147,7 +147,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
                     pt->y = jelement.polygon->points[idx_p].y;
                 }
 
-                zone->area = geom_tools_area_polygon(zone->polygon);
+                zone->area = geom_tools_area_polygon_rust(zone->polygon);
                 zone->is_blocked = false;
                 zone->is_visited = false;
                 zone->is_safe = false;
