@@ -383,3 +383,68 @@ pub extern "C" fn geom_tools_is_intersect_line_rust(l1: *const line_t, l2: *cons
 	)
 	.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
 }
+
+/// Определение точки на линии, расстояние до которой от заданной точки является минимальным из существующих
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn geom_tools_nearest_point_rust(
+	point_start: *const point_t,
+	line: *const line_t,
+) -> *mut point_t {
+	let point_start = unsafe {
+		point_start.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer point_start at geom_tools_nearest_point fn in bim_polygon_tools crate")
+		})
+	};
+
+	let line = unsafe {
+		line.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer line at geom_tools_nearest_point fn in bim_polygon_tools crate")
+		})
+	};
+
+	let p1 = unsafe {
+		line.p1.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer p1 at geom_tools_nearest_point fn in bim_polygon_tools crate")
+		})
+	};
+
+	let p2 = unsafe {
+		line.p2.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer p2 at geom_tools_nearest_point fn in bim_polygon_tools crate")
+		})
+	};
+
+	if geom_tools_length_side_rust(p1, p2) < 1e-9 {
+		return line.p1;
+	}
+
+	let a = point_start.x - p1.x;
+	let b = point_start.y - p1.y;
+	let c = p2.x - p1.x;
+	let d = p2.y - p1.y;
+
+	let dot = a * c + b * d;
+	let len_sq = c * c + d * d;
+	let mut param = -1.0;
+
+	if len_sq != 0.0 {
+		param = dot / len_sq;
+	}
+
+	let xx;
+	let yy;
+
+	if param < 0.0 {
+		xx = p1.x;
+		yy = p1.y;
+	} else if param > 1.0 {
+		xx = p2.x;
+		yy = p2.y;
+	} else {
+		xx = p1.x + param * c;
+		yy = p1.y + param * d;
+	}
+
+	Box::into_raw(Box::new(point_t { x: xx, y: yy }))
+}

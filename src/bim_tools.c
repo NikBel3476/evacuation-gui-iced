@@ -359,12 +359,12 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
     }
     // Поиск точек, которые являются ближайшими к отрезку edgeElement
     // Расстояние между этими точками и является шириной проема
-    point_t *pt1 = geom_tools_nearest_point(edgeElementA->p1, edgeElementB);
-    point_t *pt2 = geom_tools_nearest_point(edgeElementA->p2, edgeElementB);
+    point_t *pt1 = geom_tools_nearest_point_rust(edgeElementA->p1, edgeElementB);
+    point_t *pt2 = geom_tools_nearest_point_rust(edgeElementA->p2, edgeElementB);
     double d12 = geom_tools_length_side_rust(pt1, pt2);
 
-    point_t *pt3 = geom_tools_nearest_point(edgeElementB->p1, edgeElementA);
-    point_t *pt4 = geom_tools_nearest_point(edgeElementB->p2, edgeElementA);
+    point_t *pt3 = geom_tools_nearest_point_rust(edgeElementB->p1, edgeElementA);
+    point_t *pt4 = geom_tools_nearest_point_rust(edgeElementB->p2, edgeElementA);
     double d34 = geom_tools_length_side_rust(pt3, pt4);
 
     free(pt1);

@@ -70,4 +70,6 @@ double geom_tools_length_side_rust(const point_t *p1, const point_t *p2);
 
 point_t *geom_tools_nearest_point(const point_t *point_start, const line_t *line);
 
+point_t *geom_tools_nearest_point_rust(const point_t *point_start, const line_t *line);
+
 #endif //BIM_POLYGON_TOOLS_H

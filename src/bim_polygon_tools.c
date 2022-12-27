@@ -160,7 +160,7 @@ is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx,
 }*/
 
 // Определение точки на линии, расстояние до которой от заданной точки является минимальным из существующих
-point_t *geom_tools_nearest_point(const point_t *const point_start, const line_t *const line) {
+/*point_t *geom_tools_nearest_point(const point_t *const point_start, const line_t *const line) {
     point_t a = {line->p1->x, line->p1->y};
     point_t b = {line->p2->x, line->p2->y};
 
@@ -199,5 +199,5 @@ point_t *geom_tools_nearest_point(const point_t *const point_start, const line_t
     point_end->x = xx;
     point_end->y = yy;
     return point_end;
-}
+}*/
 
