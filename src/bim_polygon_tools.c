@@ -90,19 +90,19 @@
     return areaElement;
 }*/
 
-static int where_point(double aAx, double aAy, double aBx, double aBy, double aPx, double aPy) {
+/*static int where_point(double aAx, double aAy, double aBx, double aBy, double aPx, double aPy) {
     double s = (aBx - aAx) * (aPy - aAy) - (aBy - aAy) * (aPx - aAx);
     if (s > 0) return 1;        // Точка слева от вектора AB
     else if (s < 0) return -1;   // Точка справа от вектора AB
     else return 0;              // Точка на векторе, прямо по вектору или сзади вектора
-}
+}*/
 
 static uint8_t
 is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx, double aCy,
                       double aPx, double aPy) {
-    int q1 = where_point(aAx, aAy, aBx, aBy, aPx, aPy);
-    int q2 = where_point(aBx, aBy, aCx, aCy, aPx, aPy);
-    int q3 = where_point(aCx, aCy, aAx, aAy, aPx, aPy);
+    int q1 = where_point_rust(aAx, aAy, aBx, aBy, aPx, aPy);
+    int q2 = where_point_rust(aBx, aBy, aCx, aCy, aPx, aPy);
+    int q3 = where_point_rust(aCx, aCy, aAx, aAy, aPx, aPy);
 
     return (q1 >= 0 && q2 >= 0 && q3 >= 0);
 }

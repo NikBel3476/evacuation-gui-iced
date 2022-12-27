@@ -1,7 +1,8 @@
 #![allow(non_camel_case_types)]
 
 use libc::{c_char, c_double, c_int};
-use std::ffi::{CStr, CString};
+use std::cmp::Ordering;
+use std::ffi::CString;
 
 #[repr(C)]
 pub struct point_t {
@@ -202,4 +203,21 @@ pub extern "C" fn geom_tools_area_polygon_rust(polygon: *const polygon_t) -> c_d
 	}
 
 	area_element
+}
+
+#[no_mangle]
+pub extern "C" fn where_point_rust(
+	a_ax: c_double,
+	a_ay: c_double,
+	a_bx: c_double,
+	a_by: c_double,
+	a_px: c_double,
+	a_py: c_double,
+) -> c_int {
+	let s = (a_bx - a_ax) * (a_py - a_ay) - (a_by - a_ay) * (a_px - a_ax);
+	match s.total_cmp(&0.0) {
+		Ordering::Greater => 1, // Точка слева от вектора AB
+		Ordering::Less => -1,   // Точка справа от вектора AB
+		Ordering::Equal => 0,   // Точка на векторе, прямо по вектору или сзади вектора
+	}
 }
