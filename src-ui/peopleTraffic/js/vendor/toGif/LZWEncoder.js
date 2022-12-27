@@ -7,7 +7,7 @@
  * @version 0.1 AS3 implementation
  */
 
-LZWEncoder = function () {
+export const LZWEncoder = function () {
 	var exports = {};
 	var EOF = -1;
 	var imgW;
@@ -81,8 +81,8 @@ LZWEncoder = function () {
 	var cur_accum = 0;
 	var cur_bits = 0;
 	var masks = [
-		0x0000, 0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
-		0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
+		0x0000, 0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff, 0x01ff, 0x03ff,
+		0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
 	];
 
 	// Number of characters so far in this 'packet'
@@ -91,12 +91,7 @@ LZWEncoder = function () {
 	// Define the storage for the packet accumulator
 	var accum = [];
 
-	var LZWEncoder = (exports.LZWEncoder = function LZWEncoder(
-		width,
-		height,
-		pixels,
-		color_depth
-	) {
+	var LZWEncoder = (exports.LZWEncoder = function LZWEncoder(width, height, pixels, color_depth) {
 		imgW = width;
 		imgH = height;
 		pixAry = pixels;

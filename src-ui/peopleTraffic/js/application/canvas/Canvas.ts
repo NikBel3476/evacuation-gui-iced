@@ -21,7 +21,6 @@ export class Canvas {
 		this.y0 = 0;
 
 		this.memCanvas = document.createElement('canvas');
-		console.log(this.memCanvas);
 		this.memCanvas.width = this.canvasContainer.clientWidth;
 		this.memCanvas.height = this.canvasContainer.clientHeight;
 		this.memContext = this.memCanvas.getContext('2d') as CanvasRenderingContext2D;

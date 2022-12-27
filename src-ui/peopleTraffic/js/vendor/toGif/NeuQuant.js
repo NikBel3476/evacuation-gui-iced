@@ -27,7 +27,7 @@
  * @version 0.1 AS3 implementation
  */
 
-NeuQuant = function () {
+export const NeuQuant = function () {
 	var exports = {};
 	var netsize = 256; /* number of colours used */
 
@@ -201,8 +201,7 @@ NeuQuant = function () {
 		}
 
 		netindex[previouscol] = (startpos + maxnetpos) >> 1;
-		for (j = previouscol + 1; j < 256; j++)
-			netindex[j] = maxnetpos; /* really 256 */
+		for (j = previouscol + 1; j < 256; j++) netindex[j] = maxnetpos; /* really 256 */
 	};
 
 	/*
@@ -240,8 +239,7 @@ NeuQuant = function () {
 		if (rad <= 1) rad = 0;
 
 		for (i = 0; i < rad; i++)
-			radpower[i] =
-				alpha * (((rad * rad - i * i) * radbias) / (rad * rad));
+			radpower[i] = alpha * (((rad * rad - i * i) * radbias) / (rad * rad));
 
 		if (lengthcount < minpicturebytes) step = 3;
 		else if (lengthcount % prime1 !== 0) step = 3 * prime1;
@@ -278,8 +276,7 @@ NeuQuant = function () {
 				if (rad <= 1) rad = 0;
 
 				for (j = 0; j < rad; j++)
-					radpower[j] =
-						alpha * (((rad * rad - j * j) * radbias) / (rad * rad));
+					radpower[j] = alpha * (((rad * rad - j * j) * radbias) / (rad * rad));
 			}
 		}
 	};

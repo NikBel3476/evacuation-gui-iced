@@ -147,7 +147,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
                     pt->y = jelement.polygon->points[idx_p].y;
                 }
 
-                zone->area = geom_tools_area_polygon(zone->polygon);
+                zone->area = geom_tools_area_polygon_rust(zone->polygon);
                 zone->is_blocked = false;
                 zone->is_visited = false;
                 zone->is_safe = false;
@@ -283,7 +283,7 @@ line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) 
         point_t *pointElementA = &aPolygonElement->points[i - 1];
         point_t *pointElementB = &aPolygonElement->points[i];
         line_t line_tmp = {pointElementA, pointElementB};
-        bool isIntersect = geom_tools_is_intersect_line(aLine, &line_tmp);
+        bool isIntersect = geom_tools_is_intersect_line_rust(aLine, &line_tmp);
         if (isIntersect) {
             line->p1 = pointElementA;
             line->p2 = pointElementB;
@@ -329,11 +329,11 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
 
     point_t *l1p1 = edge1->p1;
     point_t *l1p2 = edge2->p2;
-    double length1 = geom_tools_length_side(l1p1, l1p2);
+    double length1 = geom_tools_length_side_rust( l1p1, l1p2);
 
     point_t *l2p1 = edge1->p1;
     point_t *l2p2 = edge2->p2;
-    double length2 = geom_tools_length_side(l2p1, l2p2);
+    double length2 = geom_tools_length_side_rust(l2p1, l2p2);
 
     // Короткая линия проема, которая пересекает оба помещения
     line_t dline = {NULL, NULL};
@@ -359,13 +359,13 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
     }
     // Поиск точек, которые являются ближайшими к отрезку edgeElement
     // Расстояние между этими точками и является шириной проема
-    point_t *pt1 = geom_tools_nearest_point(edgeElementA->p1, edgeElementB);
-    point_t *pt2 = geom_tools_nearest_point(edgeElementA->p2, edgeElementB);
-    double d12 = geom_tools_length_side(pt1, pt2);
+    point_t *pt1 = geom_tools_nearest_point_rust(edgeElementA->p1, edgeElementB);
+    point_t *pt2 = geom_tools_nearest_point_rust(edgeElementA->p2, edgeElementB);
+    double d12 = geom_tools_length_side_rust(pt1, pt2);
 
-    point_t *pt3 = geom_tools_nearest_point(edgeElementB->p1, edgeElementA);
-    point_t *pt4 = geom_tools_nearest_point(edgeElementB->p2, edgeElementA);
-    double d34 = geom_tools_length_side(pt3, pt4);
+    point_t *pt3 = geom_tools_nearest_point_rust(edgeElementB->p1, edgeElementA);
+    point_t *pt4 = geom_tools_nearest_point_rust(edgeElementB->p2, edgeElementA);
+    double d34 = geom_tools_length_side_rust(pt3, pt4);
 
     free(pt1);
     free(pt2);
@@ -418,7 +418,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
         for (size_t j = 0; j < tpolygon->numofpoints; ++j) {
             const point_t *tpoint = &tpolygon->points[j];
             const polygon_t *zpolygon = t_realted_zones[0]->polygon;
-            size_t tpoint_in_zpolygon = geom_tools_is_point_in_polygon(tpoint, zpolygon);
+            size_t tpoint_in_zpolygon = geom_tools_is_point_in_polygon_rust(tpoint, zpolygon);
             if (tpoint_in_zpolygon) {
                 if (numofpoints_edge1 == 2) {
                     edge1.p1 = (point_t *) tpoint;
@@ -446,11 +446,11 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
         if (transit->sign == DOOR_WAY_INT || transit->sign == DOOR_WAY_OUT) {
             point_t *l1p1 = edge1.p1;
             point_t *l1p2 = edge1.p2;
-            double width1 = geom_tools_length_side(l1p1, l1p2);
+            double width1 = geom_tools_length_side_rust(l1p1, l1p2);
 
             point_t *l2p1 = edge2.p1;
             point_t *l2p2 = edge2.p2;
-            double width2 = geom_tools_length_side(l2p1, l2p2);
+            double width2 = geom_tools_length_side_rust(l2p1, l2p2);
 
             width = (width1 + width2) / 2;
         } else if (transit->sign == DOOR_WAY) {
