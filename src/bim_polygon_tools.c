@@ -134,16 +134,16 @@ is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx,
     return (p2->x - p1->x) * (p3->y - p1->y) - (p2->y - p1->y) * (p3->x - p1->x);
 }*/
 
-static void fswap(double *v1, double *v2) {
+/*static void fswap(double *v1, double *v2) {
     double tmp_v1 = *v1;
     *v1 = *v2;
     *v2 = tmp_v1;
-}
+}*/
 
 // https://e-maxx.ru/algo/segments_intersection_checking
 static uint8_t intersect_1(double a, double b, double c, double d) {
-    if (a > b) fswap(&a, &b);
-    if (c > d) fswap(&c, &d);
+    if (a > b) fswap_rust(&a, &b);
+    if (c > d) fswap_rust(&c, &d);
     return fmax(a, c) <= fmin(b, d);
 }
 

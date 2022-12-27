@@ -308,3 +308,21 @@ pub extern "C" fn area_rust(
 
 	(p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
 }
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn fswap_rust(v1: *mut c_double, v2: *mut c_double) {
+	let v1 = unsafe {
+		v1.as_mut().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer v1 at fswap fn in bim_polygon_tools crate")
+		})
+	};
+
+	let v2 = unsafe {
+		v2.as_mut().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer v2 at fswap fn in bim_polygon_tools crate")
+		})
+	};
+
+	std::mem::swap(&mut (*v1), &mut (*v2));
+}
