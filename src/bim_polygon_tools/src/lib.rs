@@ -329,7 +329,6 @@ pub extern "C" fn fswap_rust(v1: *mut c_double, v2: *mut c_double) {
 
 /// https://e-maxx.ru/algo/segments_intersection_checking
 #[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn intersect_1_rust(
 	mut a: c_double,
 	mut b: c_double,
@@ -345,4 +344,42 @@ pub extern "C" fn intersect_1_rust(
 
 	u8::try_from(a.max(c) <= b.min(d))
 		.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
+}
+
+/// check if two segments intersect
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn geom_tools_is_intersect_line_rust(l1: *const line_t, l2: *const line_t) -> u8 {
+	let l1 = unsafe {
+		l1.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer l1 at geom_tools_is_intersect_line_rust fn in bim_polygon_tools crate")
+		})
+	};
+
+	let l2 = unsafe {
+		l2.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer l2 at geom_tools_is_intersect_line_rust fn in bim_polygon_tools crate")
+		})
+	};
+
+	let p1 = unsafe {
+		l1.p1.as_ref().unwrap_or_else(|| panic!("Failed to dereference pointer p1 at geom_tools_is_intersect_line_rust fn in bim_polygon_tools crate"))
+	};
+	let p2 = unsafe {
+		l1.p2.as_ref().unwrap_or_else(|| panic!("Failed to dereference pointer p1 at geom_tools_is_intersect_line_rust fn in bim_polygon_tools crate"))
+	};
+	let p3 = unsafe {
+		l2.p1.as_ref().unwrap_or_else(|| panic!("Failed to dereference pointer p2 at geom_tools_is_intersect_line_rust fn in bim_polygon_tools crate"))
+	};
+	let p4 = unsafe {
+		l2.p2.as_ref().unwrap_or_else(|| panic!("Failed to dereference pointer p2 at geom_tools_is_intersect_line_rust fn in bim_polygon_tools crate"))
+	};
+
+	u8::try_from(
+		intersect_1_rust(p1.x, p2.x, p3.x, p4.x) == 1
+			&& intersect_1_rust(p1.y, p2.y, p3.y, p4.y) == 1
+			&& area_rust(p1, p2, p3) * area_rust(p1, p2, p4) <= 0.0
+			&& area_rust(p3, p4, p1) * area_rust(p3, p4, p2) <= 0.0,
+	)
+	.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
 }

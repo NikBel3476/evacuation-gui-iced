@@ -283,7 +283,7 @@ line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) 
         point_t *pointElementA = &aPolygonElement->points[i - 1];
         point_t *pointElementB = &aPolygonElement->points[i];
         line_t line_tmp = {pointElementA, pointElementB};
-        bool isIntersect = geom_tools_is_intersect_line(aLine, &line_tmp);
+        bool isIntersect = geom_tools_is_intersect_line_rust(aLine, &line_tmp);
         if (isIntersect) {
             line->p1 = pointElementA;
             line->p2 = pointElementB;

@@ -148,7 +148,7 @@ is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx,
 }*/
 
 // check if two segments intersect
-uint8_t geom_tools_is_intersect_line(const line_t *const l1, const line_t *const l2) {
+/*uint8_t geom_tools_is_intersect_line(const line_t *const l1, const line_t *const l2) {
     const point_t *p1 = l1->p1;
     const point_t *p2 = l1->p2;
     const point_t *p3 = l2->p1;
@@ -157,7 +157,7 @@ uint8_t geom_tools_is_intersect_line(const line_t *const l1, const line_t *const
            && intersect_1_rust(p1->y, p2->y, p3->y, p4->y)
            && area_rust(p1, p2, p3) * area_rust(p1, p2, p4) <= 0
            && area_rust(p3, p4, p1) * area_rust(p3, p4, p2) <= 0;
-}
+}*/
 
 // Определение точки на линии, расстояние до которой от заданной точки является минимальным из существующих
 point_t *geom_tools_nearest_point(const point_t *const point_start, const line_t *const line) {
