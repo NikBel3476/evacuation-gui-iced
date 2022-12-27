@@ -17,9 +17,9 @@
 
 // https://userpages.umbc.edu/~rostamia/cbook/triangle.html
 /// @return Массив номеров точек треугольников
-static size_t triangle_polygon(const polygon_t *const polygon, int *triangle_list) {
+/*static size_t triangle_polygon(const polygon_t *const polygon, int *triangle_list) {
     struct triangulateio in;
-    size_t num_of_points = polygon->numofpoints/* - 1*/;
+    size_t num_of_points = polygon->numofpoints*//* - 1*//*;
     REAL *pointlist = (REAL *) calloc(num_of_points * 2, sizeof(REAL));
 
     size_t counter = 0;
@@ -56,11 +56,11 @@ static size_t triangle_polygon(const polygon_t *const polygon, int *triangle_lis
     triangulate(triswitches, &in, &in, NULL);
     free(pointlist);
     return (size_t) in.numberoftriangles;
-}
+}*/
 
-double geom_tools_length_side(const point_t *const p1, const point_t *const p2) {
+/*double geom_tools_length_side(const point_t *const p1, const point_t *const p2) {
     return sqrt(pow(p1->x - p2->x, 2) + pow(p1->y - p2->y, 2));
-}
+}*/
 
 double geom_tools_area_polygon(const polygon_t *const polygon) {
     size_t num_of_triangle_corner = (polygon->numofpoints - 2) * 3;
@@ -70,7 +70,7 @@ double geom_tools_area_polygon(const polygon_t *const polygon) {
         return -1;
     }
 
-    size_t number_of_triangles = triangle_polygon(polygon, triangle_list);
+    size_t number_of_triangles = triangle_polygon_rust(polygon, triangle_list);
 
     //Вычисляем площадь по формуле S=(p(p-ab)(p-bc)(p-ca))^0.5;
     //p=(ab+bc+ca)0.5
@@ -116,7 +116,7 @@ uint8_t geom_tools_is_point_in_polygon(const point_t *const point, const polygon
         return -1;
     }
 
-    size_t numberoftriangles = triangle_polygon(polygon, triangle_list);
+    size_t numberoftriangles = triangle_polygon_rust(polygon, triangle_list);
     uint8_t result = 0;
     for (size_t i = 0, start_corner = 0; i < numberoftriangles; ++i, start_corner = i * 3) {
         const point_t *a = &polygon->points[triangle_list[start_corner + 0]];
