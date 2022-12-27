@@ -11,7 +11,6 @@ fn main() {
 		"../src/bim_graph.c",
 		"../src/bim_json_object.c",
 		"../src/bim_output.c",
-		"../src/bim_polygon_tools.c",
 		"../src/bim_tools.c",
 		"../src/run.c",
 	];

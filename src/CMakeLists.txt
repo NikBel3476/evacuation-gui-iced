@@ -18,7 +18,6 @@ add_library(EvacuationC
         bim_graph.c bim_graph.h
         bim_json_object.c bim_json_object.h
         bim_output.c bim_output.h
-        bim_polygon_tools.c bim_polygon_tools.h
         bim_tools.c bim_tools.h
         run.c run.h
 )

@@ -22,6 +22,7 @@ pub struct polygon_t {
 	pub points: *mut point_t,
 }
 
+/// cbindgen:ignore
 #[repr(C)]
 pub struct triangulateio {
 	/// In / out
@@ -77,6 +78,7 @@ pub struct triangulateio {
 	pub numberofedges: c_int,
 }
 
+/// cbindgen:ignore
 extern "C" {
 	fn triangulate(
 		triswitches: *mut c_char,
