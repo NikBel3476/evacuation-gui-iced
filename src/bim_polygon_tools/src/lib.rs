@@ -326,3 +326,23 @@ pub extern "C" fn fswap_rust(v1: *mut c_double, v2: *mut c_double) {
 
 	std::mem::swap(&mut (*v1), &mut (*v2));
 }
+
+/// https://e-maxx.ru/algo/segments_intersection_checking
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn intersect_1_rust(
+	mut a: c_double,
+	mut b: c_double,
+	mut c: c_double,
+	mut d: c_double,
+) -> u8 {
+	if a > b {
+		fswap_rust(&mut a, &mut b);
+	}
+	if c > d {
+		fswap_rust(&mut c, &mut d);
+	}
+
+	u8::try_from(a.max(c) <= b.min(d))
+		.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
+}

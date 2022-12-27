@@ -141,11 +141,11 @@ is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx,
 }*/
 
 // https://e-maxx.ru/algo/segments_intersection_checking
-static uint8_t intersect_1(double a, double b, double c, double d) {
+/*static uint8_t intersect_1(double a, double b, double c, double d) {
     if (a > b) fswap_rust(&a, &b);
     if (c > d) fswap_rust(&c, &d);
     return fmax(a, c) <= fmin(b, d);
-}
+}*/
 
 // check if two segments intersect
 uint8_t geom_tools_is_intersect_line(const line_t *const l1, const line_t *const l2) {
@@ -153,8 +153,8 @@ uint8_t geom_tools_is_intersect_line(const line_t *const l1, const line_t *const
     const point_t *p2 = l1->p2;
     const point_t *p3 = l2->p1;
     const point_t *p4 = l2->p2;
-    return intersect_1(p1->x, p2->x, p3->x, p4->x)
-           && intersect_1(p1->y, p2->y, p3->y, p4->y)
+    return intersect_1_rust(p1->x, p2->x, p3->x, p4->x)
+           && intersect_1_rust(p1->y, p2->y, p3->y, p4->y)
            && area_rust(p1, p2, p3) * area_rust(p1, p2, p4) <= 0
            && area_rust(p3, p4, p1) * area_rust(p3, p4, p2) <= 0;
 }
