@@ -418,7 +418,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
         for (size_t j = 0; j < tpolygon->numofpoints; ++j) {
             const point_t *tpoint = &tpolygon->points[j];
             const polygon_t *zpolygon = t_realted_zones[0]->polygon;
-            size_t tpoint_in_zpolygon = geom_tools_is_point_in_polygon(tpoint, zpolygon);
+            size_t tpoint_in_zpolygon = geom_tools_is_point_in_polygon_rust(tpoint, zpolygon);
             if (tpoint_in_zpolygon) {
                 if (numofpoints_edge1 == 2) {
                     edge1.p1 = (point_t *) tpoint;

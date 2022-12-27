@@ -240,3 +240,42 @@ pub extern "C" fn is_point_in_triangle_rust(
 	u8::try_from(q1 >= 0 && q2 >= 0 && q3 >= 0)
 		.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
 }
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn geom_tools_is_point_in_polygon_rust(
+	point: *const point_t,
+	polygon: *const polygon_t,
+) -> u8 {
+	let point = unsafe {
+		point.as_ref().unwrap_or_else(||
+			panic!("Failed to dereference pointer point at geom_tools_is_point_in_polygon_rust fn in bim_polygon_tools crate"))
+	};
+
+	let polygon = unsafe {
+		polygon.as_ref().unwrap_or_else(||
+			panic!("Failed to dereference pointer polygon at geom_tools_is_point_in_polygon_rust fn in bim_polygon_tools crate"))
+	};
+
+	let num_of_triangle_corner = (polygon.numofpoints - 2) * 3;
+
+	let mut triangle_list = vec![0; usize::try_from(num_of_triangle_corner)
+		.unwrap_or_else(|e|
+			panic!("Failed to convert num_of_triangle_corner to usize at geom_tools_is_point_in_polygon_rust fn in bim_polygon_tools crate. {e}"))];
+
+	let number_of_triangles = triangle_polygon_rust(polygon, triangle_list.as_mut_ptr());
+
+	let points =
+		unsafe { std::slice::from_raw_parts(polygon.points, polygon.numofpoints as usize) };
+
+	for i in 0..number_of_triangles {
+		let a = &points[triangle_list[(i * 3) as usize] as usize];
+		let b = &points[triangle_list[(i * 3 + 1) as usize] as usize];
+		let c = &points[triangle_list[(i * 3 + 2) as usize] as usize];
+		if is_point_in_triangle_rust(a.x, a.y, b.x, b.y, c.x, c.y, point.x, point.y) == 1 {
+			return 1;
+		}
+	}
+
+	0
+}

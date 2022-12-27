@@ -97,7 +97,7 @@
     else return 0;              // Точка на векторе, прямо по вектору или сзади вектора
 }*/
 
-static uint8_t
+/*static uint8_t
 is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx, double aCy,
                       double aPx, double aPy) {
     int q1 = where_point_rust(aAx, aAy, aBx, aBy, aPx, aPy);
@@ -105,9 +105,9 @@ is_point_in_triangle(double aAx, double aAy, double aBx, double aBy, double aCx,
     int q3 = where_point_rust(aCx, aCy, aAx, aAy, aPx, aPy);
 
     return (q1 >= 0 && q2 >= 0 && q3 >= 0);
-}
+}*/
 
-uint8_t geom_tools_is_point_in_polygon(const point_t *const point, const polygon_t *const polygon) {
+/*uint8_t geom_tools_is_point_in_polygon(const point_t *const point, const polygon_t *const polygon) {
     size_t numof_triangle_corner = (polygon->numofpoints - 2) * 3;
 
     int *triangle_list = NULL;
@@ -127,7 +127,7 @@ uint8_t geom_tools_is_point_in_polygon(const point_t *const point, const polygon
     }
     free(triangle_list);
     return result;
-}
+}*/
 
 // signed area of a triangle
 static double area(const point_t *p1, const point_t *p2, const point_t *p3) {
