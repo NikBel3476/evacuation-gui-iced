@@ -329,11 +329,11 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
 
     point_t *l1p1 = edge1->p1;
     point_t *l1p2 = edge2->p2;
-    double length1 = geom_tools_length_side(l1p1, l1p2);
+    double length1 = geom_tools_length_side_rust( l1p1, l1p2);
 
     point_t *l2p1 = edge1->p1;
     point_t *l2p2 = edge2->p2;
-    double length2 = geom_tools_length_side(l2p1, l2p2);
+    double length2 = geom_tools_length_side_rust(l2p1, l2p2);
 
     // Короткая линия проема, которая пересекает оба помещения
     line_t dline = {NULL, NULL};
@@ -361,11 +361,11 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
     // Расстояние между этими точками и является шириной проема
     point_t *pt1 = geom_tools_nearest_point(edgeElementA->p1, edgeElementB);
     point_t *pt2 = geom_tools_nearest_point(edgeElementA->p2, edgeElementB);
-    double d12 = geom_tools_length_side(pt1, pt2);
+    double d12 = geom_tools_length_side_rust(pt1, pt2);
 
     point_t *pt3 = geom_tools_nearest_point(edgeElementB->p1, edgeElementA);
     point_t *pt4 = geom_tools_nearest_point(edgeElementB->p2, edgeElementA);
-    double d34 = geom_tools_length_side(pt3, pt4);
+    double d34 = geom_tools_length_side_rust(pt3, pt4);
 
     free(pt1);
     free(pt2);
@@ -446,11 +446,11 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
         if (transit->sign == DOOR_WAY_INT || transit->sign == DOOR_WAY_OUT) {
             point_t *l1p1 = edge1.p1;
             point_t *l1p2 = edge1.p2;
-            double width1 = geom_tools_length_side(l1p1, l1p2);
+            double width1 = geom_tools_length_side_rust(l1p1, l1p2);
 
             point_t *l2p1 = edge2.p1;
             point_t *l2p2 = edge2.p2;
-            double width2 = geom_tools_length_side(l2p1, l2p2);
+            double width2 = geom_tools_length_side_rust(l2p1, l2p2);
 
             width = (width1 + width2) / 2;
         } else if (transit->sign == DOOR_WAY) {

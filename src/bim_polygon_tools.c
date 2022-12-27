@@ -79,9 +79,9 @@ double geom_tools_area_polygon(const polygon_t *const polygon) {
         const point_t *a = &polygon->points[triangle_list[start_corner + 0]];
         const point_t *b = &polygon->points[triangle_list[start_corner + 1]];
         const point_t *c = &polygon->points[triangle_list[start_corner + 2]];
-        double ab = geom_tools_length_side(a, b);
-        double bc = geom_tools_length_side(b, c);
-        double ca = geom_tools_length_side(c, a);
+        double ab = geom_tools_length_side_rust(a, b);
+        double bc = geom_tools_length_side_rust(b, c);
+        double ca = geom_tools_length_side_rust(c, a);
         double p = (ab + bc + ca) * 0.5;
         areaElement += sqrt(p * (p - ab) * (p - bc) * (p - ca));
     }
@@ -164,7 +164,7 @@ point_t *geom_tools_nearest_point(const point_t *const point_start, const line_t
     point_t a = {line->p1->x, line->p1->y};
     point_t b = {line->p2->x, line->p2->y};
 
-    if (geom_tools_length_side(&a, &b) < 1e-9) {
+    if (geom_tools_length_side_rust(&a, &b) < 1e-9) {
         return line->p1;
     }
 

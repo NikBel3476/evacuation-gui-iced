@@ -13,7 +13,7 @@ fn main() {
 		"../src/bim_output.c",
 		"../src/bim_polygon_tools.c",
 		"../src/bim_tools.c",
-		"../src/run.c"
+		"../src/run.c",
 	];
 
 	let headers_dirs = [
@@ -21,9 +21,11 @@ fn main() {
 		"../src/bim_cli/src",
 		"../src/bim_configure/src",
 		"../src/bim_json_object/src",
+		"../src/bim_output/src",
+		"../src/bim_polygon_tools/src",
 		"../thirdparty/arraylist",
 		"../thirdparty/triangle",
-		"../thirdparty/c-logger/src"
+		"../thirdparty/c-logger/src",
 	];
 
 	cc::Build::new()

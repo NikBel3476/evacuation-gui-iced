@@ -56,6 +56,7 @@ dependencies = [
  "bim_evac",
  "bim_json_object",
  "bim_output",
+ "bim_polygon_tools",
  "cc",
  "cli",
  "configuration",
@@ -147,6 +148,13 @@ dependencies = [
 
 [[package]]
 name = "bim_output"
+version = "0.1.0"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "bim_polygon_tools"
 version = "0.1.0"
 dependencies = [
  "libc",

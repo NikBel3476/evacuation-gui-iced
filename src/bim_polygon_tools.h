@@ -47,6 +47,8 @@ uint8_t geom_tools_is_intersect_line(const line_t *l1, const line_t *l2);
 
 double geom_tools_length_side(const point_t *p1, const point_t *p2);
 
+double geom_tools_length_side_rust(const point_t *p1, const point_t *p2);
+
 point_t *geom_tools_nearest_point(const point_t *point_start, const line_t *line);
 
 #endif //BIM_POLYGON_TOOLS_H
