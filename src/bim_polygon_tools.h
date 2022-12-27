@@ -41,16 +41,12 @@ typedef polygon_t multiline_t;
 
 size_t triangle_polygon_rust(const polygon_t *polygon, int *triangle_list);
 
-double geom_tools_area_polygon(const polygon_t *polygon);
-
 double geom_tools_area_polygon_rust(const polygon_t *polygon);
 
 int where_point_rust(double aAx, double aAy, double aBx, double aBy, double aPx, double aPy);
 
 uint8_t is_point_in_triangle_rust(double aAx, double aAy, double aBx, double aBy, double aCx, double aCy,
                                   double aPx, double aPy);
-
-uint8_t geom_tools_is_point_in_polygon(const point_t *point, const polygon_t *polygon);
 
 uint8_t geom_tools_is_point_in_polygon_rust(const point_t *point, const polygon_t *polygon);
 
@@ -60,15 +56,9 @@ void fswap_rust(double *v1, double *v2);
 
 uint8_t intersect_1_rust(double a, double b, double c, double d);
 
-uint8_t geom_tools_is_intersect_line(const line_t *l1, const line_t *l2);
-
 uint8_t geom_tools_is_intersect_line_rust(const line_t * l1, const line_t * l2);
 
-double geom_tools_length_side(const point_t *p1, const point_t *p2);
-
 double geom_tools_length_side_rust(const point_t *p1, const point_t *p2);
-
-point_t *geom_tools_nearest_point(const point_t *point_start, const line_t *line);
 
 point_t *geom_tools_nearest_point_rust(const point_t *point_start, const line_t *line);
 
