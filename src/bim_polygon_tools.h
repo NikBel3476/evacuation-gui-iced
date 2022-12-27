@@ -54,6 +54,8 @@ uint8_t geom_tools_is_point_in_polygon(const point_t *point, const polygon_t *po
 
 uint8_t geom_tools_is_point_in_polygon_rust(const point_t *point, const polygon_t *polygon);
 
+double area_rust(const point_t *p1, const point_t *p2, const point_t *p3);
+
 uint8_t geom_tools_is_intersect_line(const line_t *l1, const line_t *l2);
 
 double geom_tools_length_side(const point_t *p1, const point_t *p2);

@@ -279,3 +279,32 @@ pub extern "C" fn geom_tools_is_point_in_polygon_rust(
 
 	0
 }
+
+/// signed area of a triangle
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn area_rust(
+	p1: *const point_t,
+	p2: *const point_t,
+	p3: *const point_t,
+) -> c_double {
+	let p1 = unsafe {
+		p1.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer p1 at area fn in bim_polygon_tools crate")
+		})
+	};
+
+	let p2 = unsafe {
+		p2.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer p2 at area fn in bim_polygon_tools crate")
+		})
+	};
+
+	let p3 = unsafe {
+		p3.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer p3 at area fn in bim_polygon_tools crate")
+		})
+	};
+
+	(p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
+}
