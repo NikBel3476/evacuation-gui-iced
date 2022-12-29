@@ -17,6 +17,10 @@ const MainPage: FC<mainPageProps> = () => {
 		invoke('open_people_traffic_window');
 	};
 
+	const handleOpenBuildingViewButtonClick = () => {
+		invoke('open_building_view_window');
+	};
+
 	const handleBimStartButtonClick = () => {
 		invoke('bim_start');
 	};
@@ -36,6 +40,11 @@ const MainPage: FC<mainPageProps> = () => {
 			<div>
 				<button onClick={handleOpenPeopleTrafficButtonClick}>
 					Открыть окно моделирования эвакуации
+				</button>
+			</div>
+			<div>
+				<button onClick={handleOpenBuildingViewButtonClick}>
+					Открыть окно просмотра модели здания
 				</button>
 			</div>
 			<div>

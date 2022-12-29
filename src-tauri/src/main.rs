@@ -24,6 +24,7 @@ fn main() {
 			open_configuration_window,
 			open_configuration_rescript_window,
 			open_people_traffic_window,
+			open_building_view_window,
 			bim_start
 		])
 		.run(tauri::generate_context!())
@@ -42,6 +43,7 @@ async fn open_configuration_window(handle: AppHandle) {
 		"configuration",
 		tauri::WindowUrl::App("src-ui/config/index.html".into()),
 	)
+	.title("Configuration")
 	.build()
 	.unwrap();
 }
@@ -53,6 +55,7 @@ async fn open_configuration_rescript_window(handle: AppHandle) {
 		"configurationRescript",
 		tauri::WindowUrl::App("src-ui/configRescript/index.html".into()),
 	)
+	.title("Configuration rescript")
 	.build()
 	.unwrap();
 }
@@ -64,6 +67,20 @@ async fn open_people_traffic_window(handle: AppHandle) {
 		"people_traffic",
 		tauri::WindowUrl::App("src-ui/peopleTraffic/index.html".into()),
 	)
+	.title("People traffic")
+	.min_inner_size(1000.0, 800.0)
+	.build()
+	.unwrap();
+}
+
+#[tauri::command]
+async fn open_building_view_window(handle: AppHandle) {
+	let _building_view_window = WindowBuilder::new(
+		&handle,
+		"building_view",
+		tauri::WindowUrl::App("src-ui/buildingView/index.html".into()),
+	)
+	.title("Building view")
 	.min_inner_size(1000.0, 800.0)
 	.build()
 	.unwrap();
