@@ -31,7 +31,8 @@ export default defineConfig({
 					'configRescript',
 					'index.html'
 				),
-				peopleTraffic: path.resolve(__dirname, 'src-ui', 'peopleTraffic', 'index.html')
+				peopleTraffic: path.resolve(__dirname, 'src-ui', 'peopleTraffic', 'index.html'),
+				buildingView: path.resolve(__dirname, 'src-ui', 'buildingView', 'index.html')
 			}
 		}
 	}
