@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-function RescriptComponent(Props) {
+function RescriptComponent(props) {
   return React.createElement("div", undefined, React.createElement("p", undefined, "Rescript component"));
 }
 

@@ -14,7 +14,7 @@
     "warnings": {
         "error" : "+101"
     },
-    "reason": { "react-jsx": 3 },
+    "jsx": { "version": 4, "mode": "classic" },
     "bs-dependencies": [
         "@rescript/react",
         "@ryyppy/rescript-promise",
