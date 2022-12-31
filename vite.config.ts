@@ -16,7 +16,7 @@ export default defineConfig({
 	envPrefix: ['VITE_', 'TAURI_'],
 	css: {
 		modules: {
-			localsConvention: 'camelCaseOnly'
+			localsConvention: 'camelCase'
 		}
 	},
 	build: {
@@ -30,12 +30,7 @@ export default defineConfig({
 			input: {
 				main: path.resolve(__dirname, 'index.html'),
 				configuration: path.resolve(__dirname, 'src-ui', 'config', 'index.html'),
-				configurationRescript: path.resolve(
-					__dirname,
-					'src-ui',
-					'configRescript',
-					'index.html'
-				),
+				configurationRescript: path.resolve(__dirname, 'src-ui', 'configRescript', 'index.html'),
 				peopleTraffic: path.resolve(__dirname, 'src-ui', 'peopleTraffic', 'index.html'),
 				buildingView: path.resolve(__dirname, 'src-ui', 'buildingView', 'index.html')
 			}
