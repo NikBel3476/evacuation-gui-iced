@@ -2,6 +2,8 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
+import * as styles from './MainPage.module.css';
+
 type mainPageProps = {};
 
 const MainPage: FC<mainPageProps> = () => {
@@ -28,28 +30,38 @@ const MainPage: FC<mainPageProps> = () => {
 	return (
 		<main>
 			<h1>Main page</h1>
-			<Link to="configuration">Configuration page</Link>
-			<div>
-				<button onClick={handleOpenConfigurationButtonClick}>Открыть окно настроек</button>
-			</div>
-			<div>
-				<button onClick={handleOpenConfigurationRescriptButtonClick}>
-					Открыть окно настроек(Rescript)
-				</button>
-			</div>
-			<div>
-				<button onClick={handleOpenPeopleTrafficButtonClick}>
-					Открыть окно моделирования эвакуации
-				</button>
-			</div>
-			<div>
-				<button onClick={handleOpenBuildingViewButtonClick}>
-					Открыть окно просмотра модели здания
-				</button>
-			</div>
-			<div>
-				<button onClick={handleBimStartButtonClick}>Запустить симуляцию</button>
-			</div>
+			<header>
+				<nav>
+					<ul className={styles.linkList}>
+						<li>
+							<Link to="configuration">Configuration page</Link>
+						</li>
+						<li>
+							<button onClick={handleOpenConfigurationButtonClick}>
+								Открыть окно настроек
+							</button>
+						</li>
+						<li>
+							<button onClick={handleOpenConfigurationRescriptButtonClick}>
+								Открыть окно настроек(Rescript)
+							</button>
+						</li>
+						<li>
+							<button onClick={handleOpenPeopleTrafficButtonClick}>
+								Открыть окно моделирования эвакуации
+							</button>
+						</li>
+						<li>
+							<button onClick={handleOpenBuildingViewButtonClick}>
+								Открыть окно просмотра модели здания
+							</button>
+						</li>
+						<li>
+							<button onClick={handleBimStartButtonClick}>Запустить симуляцию</button>
+						</li>
+					</ul>
+				</nav>
+			</header>
 		</main>
 	);
 };
