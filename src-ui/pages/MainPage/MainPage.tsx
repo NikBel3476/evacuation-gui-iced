@@ -29,7 +29,7 @@ const MainPage: FC<mainPageProps> = () => {
 
 	return (
 		<main>
-			<h1>Main page</h1>
+			<h1 className="text-3xl font-bold">Main page</h1>
 			<header>
 				<nav>
 					<ul className={styles.linkList}>
