@@ -57,6 +57,7 @@ dependencies = [
  "bim_json_object",
  "bim_output",
  "bim_polygon_tools",
+ "bim_tools",
  "cc",
  "cli",
  "configuration",
@@ -158,6 +159,15 @@ name = "bim_polygon_tools"
 version = "0.1.0"
 dependencies = [
  "cc",
+ "libc",
+]
+
+[[package]]
+name = "bim_tools"
+version = "0.1.0"
+dependencies = [
+ "bim_json_object",
+ "bim_polygon_tools",
  "libc",
 ]
 

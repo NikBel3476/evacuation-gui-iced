@@ -117,8 +117,6 @@ int32_t zone_id_cmp(ArrayListValue value1, ArrayListValue value2);
 
 int32_t transit_id_cmp(ArrayListValue value1, ArrayListValue value2);
 
-bim_zone_t *outside_init(const bim_json_object_t *bim_json);
-
 int calculate_transits_width(ArrayList *zones, ArrayList *transits);
 
 #endif //BIM_TOOLS_H

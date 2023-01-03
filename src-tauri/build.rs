@@ -22,6 +22,7 @@ fn main() {
 		"../src/bim_json_object/src",
 		"../src/bim_output/src",
 		"../src/bim_polygon_tools/src",
+		"../src/bim_tools/src",
 		"../thirdparty/arraylist",
 		"../thirdparty/triangle",
 		"../thirdparty/c-logger/src",

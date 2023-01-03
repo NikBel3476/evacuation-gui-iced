@@ -14,6 +14,7 @@
  */
 
 #include "bim_tools.h"
+#include "bim_tools/src/bim_tools_rust.h"
 
 bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     const bim_json_object_t *const jbim = bim_json;
@@ -246,7 +247,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
         }
     }
 
-    bim_zone_t *outside = outside_init(bim_json);
+    bim_zone_t *outside = outside_init_rust(bim_json);
     arraylist_append(zones_list, outside);
 
     arraylist_sort(zones_list, zone_id_cmp);
@@ -255,126 +256,6 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     calculate_transits_width(zones_list, transits_list);
 
     return bim;
-}
-
-int find_zone_callback(ArrayListValue value1, ArrayListValue value2) {
-    const bim_zone_t *zone = (bim_zone_t *) value1;
-    uuid_t *uuid = (uuid_t *) value2;
-
-    for (size_t i = 0; i < UUID_SIZE; ++i) {
-        if (zone->uuid.x[i] != uuid->x[i]) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) {
-    line_t *line = (line_t *) calloc(1, sizeof(line_t));
-
-    line->p1 = (point_t *) NULL;
-    line->p2 = (point_t *) NULL;
-    line->p1 = (point_t *) calloc(1, sizeof(point_t));
-    line->p2 = (point_t *) calloc(1, sizeof(point_t));
-
-    uint8_t numOfIntersect = 0;
-    for (size_t i = 1; i < aPolygonElement->numofpoints; ++i) {
-        point_t *pointElementA = &aPolygonElement->points[i - 1];
-        point_t *pointElementB = &aPolygonElement->points[i];
-        line_t line_tmp = {pointElementA, pointElementB};
-        bool isIntersect = geom_tools_is_intersect_line_rust(aLine, &line_tmp);
-        if (isIntersect) {
-            line->p1 = pointElementA;
-            line->p2 = pointElementB;
-            numOfIntersect++;
-        }
-    }
-
-    if (numOfIntersect != 1) {
-        fprintf(stderr,
-                "[func: %s() | line: %u] :: Ошибка геометрии. Проверьте правильность ввода дверей и вирутальных проемов.\n",
-                __func__, __LINE__);
-        free(line->p1);
-        free(line->p2);
-        free(line);
-        return (line_t *) NULL;
-    }
-
-    return line;
-}
-
-double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line_t *edge1,
-                       const line_t *edge2) {
-    /*
-     * Возможные варианты стыковки помещений, которые соединены проемом
-     * Код ниже определяет область их пересечения
-       +----+  +----+     +----+
-            |  |               | +----+
-            |  |               | |
-            |  |               | |
-       +----+  +----+          | |
-                               | +----+
-       +----+             +----+
-            |  +----+
-            |  |          +----+ +----+
-            |  |               | |
-       +----+  |               | |
-               +----+          | +----+
-                          +----+
-     *************************************************************************
-     * 1. Определить грани помещения, которые пересекает короткая сторона проема
-     * 2. Вычислить среднее проекций граней друг на друга
-     */
-
-    point_t *l1p1 = edge1->p1;
-    point_t *l1p2 = edge2->p2;
-    double length1 = geom_tools_length_side_rust( l1p1, l1p2);
-
-    point_t *l2p1 = edge1->p1;
-    point_t *l2p2 = edge2->p2;
-    double length2 = geom_tools_length_side_rust(l2p1, l2p2);
-
-    // Короткая линия проема, которая пересекает оба помещения
-    line_t dline = {NULL, NULL};
-    if (length1 >= length2) {
-        dline.p1 = l2p1;
-        dline.p2 = l2p2;
-    } else {
-        dline.p1 = l1p1;
-        dline.p2 = l1p2;
-    }
-
-    // Линии, которые находятся друг напротив друга и связаны проемом
-    line_t *edgeElementA = NULL;
-    line_t *edgeElementB = NULL;
-    edgeElementA = intersected_edge(zone1, &dline);
-    if (!edgeElementA) {
-        return -1;
-    }
-    edgeElementB = intersected_edge(zone2, &dline);
-    if (!edgeElementB) {
-        free(edgeElementA);
-        return -1;
-    }
-    // Поиск точек, которые являются ближайшими к отрезку edgeElement
-    // Расстояние между этими точками и является шириной проема
-    point_t *pt1 = geom_tools_nearest_point_rust(edgeElementA->p1, edgeElementB);
-    point_t *pt2 = geom_tools_nearest_point_rust(edgeElementA->p2, edgeElementB);
-    double d12 = geom_tools_length_side_rust(pt1, pt2);
-
-    point_t *pt3 = geom_tools_nearest_point_rust(edgeElementB->p1, edgeElementA);
-    point_t *pt4 = geom_tools_nearest_point_rust(edgeElementB->p2, edgeElementA);
-    double d34 = geom_tools_length_side_rust(pt3, pt4);
-
-    free(pt1);
-    free(pt2);
-    free(pt3);
-    free(pt4);
-    free(edgeElementA);
-    free(edgeElementB);
-
-    return (d12 + d34) / 2;
 }
 
 /*
@@ -392,7 +273,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
         bim_zone_t *t_realted_zones[2] = {(bim_zone_t *) NULL, (bim_zone_t *) NULL};
 
         for (size_t j = 0; j < transit->numofoutputs; j++) {
-            zuuid = arraylist_index_of(zones, find_zone_callback, (void *) transit->outputs[j].x);
+            zuuid = arraylist_index_of(zones, find_zone_callback_rust, (void *) transit->outputs[j].x);
             t_realted_zones[j] = (bim_zone_t *) zones->data[zuuid];
             if (t_realted_zones[j]->sign == STAIRCASE) stair_sing_counter++;
         }
@@ -454,7 +335,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
 
             width = (width1 + width2) / 2;
         } else if (transit->sign == DOOR_WAY) {
-            width = width_door_way(t_realted_zones[0]->polygon, t_realted_zones[1]->polygon,
+            width = width_door_way_rust(t_realted_zones[0]->polygon, t_realted_zones[1]->polygon,
                                     &edge1, &edge2);
         }
 
@@ -474,54 +355,6 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
     }
 
     return 0;
-}
-
-bim_zone_t *outside_init(const bim_json_object_t *bim_json) {
-    bim_zone_t *outside = (bim_zone_t *) malloc(sizeof(bim_zone_t));
-    if (!outside) {
-        return NULL;
-    }
-    outside->id = 0;
-    outside->name = strdup("Outside");
-    outside->sign = OUTSIDE;
-    outside->polygon = NULL;
-    strcpy((void *) outside->uuid.x, "outside0-safe-zone-0000-000000000000");
-    outside->z_level = 0;
-    outside->size_z = FLT_MAX;
-    outside->numofpeople = 0;
-    outside->hazard_level = 0;
-    outside->is_safe = true;
-
-    size_t numofoutputs = 0;
-    uuid_t *outputs = (uuid_t *) malloc(sizeof(uuid_t) * 100);
-
-    for (size_t i = 0; i < bim_json->numoflevels; i++) {
-        for (size_t j = 0; j < bim_json->levels[i].numofelements; j++) {
-            bim_json_element_t *element = &bim_json->levels[i].elements[j];
-            if (element->sign == DOOR_WAY_OUT) {
-                uuid_t output = element->uuid;
-                strcpy((void *) outputs[numofoutputs].x, output.x);
-                numofoutputs++;
-            } else if (element->sign == ROOM || element->sign == STAIRCASE)
-                outside->id++;
-        }
-    }
-
-    if (!numofoutputs) {
-        free(outputs);
-        free(outside);
-        return (bim_zone_t *) NULL;
-    }
-
-    outside->numofoutputs = numofoutputs;
-    outside->outputs = (uuid_t *) realloc(outputs, outside->numofoutputs * sizeof(uuid_t));
-    outside->is_blocked = false;
-    outside->is_visited = false;
-    outside->potential = 0;
-    outside->area = FLT_MAX;
-    outside->numofpeople = 0;
-
-    return outside;
 }
 
 bim_t *bim_tools_copy(const bim_t *const bim) {

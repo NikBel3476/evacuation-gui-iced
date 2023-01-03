@@ -14,6 +14,7 @@
  */
 
 #include "run.h"
+#include "bim_tools/src/bim_tools_rust.h"
 
 void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scenario);
 
