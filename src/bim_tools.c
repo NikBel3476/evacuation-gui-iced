@@ -258,7 +258,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     return bim;
 }
 
-int find_zone_callback(ArrayListValue value1, ArrayListValue value2) {
+/*int find_zone_callback(ArrayListValue value1, ArrayListValue value2) {
     const bim_zone_t *zone = (bim_zone_t *) value1;
     uuid_t *uuid = (uuid_t *) value2;
 
@@ -269,7 +269,7 @@ int find_zone_callback(ArrayListValue value1, ArrayListValue value2) {
     }
 
     return 1;
-}
+}*/
 
 /*line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) {
     line_t *line = (line_t *) calloc(1, sizeof(line_t));
@@ -393,7 +393,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
         bim_zone_t *t_realted_zones[2] = {(bim_zone_t *) NULL, (bim_zone_t *) NULL};
 
         for (size_t j = 0; j < transit->numofoutputs; j++) {
-            zuuid = arraylist_index_of(zones, find_zone_callback, (void *) transit->outputs[j].x);
+            zuuid = arraylist_index_of(zones, find_zone_callback_rust, (void *) transit->outputs[j].x);
             t_realted_zones[j] = (bim_zone_t *) zones->data[zuuid];
             if (t_realted_zones[j]->sign == STAIRCASE) stair_sing_counter++;
         }

@@ -5,38 +5,38 @@ use bim_polygon_tools::{
 	geom_tools_is_intersect_line_rust, geom_tools_length_side_rust, geom_tools_nearest_point_rust,
 	line_t, point_t, polygon_t,
 };
-use libc::{c_char, c_double};
+use libc::{c_char, c_double, c_int};
 use std::cmp::Ordering;
 use std::ffi::CString;
 
 /// Структура, расширяющая элемент DOOR_*
 #[repr(C)]
 pub struct bim_transit_t {
-	///< UUID идентификатор элемента
+	/// UUID идентификатор элемента
 	uuid: uuid_t,
-	///< Внутренний номер элемента
+	/// Внутренний номер элемента
 	id: u64,
-	///< Название элемента
+	/// Название элемента
 	name: *mut char,
-	///< Массив UUID элементов, которые являются соседними
+	/// Массив UUID элементов, которые являются соседними
 	outputs: uuid_t,
-	///< Полигон элемента
+	/// Полигон элемента
 	polygon: *mut polygon_t,
-	///< Высота элемента
+	/// Высота элемента
 	size_z: f64,
-	///< Уровень, на котором находится элемент
+	/// Уровень, на котором находится элемент
 	z_level: f64,
-	///< Ширина проема/двери
+	/// Ширина проема/двери
 	width: f64,
-	///< Количество людей, которые прошли через элемент
+	/// Количество людей, которые прошли через элемент
 	nop_proceeding: f64,
-	///< Тип элемента
+	/// Тип элемента
 	sign: u8,
-	///< Количество связанных с текущим элементов
+	/// Количество связанных с текущим элементов
 	numofoutputs: u8,
-	///< Признак посещения элемента
+	/// Признак посещения элемента
 	is_visited: bool,
-	///< Признак недоступности элемента для движения
+	/// Признак недоступности элемента для движения
 	is_blocked: bool,
 }
 
@@ -80,32 +80,32 @@ pub struct bim_zone_t {
 /// Структура, описывающая этаж
 #[repr(C)]
 pub struct bim_level_t {
-	///< Массив зон, которые принадлежат этажу
-	zones: bim_zone_t,
-	///< Массив переходов, которые принадлежат этажу
-	transits: bim_transit_t,
-	///< Название этажа
-	name: String,
-	///< Высота этажа над нулевой отметкой
+	/// Массив зон, которые принадлежат этажу
+	zones: *mut bim_zone_t,
+	/// Массив переходов, которые принадлежат этажу
+	transits: *mut bim_transit_t,
+	/// Название этажа
+	name: *mut c_char,
+	/// Высота этажа над нулевой отметкой
 	z_level: f64,
-	///< Количство зон на этаже
+	/// Количство зон на этаже
 	numofzones: u16,
-	///< Количство переходов на этаже
+	/// Количство переходов на этаже
 	numoftransits: u16,
 }
 
 /// Структура, описывающая здание
 #[repr(C)]
 pub struct bim_t {
-	///< Массив уровней здания
-	levels: bim_level_t,
-	///< Название здания
-	name: *const str,
-	///< Список зон объекта
+	/// Массив уровней здания
+	levels: *mut bim_level_t,
+	/// Название здания
+	name: *mut c_char,
+	/// Список зон объекта
 	zones: Vec<bim_zone_t>,
-	///< Список переходов объекта
+	/// Список переходов объекта
 	transits: Vec<bim_transit_t>,
-	///< Количество уровней в здании
+	/// Количество уровней в здании
 	numoflevels: u8,
 }
 
@@ -369,4 +369,64 @@ pub extern "C" fn outside_init_rust(bim_json: *const bim_json_object_t_rust) -> 
 	outside.numofpeople = 0.0;
 
 	Box::into_raw(Box::new(outside))
+}
+
+/*/// Подсчитывает количество людей в здании по расширенной структуре
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn bim_tools_get_num_of_people_rust(bim: *const bim_t) -> c_double {
+	let bim = unsafe {
+		bim.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer bim at bim_tools_get_num_of_people_rust fn in bim_tools crate")
+		})
+	};
+
+	let mut num_of_people = 0.0;
+	let levels = unsafe { std::slice::from_raw_parts(bim.levels, bim.numoflevels as usize) };
+
+	for level in levels {
+		let zones = unsafe { std::slice::from_raw_parts(level.zones, level.numofzones as usize) };
+
+		for zone in zones {
+			num_of_people += zone.numofpeople;
+		}
+	}
+
+	num_of_people
+}*/
+
+// FIXME: after replacing c function the simulation result has changed
+/*/// Устанавливает в помещение заданное количество людей
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_of_people: f64) {
+	let zone = unsafe {
+		zone.as_mut().expect("Failed to dereference pointer zone at bim_tools_set_people_to_zone fn in bim_tools crate")
+	};
+
+	zone.numofpeople = num_of_people;
+}*/
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn find_zone_callback_rust(value1: *mut bim_zone_t, value2: *mut uuid_t) -> c_int {
+	let zone = unsafe {
+		value1.as_mut().expect(
+			"Failed to dereference pointer value1 at find_zone_callback_rust fn in bim_tools crate",
+		)
+	};
+
+	let uuid = unsafe {
+		value2.as_mut().expect(
+			"Failed to dereference pointer value2 at find_zone_callback_rust fn in bim_tools crate",
+		)
+	};
+
+	for i in 0..uuid.x.len() {
+		if zone.uuid.x[i] != uuid.x[i] {
+			return 0;
+		}
+	}
+
+	1
 }

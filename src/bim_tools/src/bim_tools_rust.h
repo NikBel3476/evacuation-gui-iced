@@ -4,6 +4,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/**
+ * Подсчитывает количество людей в здании по расширенной структуре
+ */
+double bim_tools_get_num_of_people_rust(const bim_t *bim);
+
+/**
+ * Устанавливает в помещение заданное количество людей
+ */
+void bim_tools_set_people_to_zone_rust(bim_zone_t *element, float num_of_people);
+
+int find_zone_callback_rust(ArrayListValue value1, ArrayListValue value2);
 
 line_t *intersected_edge_rust(const polygon_t *polygon_element, line_t *line);
 
