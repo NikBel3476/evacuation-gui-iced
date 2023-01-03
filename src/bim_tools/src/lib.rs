@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use bim_json_object::bim_json_object_t_rust;
+use bim_polygon_tools::{geom_tools_is_intersect_line_rust, line_t, point_t, polygon_t};
 
 /// Количество символов в UUID + NUL символ
 #[repr(C)]
@@ -120,3 +120,60 @@ pub struct bim_t {
 // 	std::memory::forget(bim);
 // 	bim.as_ptr()
 // }
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn intersected_edge_rust(
+	polygon_element: *const polygon_t,
+	line: *mut line_t,
+) -> *mut line_t {
+	let polygon_element = unsafe {
+		polygon_element.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer polygon_element at intersected_edge_rust fn in bim_tools crate")
+		})
+	};
+
+	let line =
+		unsafe {
+			line.as_mut().unwrap_or_else(|| {
+				panic!("Failed to dereference pointer line at intersected_edge_rust fn in bim_tools crate")
+			})
+		};
+
+	let points = unsafe {
+		std::slice::from_raw_parts_mut(polygon_element.points, polygon_element.numofpoints as usize)
+	};
+
+	let mut line_intersected = line_t {
+		p1: &mut point_t { x: 0.0, y: 0.0 },
+		p2: &mut point_t { x: 0.0, y: 0.0 },
+	};
+
+	let mut num_of_intersections = 0;
+	for i in 1..polygon_element.numofpoints {
+		// FIXME: bypass to get double mut ref
+		let (left, right) = points.split_at_mut(i as usize);
+		let point_element_a = left.last_mut().unwrap_or_else(|| {
+			panic!("Failed to get last element of left part at intersected_edge_rust fn in bim_tools crate");
+		});
+		let point_element_b = right.first_mut().unwrap_or_else(|| {
+			panic!("Failed to get first element of right part at intersected_edge_rust fn in bim_tools crate");
+		});
+		let line_tmp = line_t {
+			p1: point_element_a,
+			p2: point_element_b,
+		};
+		let is_intersected = geom_tools_is_intersect_line_rust(line, &line_tmp);
+		if is_intersected == 1 {
+			line_intersected.p1 = point_element_a;
+			line_intersected.p2 = point_element_b;
+			num_of_intersections += 1;
+		}
+	}
+
+	if num_of_intersections != 1 {
+		panic!("[func: intersected_edge_rust] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов.");
+	}
+
+	Box::into_raw(Box::new(line_intersected))
+}

@@ -14,6 +14,7 @@
  */
 
 #include "bim_tools.h"
+#include "bim_tools/src/bim_tools_rust.h"
 
 bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     const bim_json_object_t *const jbim = bim_json;
@@ -270,7 +271,7 @@ int find_zone_callback(ArrayListValue value1, ArrayListValue value2) {
     return 1;
 }
 
-line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) {
+/*line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) {
     line_t *line = (line_t *) calloc(1, sizeof(line_t));
 
     line->p1 = (point_t *) NULL;
@@ -302,7 +303,7 @@ line_t *intersected_edge(const polygon_t *aPolygonElement, const line_t *aLine) 
     }
 
     return line;
-}
+}*/
 
 double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line_t *edge1,
                        const line_t *edge2) {
@@ -348,11 +349,11 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
     // Линии, которые находятся друг напротив друга и связаны проемом
     line_t *edgeElementA = NULL;
     line_t *edgeElementB = NULL;
-    edgeElementA = intersected_edge(zone1, &dline);
+    edgeElementA = intersected_edge_rust(zone1, &dline);
     if (!edgeElementA) {
         return -1;
     }
-    edgeElementB = intersected_edge(zone2, &dline);
+    edgeElementB = intersected_edge_rust(zone2, &dline);
     if (!edgeElementB) {
         free(edgeElementA);
         return -1;
