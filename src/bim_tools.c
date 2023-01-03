@@ -247,7 +247,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
         }
     }
 
-    bim_zone_t *outside = outside_init(bim_json);
+    bim_zone_t *outside = outside_init_rust(bim_json);
     arraylist_append(zones_list, outside);
 
     arraylist_sort(zones_list, zone_id_cmp);
@@ -477,7 +477,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
     return 0;
 }
 
-bim_zone_t *outside_init(const bim_json_object_t *bim_json) {
+/*bim_zone_t *outside_init(const bim_json_object_t *bim_json) {
     bim_zone_t *outside = (bim_zone_t *) malloc(sizeof(bim_zone_t));
     if (!outside) {
         return NULL;
@@ -523,7 +523,7 @@ bim_zone_t *outside_init(const bim_json_object_t *bim_json) {
     outside->numofpeople = 0;
 
     return outside;
-}
+}*/
 
 bim_t *bim_tools_copy(const bim_t *const bim) {
     return (bim_t *) bim;

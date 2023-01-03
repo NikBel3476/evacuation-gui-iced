@@ -7,6 +7,8 @@
 
 line_t *intersected_edge_rust(const polygon_t *polygon_element, line_t *line);
 
+struct bim_zone_t *outside_init_rust(const bim_json_object_t *bim_json);
+
 /**
  * Возможные варианты стыковки помещений, которые соединены проемом
  *

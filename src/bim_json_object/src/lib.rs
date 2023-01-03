@@ -5,21 +5,9 @@ use libc::{c_char, c_double, c_ulonglong};
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 
+/// Количество символов в UUID + NUL символ
 #[repr(C)]
-pub enum bim_element_sign_t_rust {
-	ROOM,         //< Указывает, что элемент здания является помещением/комнатой
-	STAIRCASE,    //< Указывает, что элемент здания является лестницей
-	DOOR_WAY,     //< Указывает, что элемент здания является проемом (без дверного полотна)
-	DOOR_WAY_INT, //< Указывает, что элемент здания является дверью, которая соединяет
-	// < два элемента: ROOM и ROOM или ROOM и STAIR
-	DOOR_WAY_OUT, //< Указывает, что элемент здания является эвакуационным выходом
-	OUTSIDE,      //< Указывает, что элемент является зоной вне здания
-	UNDEFINDED,   //< Указывает, что тип элемента не определен
-}
-
-// Количество символов в UUID + NUL символ
-#[repr(C)]
-pub struct uuid_t_rust {
+pub struct uuid_t {
 	pub x: [c_char; 36 + 1],
 }
 
@@ -35,45 +23,84 @@ pub struct polygon_t_rust {
 	pub points: *mut point_t_rust,
 }
 
-// Структура, описывающая элемент
+#[repr(C)]
+pub enum bim_element_sign_t_rust {
+	/// Указывает, что элемент здания является помещением/комнатой
+	ROOM = 0,
+	/// Указывает, что элемент здания является лестницей
+	STAIRCASE = 1,
+	/// Указывает, что элемент здания является проемом (без дверного полотна)
+	DOOR_WAY = 2,
+	/// Указывает, что элемент здания является дверью, которая соединяет два элемента: ROOM и ROOM или ROOM и STAIR
+	DOOR_WAY_INT = 3,
+	/// Указывает, что элемент здания является эвакуационным выходом
+	DOOR_WAY_OUT = 4,
+	/// Указывает, что элемент является зоной вне здания
+	OUTSIDE = 5,
+	/// Указывает, что тип элемента не определен
+	UNDEFINDED = 6,
+}
+
+/// Структура, описывающая элемент
 #[repr(C)]
 pub struct bim_json_element_t_rust {
-	pub uuid: uuid_t_rust,             //< [JSON] UUID идентификатор элемента
-	pub name: *const c_char,           //< [JSON] Название элемента
-	pub polygon: *mut polygon_t_rust,  //< [JSON] Полигон элемента
-	pub outputs: *mut uuid_t_rust, //< [JSON] Массив UUID элементов, которые являются соседними к элементу
-	pub id: c_ulonglong,           //< Внутренний номер элемента (генерируется)
-	pub numofpeople: c_ulonglong,  //< [JSON] Количество людей в элементе
-	pub numofoutputs: c_ulonglong, //< Количество связанных с текущим элементов
-	pub size_z: c_double,          //< [JSON] Высота элемента
-	pub z_level: c_double,         //< Уровень, на котором находится элемент
-	pub sign: bim_element_sign_t_rust, //< [JSON] Тип элемента
+	/// [JSON] UUID идентификатор элемента
+	pub uuid: uuid_t,
+	/// [JSON] Название элемента
+	pub name: *const c_char,
+	/// [JSON] Полигон элемента
+	pub polygon: *mut polygon_t_rust,
+	/// [JSON] Массив UUID элементов, которые являются соседними к элементу
+	pub outputs: *mut uuid_t,
+	/// Внутренний номер элемента (генерируется)
+	pub id: c_ulonglong,
+	/// [JSON] Количество людей в элементе
+	pub numofpeople: c_ulonglong,
+	/// Количество связанных с текущим элементов
+	pub numofoutputs: c_ulonglong,
+	/// [JSON] Высота элемента
+	pub size_z: c_double,
+	/// Уровень, на котором находится элемент
+	pub z_level: c_double,
+	/// [JSON] Тип элемента
+	pub sign: bim_element_sign_t_rust,
 }
 
-// Структура поля, описывающего географическое положение объекта
+/// Структура поля, описывающего географическое положение объекта
 #[repr(C)]
 pub struct bim_json_address_t_rust {
-	pub city: *const c_char,           //< [JSON] Название города
-	pub street_address: *const c_char, //< [JSON] Название улицы
-	pub add_info: *const c_char,       //< [JSON] Дополнительная информация о местоположении объекта
+	/// [JSON] Название города
+	pub city: *const c_char,
+	/// [JSON] Название улицы
+	pub street_address: *const c_char,
+	/// [JSON] Дополнительная информация о местоположении объекта
+	pub add_info: *const c_char,
 }
 
-// Структура, описывающая этаж
+/// Структура, описывающая этаж
 #[repr(C)]
 pub struct bim_json_level_t_rust {
-	pub name: *const c_char,                    //< [JSON] Название этажа
-	pub elements: *mut bim_json_element_t_rust, //< [JSON] Массив элементов, которые принадлежат этажу
-	pub z_level: c_double,                      //< [JSON] Высота этажа над нулевой отметкой
-	pub numofelements: c_ulonglong,             //< Количство элементов на этаже
+	/// [JSON] Название этажа
+	pub name: *const c_char,
+	/// [JSON] Массив элементов, которые принадлежат этажу
+	pub elements: *mut bim_json_element_t_rust,
+	/// [JSON] Высота этажа над нулевой отметкой
+	pub z_level: c_double,
+	/// Количство элементов на этаже
+	pub numofelements: c_ulonglong,
 }
 
-// Структура, описывающая здание
+/// Структура, описывающая здание
 #[repr(C)]
 pub struct bim_json_object_t_rust {
-	pub address: *mut bim_json_address_t_rust, //< [JSON] Информация о местоположении объекта
-	pub name: *const c_char,                   //< [JSON] Название здания
-	pub levels: *mut bim_json_level_t_rust,    //< [JSON] Массив уровней здания
-	pub numoflevels: c_ulonglong,              //< Количество уровней в здании
+	/// [JSON] Информация о местоположении объекта
+	pub address: *mut bim_json_address_t_rust,
+	/// [JSON] Название здания
+	pub name: *const c_char,
+	/// [JSON] Массив уровней здания
+	pub levels: *mut bim_json_level_t_rust,
+	/// Количество уровней в здании
+	pub numoflevels: c_ulonglong,
 }
 
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
@@ -109,7 +136,7 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 							.build_elements
 							.iter()
 							.map(|element| bim_json_element_t_rust {
-								uuid: uuid_t_rust {
+								uuid: uuid_t {
 									x: {
 										let mut char_vec = element
 											.id
@@ -173,7 +200,7 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 									let mut outputs = element
 										.outputs
 										.iter()
-										.map(|output| uuid_t_rust {
+										.map(|output| uuid_t {
 											x: {
 												let mut char_vec = output
 													.clone()
@@ -192,7 +219,7 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 												})
 											},
 										})
-										.collect::<Vec<uuid_t_rust>>();
+										.collect::<Vec<uuid_t>>();
 
 									let ptr = outputs.as_mut_ptr();
 									std::mem::forget(outputs);
