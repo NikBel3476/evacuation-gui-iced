@@ -305,9 +305,9 @@ int find_zone_callback(ArrayListValue value1, ArrayListValue value2) {
     return line;
 }*/
 
-double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line_t *edge1,
+/*double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line_t *edge1,
                        const line_t *edge2) {
-    /*
+    *//*
      * Возможные варианты стыковки помещений, которые соединены проемом
      * Код ниже определяет область их пересечения
        +----+  +----+     +----+
@@ -326,7 +326,7 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
      *************************************************************************
      * 1. Определить грани помещения, которые пересекает короткая сторона проема
      * 2. Вычислить среднее проекций граней друг на друга
-     */
+     *//*
 
     point_t *l1p1 = edge1->p1;
     point_t *l1p2 = edge2->p2;
@@ -376,7 +376,7 @@ double width_door_way(const polygon_t *zone1, const polygon_t *zone2, const line
     free(edgeElementB);
 
     return (d12 + d34) / 2;
-}
+}*/
 
 /*
 Вычисление ширины проема по данным из модели здания
@@ -455,7 +455,7 @@ int calculate_transits_width(ArrayList *zones, ArrayList *transits) {
 
             width = (width1 + width2) / 2;
         } else if (transit->sign == DOOR_WAY) {
-            width = width_door_way(t_realted_zones[0]->polygon, t_realted_zones[1]->polygon,
+            width = width_door_way_rust(t_realted_zones[0]->polygon, t_realted_zones[1]->polygon,
                                     &edge1, &edge2);
         }
 

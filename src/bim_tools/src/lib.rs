@@ -1,6 +1,11 @@
 #![allow(non_camel_case_types)]
 
-use bim_polygon_tools::{geom_tools_is_intersect_line_rust, line_t, point_t, polygon_t};
+use bim_polygon_tools::{
+	geom_tools_is_intersect_line_rust, geom_tools_length_side_rust, geom_tools_nearest_point_rust,
+	line_t, point_t, polygon_t,
+};
+use libc::c_double;
+use std::cmp::Ordering;
 
 /// Количество символов в UUID + NUL символ
 #[repr(C)]
@@ -176,4 +181,110 @@ pub extern "C" fn intersected_edge_rust(
 	}
 
 	Box::into_raw(Box::new(line_intersected))
+}
+
+/// Возможные варианты стыковки помещений, которые соединены проемом
+///
+/// Код ниже определяет область их пересечения
+/// ```
+/// +----+  +----+     +----+
+///      |  |               | +----+
+///      |  |               | |
+///      |  |               | |
+/// +----+  +----+          | |
+///                         | +----+
+/// +----+             +----+
+///      |  +----+
+///      |  |          +----+ +----+
+///      |  |               | |
+/// +----+  |               | |
+///         +----+          | +----+
+///                    +----+
+/// ```
+/// *************************************************************************
+/// 1. Определить грани помещения, которые пересекает короткая сторона проема
+/// 2. Вычислить среднее проекций граней друг на друга
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn width_door_way_rust(
+	zone1: *const polygon_t,
+	zone2: *const polygon_t,
+	edge1: *const line_t,
+	edge2: *const line_t,
+) -> c_double {
+	let zone1 = unsafe {
+		zone1.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer zone1 at width_door_way fn in bim_tools crate")
+		})
+	};
+
+	let zone2 = unsafe {
+		zone2.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer zone2 at width_door_way fn in bim_tools crate")
+		})
+	};
+
+	let edge1 = unsafe {
+		edge1.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer edge1 at width_door_way fn in bim_tools crate")
+		})
+	};
+
+	let edge2 = unsafe {
+		edge2.as_ref().unwrap_or_else(|| {
+			panic!("Failed to dereference pointer edge2 at width_door_way fn in bim_tools crate")
+		})
+	};
+
+	// TODO: l1p1 == l2p1 and l1p2 == l2p2 ??? figure out why this is so
+	/* old c code
+	point_t *l1p1 = edge1->p1;
+	point_t *l1p2 = edge2->p2;
+	double length1 = geom_tools_length_side_rust( l1p1, l1p2);
+
+	point_t *l2p1 = edge1->p1;
+	point_t *l2p2 = edge2->p2;
+	double length2 = geom_tools_length_side_rust(l2p1, l2p2);
+	 */
+	let l1p1 = edge1.p1;
+	let l1p2 = edge2.p2;
+	let length1 = geom_tools_length_side_rust(l1p1, l1p2);
+
+	let l2p1 = edge1.p1;
+	let l2p2 = edge2.p2;
+	let length2 = geom_tools_length_side_rust(l2p1, l2p2);
+
+	// Короткая линия проема, которая пересекает оба помещения
+	let mut d_line = match length1.total_cmp(&length2) {
+		Ordering::Greater | Ordering::Equal => line_t { p1: l2p1, p2: l2p2 },
+		Ordering::Less => line_t { p1: l1p1, p2: l1p2 },
+	};
+
+	// Линии, которые находятся друг напротив друга и связаны проемом
+	let edge_element_a = unsafe {
+		intersected_edge_rust(zone1, &mut d_line)
+			.as_ref()
+			.unwrap_or_else(|| {
+				panic!("Failed to dereference pointer edge_element_a at width_door_way fn in bim_tools crate")
+			})
+	};
+	let edge_element_b = unsafe {
+		intersected_edge_rust(zone2, &mut d_line)
+			.as_ref()
+			.unwrap_or_else(|| {
+				panic!("Failed to dereference pointer edge_element_b at width_door_way fn in bim_tools crate")
+			})
+	};
+
+	// Поиск точек, которые являются ближайшими к отрезку edgeElement
+	// Расстояние между этими точками и является шириной проема
+	let point1 = geom_tools_nearest_point_rust(edge_element_a.p1, edge_element_b);
+	let point2 = geom_tools_nearest_point_rust(edge_element_a.p2, edge_element_b);
+	let distance12 = geom_tools_length_side_rust(point1, point2);
+
+	let point3 = geom_tools_nearest_point_rust(edge_element_b.p1, edge_element_a);
+	let point4 = geom_tools_nearest_point_rust(edge_element_b.p2, edge_element_a);
+	let distance34 = geom_tools_length_side_rust(point3, point4);
+
+	(distance12 + distance34) * 0.5
 }
