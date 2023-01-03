@@ -35,6 +35,19 @@ void evac_time_inc_rust(void);
 void evac_time_reset_rust(void);
 
 /**
+ * Метод определения скорости движения людского потока по разным зонам
+ *
+ * # Arguments
+ * * `receiving_zone` - зона, в которую засасываются люди
+ * * `transmitting_zone` - зона, из которой высасываются люди
+ *
+ * # Returns
+ * Скорость людского потока в зоне
+ */
+double speed_in_element_rust(const bim_zone_t *receiving_zone,
+                             const bim_zone_t *transmitting_zone);
+
+/**
  * Скорость потока в комнате
  *
  * # Arguments

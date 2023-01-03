@@ -136,6 +136,8 @@ dependencies = [
 name = "bim_evac"
 version = "0.1.0"
 dependencies = [
+ "bim_json_object",
+ "bim_tools",
  "libc",
 ]
 

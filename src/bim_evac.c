@@ -38,7 +38,7 @@ void evac_def_modeling_step(const bim_t *bim) {
  * @param aGiverElement        зона, из которой высасываются люди
  * @return Скорость людского потока в зоне
  */
-static double speed_in_element(const bim_zone_t *receiving_zone,  // принимающая зона
+/*static double speed_in_element(const bim_zone_t *receiving_zone,  // принимающая зона
                                const bim_zone_t *giver_zone)      // отдающая зона
 {
     double density_in_giver_zone = giver_zone->numofpeople / giver_zone->area;
@@ -50,7 +50,7 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
     // Если принимающее помещение является лестницей и находится на другом уровне,
     // то скорость будет рассчитываться как по наклонной поверхности
     if (fabs(dh) > 1e-3 && receiving_zone->sign == STAIRCASE) {
-        /* Иначе определяем направление движения по лестнице
+        *//* Иначе определяем направление движения по лестнице
          * -1 вниз, 1 вверх
          *         ______   aGiverItem
          *        /                         => direction = -1
@@ -59,7 +59,7 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
          *      \
          *       \                          => direction = 1
          *        \______   aGiverItem
-         */
+         *//*
         int direction = (dh > 0) ? -1 : 1;
         v_zone = evac_speed_on_stair_rust(density_in_giver_zone, direction);
     }
@@ -68,13 +68,13 @@ static double speed_in_element(const bim_zone_t *receiving_zone,  // прини�
         LOG_ERROR("Скорость в отдающей зоне меньше 0: %s", giver_zone->name);
 
     return v_zone;
-}
+}*/
 
 static double speed_at_exit(const bim_zone_t *receiving_zone,  // принимающая зона
                             const bim_zone_t *giver_zone,      // отдающая зона
                             double transit_width) {
     // Определение скорости на выходе из отдающего помещения
-    double zone_speed = speed_in_element(receiving_zone, giver_zone);
+    double zone_speed = speed_in_element_rust(receiving_zone, giver_zone);
     double density_in_giver_element = giver_zone->numofpeople / giver_zone->area;
     double transition_speed = speed_through_transit_rust(transit_width, density_in_giver_element,
                                                          evac_speed_max);

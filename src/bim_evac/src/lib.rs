@@ -1,3 +1,5 @@
+use bim_json_object::bim_element_sign_t_rust;
+use bim_tools::bim_zone_t;
 use libc::{c_double, c_int};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
@@ -115,6 +117,56 @@ pub extern "C" fn evac_speed_on_stair_rust(
 		true => velocity_rust(v0, a, density_in_zone, d0),
 		false => v0,
 	}
+}
+
+/// Метод определения скорости движения людского потока по разным зонам
+///
+/// # Arguments
+/// * `receiving_zone` - зона, в которую засасываются люди
+/// * `transmitting_zone` - зона, из которой высасываются люди
+///
+/// # Returns
+/// Скорость людского потока в зоне
+#[no_mangle]
+pub extern "C" fn speed_in_element_rust(
+	receiving_zone: *const bim_zone_t,
+	transmitting_zone: *const bim_zone_t,
+) -> c_double {
+	let receiving_zone = unsafe {
+		receiving_zone.as_ref().expect("Failed to dereference pointer receiving_zone at speed_in_element_rust fn in bim_evac crate")
+	};
+
+	let transmitting_zone = unsafe {
+		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at speed_in_element_rust fn in bim_evac crate")
+	};
+
+	let density_in_transmitting_zone = transmitting_zone.numofpeople / transmitting_zone.area;
+	// По умолчанию, используется скорость движения по горизонтальной поверхности
+	let mut v_zone = unsafe { speed_in_room_rust(density_in_transmitting_zone, EVAC_SPEED_MAX) };
+	// Разница высот зон
+	let dh = receiving_zone.z_level - transmitting_zone.z_level;
+
+	// Если принимающее помещение является лестницей и находится на другом уровне,
+	// то скорость будет рассчитываться как по наклонной поверхности
+	if dh.abs() > 1e-3 && receiving_zone.sign == bim_element_sign_t_rust::STAIRCASE as u8 {
+		/* Иначе определяем направление движения по лестнице
+		 * -1 вниз, 1 вверх
+		 *         ______   aGiverItem
+		 *        /                         => direction = -1
+		 *       /
+		 * _____/           aReceivingItem
+		 *      \
+		 *       \                          => direction = 1
+		 *        \______   aGiverItem
+		 */
+		let direction = if dh > 0.0 { -1 } else { 1 };
+		v_zone = evac_speed_on_stair_rust(density_in_transmitting_zone, direction);
+	}
+
+	// TODO: Add logging
+	// if v_zone < 0 { log() }
+
+	v_zone
 }
 
 #[no_mangle]
