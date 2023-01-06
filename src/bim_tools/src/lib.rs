@@ -395,17 +395,21 @@ pub extern "C" fn bim_tools_get_num_of_people_rust(bim: *const bim_t) -> c_doubl
 	num_of_people
 }*/
 
-// FIXME: after replacing c function the simulation result has changed
-/*/// Устанавливает в помещение заданное количество людей
+/// Устанавливает в помещение заданное количество людей
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_of_people: f64) {
+pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_of_people: f32) {
 	let zone = unsafe {
 		zone.as_mut().expect("Failed to dereference pointer zone at bim_tools_set_people_to_zone fn in bim_tools crate")
 	};
 
-	zone.numofpeople = num_of_people;
-}*/
+	zone.numofpeople = f64::try_from(num_of_people).unwrap_or_else(|e| {
+		panic!(
+			"Failed to convert f32 to f64. f32: {}. Error: {:?}",
+			num_of_people, e
+		)
+	});
+}
 
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]

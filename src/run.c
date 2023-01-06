@@ -194,7 +194,7 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
         if (zone->sign == OUTSIDE) continue;
 
         if (cfg_scenario->distribution.type == distribution_uniform) {
-            bim_tools_set_people_to_zone(zone, (float)(zone->area * cfg_scenario->distribution.density));
+            bim_tools_set_people_to_zone_rust(zone, (float)(zone->area * cfg_scenario->distribution.density));
         }
 
         // A special set up the density of item of bim
@@ -202,7 +202,7 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
             const special_t special = cfg_scenario->distribution.special[s];
             for (size_t u = 0; u < special.num_of_uuids; u++) {
                 if (uuideq(zone->uuid.x, special.uuid[u].x)) {
-                    bim_tools_set_people_to_zone(zone, (float)(zone->area * special.value));
+                    bim_tools_set_people_to_zone_rust(zone, (float)(zone->area * special.value));
                 }
             }
         }
