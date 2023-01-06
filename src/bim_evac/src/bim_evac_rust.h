@@ -35,6 +35,21 @@ void evac_time_inc_rust(void);
 void evac_time_reset_rust(void);
 
 /**
+ * Определение скорости на выходе из отдающего помещения
+ *
+ * # Arguments
+ * * `receiving_zone` - принимающая зона
+ * * `transmitting_zone` - отдающая зона
+ * * `transit_width` - ширина прохода
+ *
+ * # Returns
+ * Скорость на выходе из отдающего помещения
+ */
+double speed_at_exit_rust(const bim_zone_t *receiving_zone,
+                          const bim_zone_t *transmitting_zone,
+                          double transit_width);
+
+/**
  * Метод определения скорости движения людского потока по разным зонам
  *
  * # Arguments

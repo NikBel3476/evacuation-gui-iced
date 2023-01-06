@@ -4,9 +4,13 @@ use libc::{c_double, c_int};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
 
+/// м/мин
 static mut EVAC_SPEED_MAX: f64 = 100.0;
+/// чел/м^2
 static mut EVAC_DENSITY_MIN: f64 = 0.1;
+/// чел/м^2
 static mut EVAC_DENSITY_MAX: f64 = 5.0;
+/// мин
 static mut EVAC_MODELING_STEP: f64 = 0.01;
 static mut EVAC_TIME: f64 = 0.0;
 
@@ -167,6 +171,43 @@ pub extern "C" fn speed_in_element_rust(
 	// if v_zone < 0 { log() }
 
 	v_zone
+}
+
+// TODO: complete docs comments
+/// Определение скорости на выходе из отдающего помещения
+///
+/// # Arguments
+/// * `receiving_zone` - принимающая зона
+/// * `transmitting_zone` - отдающая зона
+/// * `transit_width` - ширина прохода
+///
+/// # Returns
+/// Скорость на выходе из отдающего помещения
+#[no_mangle]
+pub extern "C" fn speed_at_exit_rust(
+	receiving_zone: *const bim_zone_t,
+	transmitting_zone: *const bim_zone_t,
+	transit_width: c_double,
+) -> c_double {
+	let receiving_zone = unsafe {
+		receiving_zone.as_ref().expect("Failed to dereference pointer receiving_zone at speed_at_exit_rust fn in bim_evac crate")
+	};
+
+	let transmitting_zone = unsafe {
+		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at speed_at_exit_rust fn in bim_evac crate")
+	};
+
+	let zone_speed = speed_in_element_rust(receiving_zone, transmitting_zone);
+	let density_in_transmitting_element = transmitting_zone.numofpeople / transmitting_zone.area;
+	let transition_speed = unsafe {
+		speed_through_transit_rust(
+			transit_width,
+			density_in_transmitting_element,
+			EVAC_SPEED_MAX,
+		)
+	};
+
+	zone_speed.min(transition_speed)
 }
 
 #[no_mangle]

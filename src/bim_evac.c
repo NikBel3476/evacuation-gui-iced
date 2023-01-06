@@ -14,6 +14,7 @@
  */
 
 #include "bim_evac.h"
+#include "bim_evac/src/bim_evac_rust.h"
 
 static double evac_speed_max;//= 100;  // м/мин
 static double evac_density_min;//= 0.1;  // чел/м^2
@@ -70,7 +71,7 @@ void evac_def_modeling_step(const bim_t *bim) {
     return v_zone;
 }*/
 
-static double speed_at_exit(const bim_zone_t *receiving_zone,  // принимающая зона
+/*static double speed_at_exit(const bim_zone_t *receiving_zone,  // принимающая зона
                             const bim_zone_t *giver_zone,      // отдающая зона
                             double transit_width) {
     // Определение скорости на выходе из отдающего помещения
@@ -81,7 +82,7 @@ static double speed_at_exit(const bim_zone_t *receiving_zone,  // принима
     double exit_speed = fmin(zone_speed, transition_speed);
 
     return exit_speed;
-}
+}*/
 
 static double change_num_of_people(const bim_zone_t *giver_zone,
                                  double transit_width,
@@ -102,7 +103,7 @@ static double change_num_of_people(const bim_zone_t *giver_zone,
 static double potential_element(const bim_zone_t *receiving_zone,  // принимающая зона
                                 const bim_zone_t *giver_zone,      // отдающая зона
                                 const bim_transit_t *transit) {
-    double p = sqrt(giver_zone->area) / speed_at_exit(receiving_zone, giver_zone, transit->width);
+    double p = sqrt(giver_zone->area) / speed_at_exit_rust(receiving_zone, giver_zone, transit->width);
     if (receiving_zone->potential >= FLT_MAX) return p;
     return receiving_zone->potential + p;
 }
@@ -126,7 +127,7 @@ static double part_people_flow(const bim_zone_t *receiving_zone,  // прини�
     // которое осталось в помещении. Если там слишком мало людей,
     // то они переходя все сразу, чтоб не дробить их
     double door_width = transit->width; //(densityInElement > densityMin) ? aDoor.VCn().getWidth() : std::sqrt(areaElement);
-    double speedatexit = speed_at_exit(receiving_zone, giver_zone, door_width);
+    double speedatexit = speed_at_exit_rust(receiving_zone, giver_zone, door_width);
 
     // Кол. людей, которые могут покинуть помещение
     double part_of_people_flow = (density_in_giver_zone > density_min_giver_zone)
