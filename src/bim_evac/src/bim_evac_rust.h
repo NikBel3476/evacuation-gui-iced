@@ -50,6 +50,21 @@ void evac_time_inc_rust(void);
 void evac_time_reset_rust(void);
 
 /**
+ * Подсчет потенциала
+ *
+ * # Arguments
+ * * `receiving_zone` - принимающая зона
+ * * `transmitting_zone` - отдающая зона
+ * * `transit` - проем
+ *
+ * # Returns
+ * Потенциал
+ */
+double potential_element_rust(const bim_zone_t *receiving_zone,
+                              const bim_zone_t *transmitting_zone,
+                              const bim_transit_t *transit);
+
+/**
  * Определение скорости на выходе из отдающего помещения
  *
  * # Arguments

@@ -100,13 +100,13 @@ void evac_def_modeling_step(const bim_t *bim) {
 // TODO Уточнить корректность подсчета потенциала
 // TODO Потенциал должен считаться до эвакуации из помещения или после?
 // TODO Когда возникает ситуация, что потенциал принимающего больше отдающего
-static double potential_element(const bim_zone_t *receiving_zone,  // принимающая зона
+/*static double potential_element(const bim_zone_t *receiving_zone,  // принимающая зона
                                 const bim_zone_t *giver_zone,      // отдающая зона
                                 const bim_transit_t *transit) {
     double p = sqrt(giver_zone->area) / speed_at_exit_rust(receiving_zone, giver_zone, transit->width);
     if (receiving_zone->potential >= FLT_MAX) return p;
     return receiving_zone->potential + p;
-}
+}*/
 
 /**
  * @brief _part_people_flow
@@ -196,7 +196,7 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
 
             bim_zone_t *giver_zone = zones->data[ptr->dest];
 
-            receiving_zone->potential = potential_element(receiving_zone, giver_zone, transit);
+            receiving_zone->potential = potential_element_rust(receiving_zone, giver_zone, transit);
             double moved_people = part_people_flow(receiving_zone, giver_zone, transit);
             receiving_zone->numofpeople += moved_people;
             giver_zone->numofpeople -= moved_people;

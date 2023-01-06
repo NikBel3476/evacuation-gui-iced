@@ -1,5 +1,5 @@
 use bim_json_object::bim_element_sign_t_rust;
-use bim_tools::bim_zone_t;
+use bim_tools::{bim_transit_t, bim_zone_t};
 use libc::{c_double, c_int};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
@@ -235,6 +235,47 @@ pub extern "C" fn change_num_of_people_rust(
 	// Зная скорость потока, можем вычислить конкретное количество человек,
 	// которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
 	unsafe { people_flow * EVAC_MODELING_STEP }
+}
+
+// TODO: Уточнить корректность подсчета потенциала
+// TODO: Потенциал должен считаться до эвакуации из помещения или после?
+// TODO: Когда возникает ситуация, что потенциал принимающего больше отдающего
+/// Подсчет потенциала
+///
+/// # Arguments
+/// * `receiving_zone` - принимающая зона
+/// * `transmitting_zone` - отдающая зона
+/// * `transit` - проем
+///
+/// # Returns
+/// Потенциал
+#[no_mangle]
+pub extern "C" fn potential_element_rust(
+	receiving_zone: *const bim_zone_t,
+	transmitting_zone: *const bim_zone_t,
+	transit: *const bim_transit_t,
+) -> c_double {
+	let receiving_zone = unsafe {
+		receiving_zone.as_ref().expect("Failed to dereference pointer receiving_zone at potential_element_rust fn in bim_evac crate")
+	};
+
+	let transmitting_zone = unsafe {
+		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at potential_element_rust fn in bim_evac crate")
+	};
+
+	let transit = unsafe {
+		transit.as_ref().expect(
+			"Failed to dereference pointer transit at potential_element_rust fn in bim_evac crate",
+		)
+	};
+
+	let p = transmitting_zone.area.sqrt()
+		/ speed_at_exit_rust(receiving_zone, transmitting_zone, transit.width);
+
+	match receiving_zone.potential.total_cmp(&f64::MAX) {
+		Ordering::Less => receiving_zone.potential + p,
+		_ => p,
+	}
 }
 
 #[no_mangle]
