@@ -20,7 +20,7 @@ double change_num_of_people_rust(const bim_zone_t *transmitting_zone,
                                  double transit_width,
                                  double speed_at_exit);
 
-int element_id_eq_callback_rust(ArrayListValue value1, ArrayListValue value2);
+int element_id_eq_callback_rust(ArrayListValue *value1, ArrayListValue *value2);
 
 double evac_get_time_m_rust(void);
 
@@ -51,7 +51,22 @@ void evac_time_inc_rust(void);
 
 void evac_time_reset_rust(void);
 
-int potential_cmp_callback_rust(ArrayListValue value1, ArrayListValue value2);
+/**
+ * _part_people_flow
+ *
+ * # Arguments
+ * * `receiving_zone` - принимающее помещение
+ * * `transmitting_zone` - отдающее помещение
+ * * `transit` - проем между помещениями
+ *
+ * # Returns
+ * Количество людей
+ */
+double part_people_flow_rust(const bim_zone_t *receiving_zone,
+                             const bim_zone_t *transmitting_zone,
+                             const bim_transit_t *transit);
+
+int potential_cmp_callback_rust(ArrayListValue *value1, ArrayListValue *value2);
 
 /**
  * Подсчет потенциала

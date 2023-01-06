@@ -114,7 +114,7 @@ void evac_def_modeling_step(const bim_t *bim) {
  * @param giver_zone        отдающее помещение
  * @param transit             дверь между этими помещениями
  * @return  количество людей
- */
+ *//*
 static double part_people_flow(const bim_zone_t *receiving_zone,  // принимающая зона
                                const bim_zone_t *giver_zone,      // отдающая зона
                                const bim_transit_t *transit) {
@@ -151,7 +151,7 @@ static double part_people_flow(const bim_zone_t *receiving_zone,  // прини�
     }
     return (capacity_receiving_zone > part_of_people_flow) ? part_of_people_flow
                                                           : capacity_receiving_zone;
-}
+}*/
 
 static void reset_zones(const ArrayList *zones) {
     for (size_t i = 0; i < zones->length; i++) {
@@ -197,7 +197,7 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
             bim_zone_t *giver_zone = zones->data[ptr->dest];
 
             receiving_zone->potential = potential_element_rust(receiving_zone, giver_zone, transit);
-            double moved_people = part_people_flow(receiving_zone, giver_zone, transit);
+            double moved_people = part_people_flow_rust(receiving_zone, giver_zone, transit);
             receiving_zone->numofpeople += moved_people;
             giver_zone->numofpeople -= moved_people;
             transit->nop_proceeding = moved_people;

@@ -19,7 +19,7 @@ pub struct bim_transit_t {
 	/// Название элемента
 	pub name: *mut char,
 	/// Массив UUID элементов, которые являются соседними
-	pub outputs: uuid_t,
+	pub outputs: *mut uuid_t,
 	/// Полигон элемента
 	pub polygon: *mut polygon_t,
 	/// Высота элемента

@@ -282,7 +282,7 @@ pub extern "C" fn potential_element_rust(
 	}
 }
 
-/*/// _part_people_flow
+/// _part_people_flow
 ///
 /// # Arguments
 /// * `receiving_zone` - принимающее помещение
@@ -315,7 +315,7 @@ pub extern "C" fn part_people_flow_rust(
 	let area_transmitting_zone = transmitting_zone.area;
 	let people_in_transmitting_zone = transmitting_zone.numofpeople;
 	let density_in_transmitting_zone = people_in_transmitting_zone / area_transmitting_zone;
-	let density_min_in_transmitting_zone = unsafe {
+	let density_min_transmitting_zone = unsafe {
 		match EVAC_DENSITY_MIN > 0.0 {
 			true => EVAC_DENSITY_MIN,
 			false => 0.5 / area_transmitting_zone,
@@ -329,8 +329,7 @@ pub extern "C" fn part_people_flow_rust(
 	let speed_at_exit = speed_at_exit_rust(receiving_zone, transmitting_zone, door_width);
 
 	// Количество людей, которые могут покинуть помещение
-	let part_of_people_flow = match density_in_transmitting_zone > density_min_in_transmitting_zone
-	{
+	let part_of_people_flow = match density_in_transmitting_zone > density_min_transmitting_zone {
 		true => change_num_of_people_rust(transmitting_zone, door_width, speed_at_exit),
 		false => people_in_transmitting_zone,
 	};
@@ -356,7 +355,7 @@ pub extern "C" fn part_people_flow_rust(
 		true => part_of_people_flow,
 		false => capacity_receiving_zone,
 	}
-}*/
+}
 
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
