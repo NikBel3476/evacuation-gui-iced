@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 libc = "0.2"
+bim_json_object = { path = "../bim_json_object" }
+bim_tools = { path = "../bim_tools" }
 
 [lib]
 crate-type=["staticlib", "lib"]
