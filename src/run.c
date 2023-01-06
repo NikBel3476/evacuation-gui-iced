@@ -213,5 +213,7 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
     evac_set_speed_max(cfg_scenario->modeling.speed_max);
     evac_set_speed_max_rust(cfg_scenario->modeling.speed_max);
     evac_set_density_max(cfg_scenario->modeling.density_max);
+    evac_set_density_max_rust(cfg_scenario->modeling.density_max);
     evac_set_density_min(cfg_scenario->modeling.density_min);
+    evac_set_density_min_rust(cfg_scenario->modeling.density_min);
 }

@@ -132,6 +132,7 @@ pub extern "C" fn evac_speed_on_stair_rust(
 /// # Returns
 /// Скорость людского потока в зоне
 #[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn speed_in_element_rust(
 	receiving_zone: *const bim_zone_t,
 	transmitting_zone: *const bim_zone_t,
@@ -183,6 +184,7 @@ pub extern "C" fn speed_in_element_rust(
 /// # Returns
 /// Скорость на выходе из отдающего помещения
 #[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn speed_at_exit_rust(
 	receiving_zone: *const bim_zone_t,
 	transmitting_zone: *const bim_zone_t,
@@ -220,6 +222,7 @@ pub extern "C" fn speed_at_exit_rust(
 /// # Returns
 ///
 #[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn change_num_of_people_rust(
 	transmitting_zone: *const bim_zone_t,
 	transit_width: c_double,
@@ -250,6 +253,7 @@ pub extern "C" fn change_num_of_people_rust(
 /// # Returns
 /// Потенциал
 #[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn potential_element_rust(
 	receiving_zone: *const bim_zone_t,
 	transmitting_zone: *const bim_zone_t,
@@ -276,6 +280,101 @@ pub extern "C" fn potential_element_rust(
 		Ordering::Less => receiving_zone.potential + p,
 		_ => p,
 	}
+}
+
+/*/// _part_people_flow
+///
+/// # Arguments
+/// * `receiving_zone` - принимающее помещение
+/// * `transmitting_zone` - отдающее помещение
+/// * `transit` - проем между помещениями
+///
+/// # Returns
+/// Количество людей
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn part_people_flow_rust(
+	receiving_zone: *const bim_zone_t,
+	transmitting_zone: *const bim_zone_t,
+	transit: *const bim_transit_t,
+) -> c_double {
+	let receiving_zone = unsafe {
+		receiving_zone.as_ref().expect("Failed to dereference pointer receiving_zone at part_people_flow_rust fn in bim_evac crate")
+	};
+
+	let transmitting_zone = unsafe {
+		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at part_people_flow_rust fn in bim_evac crate")
+	};
+
+	let transit = unsafe {
+		transit.as_ref().expect(
+			"Failed to dereference pointer transit at part_people_flow_rust fn in bim_evac crate",
+		)
+	};
+
+	let area_transmitting_zone = transmitting_zone.area;
+	let people_in_transmitting_zone = transmitting_zone.numofpeople;
+	let density_in_transmitting_zone = people_in_transmitting_zone / area_transmitting_zone;
+	let density_min_in_transmitting_zone = unsafe {
+		match EVAC_DENSITY_MIN > 0.0 {
+			true => EVAC_DENSITY_MIN,
+			false => 0.5 / area_transmitting_zone,
+		}
+	};
+
+	// Ширина перехода между зонами зависит от количества человек,
+	// которое осталось в помещении. Если там слишком мало людей,
+	// то они переходят все сразу, чтоб не дробить их
+	let door_width = transit.width; //(densityInElement > densityMin) ? aDoor.VCn().getWidth() : std::sqrt(areaElement);
+	let speed_at_exit = speed_at_exit_rust(receiving_zone, transmitting_zone, door_width);
+
+	// Количество людей, которые могут покинуть помещение
+	let part_of_people_flow = match density_in_transmitting_zone > density_min_in_transmitting_zone
+	{
+		true => change_num_of_people_rust(transmitting_zone, door_width, speed_at_exit),
+		false => people_in_transmitting_zone,
+	};
+
+	// Т.к. зона вне здания принята безразмерной,
+	// в нее может войти максимально возможное количество человек
+	// Все другие зоны могут принять ограниченное количество человек.
+	// Т.о. нужно проверить может ли принимающая зона вместить еще людей.
+	// capacity_receiving_zone - количество людей, которое еще может
+	// вместиться до достижения максимальной плотности
+	// => если может вместить больше, чем может выйти, то вмещает всех вышедших,
+	// иначе вмещает только возможное количество.
+	let max_num_of_people = unsafe { EVAC_DENSITY_MAX * receiving_zone.area };
+	let capacity_receiving_zone = max_num_of_people - receiving_zone.numofpeople;
+
+	// Такая ситуация возникает при плотности в принимающем помещении более Dmax чел./м2
+	// Фактически capacity_receiving_zone < 0 означает, что помещение не может принять людей
+	if capacity_receiving_zone < 0.0 {
+		return 0.0;
+	}
+
+	match capacity_receiving_zone > part_of_people_flow {
+		true => part_of_people_flow,
+		false => capacity_receiving_zone,
+	}
+}*/
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn element_id_eq_callback_rust(
+	value1: *mut bim_zone_t,
+	value2: *mut bim_zone_t,
+) -> c_int {
+	let value1 = unsafe {
+		value1.as_ref().expect("Failed to dereference pointer value1 at element_id_eq_callback_rust fn in bim_evac crate")
+	};
+
+	let value2 = unsafe {
+		value2.as_ref().expect("Failed to dereference pointer value2 at element_id_eq_callback_rust fn in bim_evac crate")
+	};
+
+	c_int::try_from(value1.id == value2.id).unwrap_or_else(|e| {
+		panic!("Failed to convert bool to c_int at element_id_eq_callback_rust fn in bim_evac crate. Error: {}", e)
+	})
 }
 
 #[no_mangle]

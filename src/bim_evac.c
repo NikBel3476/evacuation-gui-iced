@@ -169,9 +169,9 @@ static void reset_transits(const ArrayList *transits) {
     }
 }
 
-static int element_id_eq_callback(ArrayListValue value1, ArrayListValue value2) {
+/*static int element_id_eq_callback(ArrayListValue value1, ArrayListValue value2) {
     return ((bim_zone_t *) value1)->id == ((bim_zone_t *) value2)->id;
-}
+}*/
 
 static int potential_cmp_callback(ArrayListValue value1, ArrayListValue value2) {
     return ((bim_zone_t *) value1)->potential < ((bim_zone_t *) value2)->potential;
@@ -206,7 +206,7 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
             transit->is_visited = true;
 
             if (giver_zone->numofoutputs > 1 && !giver_zone->is_blocked
-                && arraylist_index_of(zones_to_process, element_id_eq_callback, giver_zone) < 0) {
+                && arraylist_index_of(zones_to_process, element_id_eq_callback_rust, giver_zone) < 0) {
                 arraylist_append(zones_to_process, giver_zone);
             }
         }

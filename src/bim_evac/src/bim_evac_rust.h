@@ -20,6 +20,8 @@ double change_num_of_people_rust(const bim_zone_t *transmitting_zone,
                                  double transit_width,
                                  double speed_at_exit);
 
+int element_id_eq_callback_rust(ArrayListValue value1, ArrayListValue value2);
+
 double evac_get_time_m_rust(void);
 
 double evac_get_time_s_rust(void);
