@@ -84,7 +84,7 @@ void evac_def_modeling_step(const bim_t *bim) {
     return exit_speed;
 }*/
 
-static double change_num_of_people(const bim_zone_t *giver_zone,
+/*static double change_num_of_people(const bim_zone_t *giver_zone,
                                  double transit_width,
                                  double speed_at_exit)     // Скорость перехода в принимающую зону
 {
@@ -94,7 +94,7 @@ static double change_num_of_people(const bim_zone_t *giver_zone,
     // Зная скорость потока, можем вычислить конкретное количество человек,
     // которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
     return P * evac_modeling_step;
-}
+}*/
 
 // Подсчет потенциала
 // TODO Уточнить корректность подсчета потенциала
@@ -131,7 +131,7 @@ static double part_people_flow(const bim_zone_t *receiving_zone,  // прини�
 
     // Кол. людей, которые могут покинуть помещение
     double part_of_people_flow = (density_in_giver_zone > density_min_giver_zone)
-                                 ? change_num_of_people(giver_zone, door_width, speedatexit)
+                                 ? change_num_of_people_rust(giver_zone, door_width, speedatexit)
                                  : people_in_giver_zone;
 
     // Т.к. зона вне здания принята безразмерной,

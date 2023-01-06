@@ -173,7 +173,6 @@ pub extern "C" fn speed_in_element_rust(
 	v_zone
 }
 
-// TODO: complete docs comments
 /// Определение скорости на выходе из отдающего помещения
 ///
 /// # Arguments
@@ -208,6 +207,34 @@ pub extern "C" fn speed_at_exit_rust(
 	};
 
 	zone_speed.min(transition_speed)
+}
+
+// TODO: complete docs comment
+///
+///
+/// # Arguments
+/// * `transmitting_zone` - отдающая зона
+/// * `transit_width` - ширина прохода
+/// * `speed_at_exit` - Скорость перехода в принимающую зону
+///
+/// # Returns
+///
+#[no_mangle]
+pub extern "C" fn change_num_of_people_rust(
+	transmitting_zone: *const bim_zone_t,
+	transit_width: c_double,
+	speed_at_exit: c_double,
+) -> c_double {
+	let transmitting_zone = unsafe {
+		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at change_num_of_people_rust fn in bim_evac crate")
+	};
+
+	let density_in_element = transmitting_zone.numofpeople / transmitting_zone.area;
+	// Величина людского потока, через проем, чел./мин
+	let people_flow = density_in_element * speed_at_exit * transit_width;
+	// Зная скорость потока, можем вычислить конкретное количество человек,
+	// которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
+	unsafe { people_flow * EVAC_MODELING_STEP }
 }
 
 #[no_mangle]

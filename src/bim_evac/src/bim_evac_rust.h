@@ -5,6 +5,21 @@
 #include <stdlib.h>
 
 
+/**
+ *
+ *
+ * # Arguments
+ * * `transmitting_zone` - отдающая зона
+ * * `transit_width` - ширина прохода
+ * * `speed_at_exit` - Скорость перехода в принимающую зону
+ *
+ * # Returns
+ *
+ */
+double change_num_of_people_rust(const bim_zone_t *transmitting_zone,
+                                 double transit_width,
+                                 double speed_at_exit);
+
 double evac_get_time_m_rust(void);
 
 double evac_get_time_s_rust(void);
