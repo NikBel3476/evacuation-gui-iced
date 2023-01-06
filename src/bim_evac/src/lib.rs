@@ -378,6 +378,25 @@ pub extern "C" fn element_id_eq_callback_rust(
 }
 
 #[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn potential_cmp_callback_rust(
+	value1: *mut bim_zone_t,
+	value2: *mut bim_zone_t,
+) -> c_int {
+	let value1 = unsafe {
+		value1.as_ref().expect("Failed to dereference pointer value1 at potential_cmp_callback_rust fn in bim_evac crate")
+	};
+
+	let value2 = unsafe {
+		value2.as_ref().expect("Failed to dereference pointer value2 at potential_cmp_callback_rust fn in bim_evac crate")
+	};
+
+	c_int::try_from(value1.potential < value2.potential).unwrap_or_else(|e| {
+		panic!("Failed to convert Ordering to c_int at potential_cmp_callback_rust fn in bim_evac crate. Error: {}", e)
+	})
+}
+
+#[no_mangle]
 pub extern "C" fn evac_set_speed_max_rust(speed: c_double) {
 	unsafe {
 		EVAC_SPEED_MAX = speed;

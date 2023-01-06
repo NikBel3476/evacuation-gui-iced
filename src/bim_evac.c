@@ -173,9 +173,9 @@ static void reset_transits(const ArrayList *transits) {
     return ((bim_zone_t *) value1)->id == ((bim_zone_t *) value2)->id;
 }*/
 
-static int potential_cmp_callback(ArrayListValue value1, ArrayListValue value2) {
+/*static int potential_cmp_callback(ArrayListValue value1, ArrayListValue value2) {
     return ((bim_zone_t *) value1)->potential < ((bim_zone_t *) value2)->potential;
-}
+}*/
 
 void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const ArrayList *transits) {
     reset_zones(zones);
@@ -211,7 +211,7 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
             }
         }
 
-        arraylist_sort(zones_to_process, potential_cmp_callback);
+        arraylist_sort(zones_to_process, potential_cmp_callback_rust);
 
         if (zones_to_process->length > 0) {
             receiving_zone = zones_to_process->data[0];

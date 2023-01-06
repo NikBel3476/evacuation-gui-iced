@@ -51,6 +51,8 @@ void evac_time_inc_rust(void);
 
 void evac_time_reset_rust(void);
 
+int potential_cmp_callback_rust(ArrayListValue value1, ArrayListValue value2);
+
 /**
  * Подсчет потенциала
  *
