@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import * as path from 'path';
@@ -34,6 +35,32 @@ export default defineConfig({
 				peopleTraffic: path.resolve(__dirname, 'src-ui', 'peopleTraffic', 'index.html'),
 				buildingView: path.resolve(__dirname, 'src-ui', 'buildingView', 'index.html')
 			}
+		}
+	},
+	test: {
+		globals: true,
+		environment: 'jsdom',
+		setupFiles: 'src-ui/setupTests.ts',
+		coverage: {
+			all: true,
+			exclude: [
+				'coverage/**',
+				'dist/**',
+				'packages/*/test{,s}/**',
+				'**/*.d.ts',
+				'cypress/**',
+				'test{,s}/**',
+				'test{,-*}.{js,cjs,mjs,ts,tsx,jsx}',
+				'**/*{.,-}test.{js,cjs,mjs,ts,tsx,jsx}',
+				'**/*{.,-}spec.{js,cjs,mjs,ts,tsx,jsx}',
+				'**/__tests__/**',
+				'**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress}.config.*',
+				'**/.{eslint,mocha,prettier}rc.{js,cjs,yml}',
+				'vite.config.ts',
+				'tailwind.config.cjs',
+				'postcss.config.cjs',
+				'**/target/**'
+			]
 		}
 	}
 });
