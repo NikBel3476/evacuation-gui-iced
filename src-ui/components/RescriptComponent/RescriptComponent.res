@@ -2,6 +2,6 @@
 @react.component
 let make = () => {
     <div>
-        <p> {React.string(`Rescript component`)} </p>
+        <p dataTestId="text-content">{React.string(`Rescript component`)}</p>
     </div>
 }

@@ -3,7 +3,9 @@
 import * as React from "react";
 
 function RescriptComponent(props) {
-  return React.createElement("div", undefined, React.createElement("p", undefined, "Rescript component"));
+  return React.createElement("div", undefined, React.createElement("p", {
+                  "data-testid": "text-content"
+                }, "Rescript component"));
 }
 
 var make = RescriptComponent;
