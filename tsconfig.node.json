@@ -3,11 +3,16 @@
         "composite": true,
         "module": "ESNext",
         "moduleResolution": "Node",
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "types": [
+            "node",
+            "cypress"
+        ]
     },
     "include": [
         "vite.config.ts",
         "postcss.config.cjs",
-        "tailwind.config.cjs"
+        "tailwind.config.cjs",
+        "cypress"
     ]
 }

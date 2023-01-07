@@ -1,12 +1,14 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "cypress/globals": true
     },
     "extends": [
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
-        "standard-with-typescript"
+        "standard-with-typescript",
+        "plugin:cypress/recommended"
     ],
     "overrides": [
     ],
@@ -16,7 +18,8 @@
         "project": "tsconfig.json"
     },
     "plugins": [
-        "react"
+        "react",
+        "cypress"
     ],
     "settings": {
         "react": {

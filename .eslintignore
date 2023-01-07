@@ -8,4 +8,5 @@ vite.config.ts
 postcss.config.cjs
 tailwind.config.cjs
 
-src-ui/peopleTraffic/js/vendor/toGif
+src-ui/peopleTraffic/js/vendor/
+coverage/
