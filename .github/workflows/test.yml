@@ -52,3 +52,6 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test rust
+        run: cargo test --manifest-path src-tauri/Cargo.toml --workspace
