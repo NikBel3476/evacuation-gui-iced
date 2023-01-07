@@ -36,6 +36,7 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
+          key: ${{ matrix.platform }}
 
       - name: Sync node version and setup cache (ubuntu-18.04 only)
         uses: actions/setup-node@v3
