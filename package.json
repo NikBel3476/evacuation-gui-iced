@@ -22,8 +22,7 @@
         "lint": "npx eslint .",
         "prepare": "husky install",
         "start-server": "http-server ./dist -p 8080",
-        "cypress:test:ci": "start-server-and-test start-server http://localhost:8080 cypress:run",
-        "precypress:test:ci": "npm run build"
+        "cypress:test:ci": "start-server-and-test start-server http://localhost:8080 cypress:run"
     },
     "lint-staged": {
         "!(*.bs).js": [
