@@ -14,6 +14,7 @@
  */
 
 #include "run.h"
+#include "bim_tools/src/bim_tools_rust.h"
 
 void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scenario);
 
@@ -193,7 +194,7 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
         if (zone->sign == OUTSIDE) continue;
 
         if (cfg_scenario->distribution.type == distribution_uniform) {
-            bim_tools_set_people_to_zone(zone, (float)(zone->area * cfg_scenario->distribution.density));
+            bim_tools_set_people_to_zone_rust(zone, (float)(zone->area * cfg_scenario->distribution.density));
         }
 
         // A special set up the density of item of bim
@@ -201,14 +202,18 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
             const special_t special = cfg_scenario->distribution.special[s];
             for (size_t u = 0; u < special.num_of_uuids; u++) {
                 if (uuideq(zone->uuid.x, special.uuid[u].x)) {
-                    bim_tools_set_people_to_zone(zone, (float)(zone->area * special.value));
+                    bim_tools_set_people_to_zone_rust(zone, (float)(zone->area * special.value));
                 }
             }
         }
     }
 
     evac_set_modeling_step(cfg_scenario->modeling.step);
+    evac_set_modeling_step_rust(cfg_scenario->modeling.step);
     evac_set_speed_max(cfg_scenario->modeling.speed_max);
+    evac_set_speed_max_rust(cfg_scenario->modeling.speed_max);
     evac_set_density_max(cfg_scenario->modeling.density_max);
+    evac_set_density_max_rust(cfg_scenario->modeling.density_max);
     evac_set_density_min(cfg_scenario->modeling.density_min);
+    evac_set_density_min_rust(cfg_scenario->modeling.density_min);
 }

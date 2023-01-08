@@ -1,0 +1,9 @@
+.link-list {
+	margin: 20px auto auto 20px;
+	padding: 0;
+	list-style-type: none;
+}
+
+.link-list li {
+	margin-bottom: 10px;
+}

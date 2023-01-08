@@ -19,7 +19,7 @@
 #include "bim_configure.h"
 #include "bim_configure/src/bim_configure_rust.h"
 #include "bim_output.h"
-#include "bim_output/src/bim_output_rust.h"
+#include "../src-tauri/src/bim_output/src/bim_output_rust.h"
 
 void run();
 

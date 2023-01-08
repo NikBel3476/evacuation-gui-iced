@@ -14,6 +14,7 @@
  */
 
 #include "bim_evac.h"
+#include "bim_evac/src/bim_evac_rust.h"
 
 static double evac_speed_max;//= 100;  // м/мин
 static double evac_density_min;//= 0.1;  // чел/м^2
@@ -31,127 +32,6 @@ void evac_def_modeling_step(const bim_t *bim) {
                                                    : evac_modeling_step;      // Шаг моделирования, мин
 }
 
-/**
- * Метод определения скорости движения людского потока по разным зонам
- *
- * @param aReceivingElement    зона, в которую засасываются люди
- * @param aGiverElement        зона, из которой высасываются люди
- * @return Скорость людского потока в зоне
- */
-static double speed_in_element(const bim_zone_t *receiving_zone,  // принимающая зона
-                               const bim_zone_t *giver_zone)      // отдающая зона
-{
-    double density_in_giver_zone = giver_zone->numofpeople / giver_zone->area;
-    // По умолчанию, используется скорость движения по горизонтальной поверхности
-    double v_zone = speed_in_room_rust(density_in_giver_zone, evac_speed_max);
-
-    double dh = receiving_zone->z_level - giver_zone->z_level;   // Разница высот зон
-
-    // Если принимающее помещение является лестницей и находится на другом уровне,
-    // то скорость будет рассчитываться как по наклонной поверхности
-    if (fabs(dh) > 1e-3 && receiving_zone->sign == STAIRCASE) {
-        /* Иначе определяем направление движения по лестнице
-         * -1 вниз, 1 вверх
-         *         ______   aGiverItem
-         *        /                         => direction = -1
-         *       /
-         * _____/           aReceivingItem
-         *      \
-         *       \                          => direction = 1
-         *        \______   aGiverItem
-         */
-        int direction = (dh > 0) ? -1 : 1;
-        v_zone = evac_speed_on_stair_rust(density_in_giver_zone, direction);
-    }
-
-    if (v_zone < 0)
-        LOG_ERROR("Скорость в отдающей зоне меньше 0: %s", giver_zone->name);
-
-    return v_zone;
-}
-
-static double speed_at_exit(const bim_zone_t *receiving_zone,  // принимающая зона
-                            const bim_zone_t *giver_zone,      // отдающая зона
-                            double transit_width) {
-    // Определение скорости на выходе из отдающего помещения
-    double zone_speed = speed_in_element(receiving_zone, giver_zone);
-    double density_in_giver_element = giver_zone->numofpeople / giver_zone->area;
-    double transition_speed = speed_through_transit_rust(transit_width, density_in_giver_element,
-                                                         evac_speed_max);
-    double exit_speed = fmin(zone_speed, transition_speed);
-
-    return exit_speed;
-}
-
-static double change_num_of_people(const bim_zone_t *giver_zone,
-                                 double transit_width,
-                                 double speed_at_exit)     // Скорость перехода в принимающую зону
-{
-    double densityInElement = giver_zone->numofpeople / giver_zone->area;
-    // Величина людского потока, через проем шириной aWidthDoor, чел./мин
-    double P = densityInElement * speed_at_exit * transit_width;
-    // Зная скорость потока, можем вычислить конкретное количество человек,
-    // которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
-    return P * evac_modeling_step;
-}
-
-// Подсчет потенциала
-// TODO Уточнить корректность подсчета потенциала
-// TODO Потенциал должен считаться до эвакуации из помещения или после?
-// TODO Когда возникает ситуация, что потенциал принимающего больше отдающего
-static double potential_element(const bim_zone_t *receiving_zone,  // принимающая зона
-                                const bim_zone_t *giver_zone,      // отдающая зона
-                                const bim_transit_t *transit) {
-    double p = sqrt(giver_zone->area) / speed_at_exit(receiving_zone, giver_zone, transit->width);
-    if (receiving_zone->potential >= FLT_MAX) return p;
-    return receiving_zone->potential + p;
-}
-
-/**
- * @brief _part_people_flow
- * @param receiving_zone    принимающее помещение
- * @param giver_zone        отдающее помещение
- * @param transit             дверь между этими помещениями
- * @return  количество людей
- */
-static double part_people_flow(const bim_zone_t *receiving_zone,  // принимающая зона
-                               const bim_zone_t *giver_zone,      // отдающая зона
-                               const bim_transit_t *transit) {
-    double area_giver_zone = giver_zone->area;
-    double people_in_giver_zone = giver_zone->numofpeople;
-    double density_in_giver_zone = people_in_giver_zone / area_giver_zone;
-    double density_min_giver_zone = evac_density_min > 0 ? evac_density_min : 0.5 / area_giver_zone;
-
-    // Ширина перехода между зонами зависит от количества человек,
-    // которое осталось в помещении. Если там слишком мало людей,
-    // то они переходя все сразу, чтоб не дробить их
-    double door_width = transit->width; //(densityInElement > densityMin) ? aDoor.VCn().getWidth() : std::sqrt(areaElement);
-    double speedatexit = speed_at_exit(receiving_zone, giver_zone, door_width);
-
-    // Кол. людей, которые могут покинуть помещение
-    double part_of_people_flow = (density_in_giver_zone > density_min_giver_zone)
-                                 ? change_num_of_people(giver_zone, door_width, speedatexit)
-                                 : people_in_giver_zone;
-
-    // Т.к. зона вне здания принята безразмерной,
-    // в нее может войти максимально возможное количество человек
-    // Все другие зоны могут принять ограниченное количество человек.
-    // Т.о. нужно проверить может ли принимающая зона вместить еще людей.
-    // capacity_receiving_zone - количество людей, которое еще может
-    // вместиться до достижения максимальной плотности
-    // => если может вместить больше, чем может выйти, то вмещает всех вышедших,
-    // иначе вмещает только возможное количество.
-    double max_num_of_people = evac_density_max * receiving_zone->area;
-    double capacity_receiving_zone = max_num_of_people - receiving_zone->numofpeople;
-    // Такая ситуация возникает при плотности в принимающем помещении более Dmax чел./м2
-    // Фактически capacity_receiving_zone < 0 означает, что помещение не может принять людей
-    if (capacity_receiving_zone < 0) {
-        return 0;
-    }
-    return (capacity_receiving_zone > part_of_people_flow) ? part_of_people_flow
-                                                          : capacity_receiving_zone;
-}
-
 static void reset_zones(const ArrayList *zones) {
     for (size_t i = 0; i < zones->length; i++) {
         bim_zone_t *zone = zones->data[i];
@@ -166,14 +46,6 @@ static void reset_transits(const ArrayList *transits) {
         transit->is_visited = false;
         transit->nop_proceeding = 0;
     }
-}
-
-static int element_id_eq_callback(ArrayListValue value1, ArrayListValue value2) {
-    return ((bim_zone_t *) value1)->id == ((bim_zone_t *) value2)->id;
-}
-
-static int potential_cmp_callback(ArrayListValue value1, ArrayListValue value2) {
-    return ((bim_zone_t *) value1)->potential < ((bim_zone_t *) value2)->potential;
 }
 
 void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const ArrayList *transits) {
@@ -195,8 +67,8 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
 
             bim_zone_t *giver_zone = zones->data[ptr->dest];
 
-            receiving_zone->potential = potential_element(receiving_zone, giver_zone, transit);
-            double moved_people = part_people_flow(receiving_zone, giver_zone, transit);
+            receiving_zone->potential = potential_element_rust(receiving_zone, giver_zone, transit);
+            double moved_people = part_people_flow_rust(receiving_zone, giver_zone, transit);
             receiving_zone->numofpeople += moved_people;
             giver_zone->numofpeople -= moved_people;
             transit->nop_proceeding = moved_people;
@@ -205,12 +77,12 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
             transit->is_visited = true;
 
             if (giver_zone->numofoutputs > 1 && !giver_zone->is_blocked
-                && arraylist_index_of(zones_to_process, element_id_eq_callback, giver_zone) < 0) {
+                && arraylist_index_of(zones_to_process, element_id_eq_callback_rust, giver_zone) < 0) {
                 arraylist_append(zones_to_process, giver_zone);
             }
         }
 
-        arraylist_sort(zones_to_process, potential_cmp_callback);
+        arraylist_sort(zones_to_process, potential_cmp_callback_rust);
 
         if (zones_to_process->length > 0) {
             receiving_zone = zones_to_process->data[0];

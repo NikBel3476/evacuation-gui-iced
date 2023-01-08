@@ -26,8 +26,9 @@ bim_cli = { path = "../src/bim_cli" }
 bim_configure = { path = "../src/bim_configure" }
 bim_evac = { path = "../src/bim_evac" }
 bim_json_object = { path = "../src/bim_json_object" }
-bim_output = { path = "../src/bim_output" }
+bim_output = { path = "src/bim_output" }
 bim_polygon_tools = { path = "../src/bim_polygon_tools" }
+bim_tools = { path = "../src/bim_tools" }
 
 [features]
 # by default Tauri runs in production mode
@@ -36,3 +37,8 @@ default = [ "custom-protocol" ]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
+
+[workspace]
+members = [
+  "src/bim_output"
+]

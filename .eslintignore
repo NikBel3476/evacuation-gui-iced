@@ -5,5 +5,9 @@ src-tauri/target/
 *.bs.js
 *.gen.ts*
 vite.config.ts
+postcss.config.cjs
+tailwind.config.cjs
+cypress.config.ts
 
-src-ui/peopleTraffic/js/vendor/toGif
+src-ui/peopleTraffic/js/vendor/
+coverage/

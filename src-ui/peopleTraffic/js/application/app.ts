@@ -181,7 +181,6 @@ export class App {
 	}
 
 	updateField() {
-		console.log('Go!');
 		this.logic.updateField();
 		window.requestAnimationFrame(() => this.updateField());
 	}

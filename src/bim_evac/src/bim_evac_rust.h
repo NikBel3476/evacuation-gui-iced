@@ -5,6 +5,23 @@
 #include <stdlib.h>
 
 
+/**
+ *
+ *
+ * # Arguments
+ * * `transmitting_zone` - отдающая зона
+ * * `transit_width` - ширина прохода
+ * * `speed_at_exit` - Скорость перехода в принимающую зону
+ *
+ * # Returns
+ *
+ */
+double change_num_of_people_rust(const bim_zone_t *transmitting_zone,
+                                 double transit_width,
+                                 double speed_at_exit);
+
+int element_id_eq_callback_rust(ArrayListValue *value1, ArrayListValue *value2);
+
 double evac_get_time_m_rust(void);
 
 double evac_get_time_s_rust(void);
@@ -33,6 +50,66 @@ double evac_speed_on_stair_rust(double density_in_zone,
 void evac_time_inc_rust(void);
 
 void evac_time_reset_rust(void);
+
+/**
+ * _part_people_flow
+ *
+ * # Arguments
+ * * `receiving_zone` - принимающее помещение
+ * * `transmitting_zone` - отдающее помещение
+ * * `transit` - проем между помещениями
+ *
+ * # Returns
+ * Количество людей
+ */
+double part_people_flow_rust(const bim_zone_t *receiving_zone,
+                             const bim_zone_t *transmitting_zone,
+                             const bim_transit_t *transit);
+
+int potential_cmp_callback_rust(ArrayListValue *value1, ArrayListValue *value2);
+
+/**
+ * Подсчет потенциала
+ *
+ * # Arguments
+ * * `receiving_zone` - принимающая зона
+ * * `transmitting_zone` - отдающая зона
+ * * `transit` - проем
+ *
+ * # Returns
+ * Потенциал
+ */
+double potential_element_rust(const bim_zone_t *receiving_zone,
+                              const bim_zone_t *transmitting_zone,
+                              const bim_transit_t *transit);
+
+/**
+ * Определение скорости на выходе из отдающего помещения
+ *
+ * # Arguments
+ * * `receiving_zone` - принимающая зона
+ * * `transmitting_zone` - отдающая зона
+ * * `transit_width` - ширина прохода
+ *
+ * # Returns
+ * Скорость на выходе из отдающего помещения
+ */
+double speed_at_exit_rust(const bim_zone_t *receiving_zone,
+                          const bim_zone_t *transmitting_zone,
+                          double transit_width);
+
+/**
+ * Метод определения скорости движения людского потока по разным зонам
+ *
+ * # Arguments
+ * * `receiving_zone` - зона, в которую засасываются люди
+ * * `transmitting_zone` - зона, из которой высасываются люди
+ *
+ * # Returns
+ * Скорость людского потока в зоне
+ */
+double speed_in_element_rust(const bim_zone_t *receiving_zone,
+                             const bim_zone_t *transmitting_zone);
 
 /**
  * Скорость потока в комнате
