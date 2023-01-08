@@ -7,8 +7,6 @@
     },
     "include": [
         "vite.config.ts",
-        "postcss.config.cjs",
-        "tailwind.config.cjs",
         "cypress.config.ts"
     ]
 }
