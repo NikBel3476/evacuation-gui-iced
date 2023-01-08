@@ -36,6 +36,9 @@
         ],
         "!(*.gen).tsx": [
             "prettier --write"
+        ],
+        "*.rs": [
+            "rustfmt"
         ]
     },
     "devDependencies": {
