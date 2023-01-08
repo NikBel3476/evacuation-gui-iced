@@ -71,3 +71,4 @@ jobs:
         with:
           start: npm run start-server
           browser: edge
+          cache-key: ${{ matrix.platform }}-${{ runner.os }}-hash-${{ hashFiles('package-lock.json') }}
