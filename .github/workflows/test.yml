@@ -67,4 +67,7 @@ jobs:
         run: npm run test
 
       - name: Run cypress tests
-        run: npm run cypress:test:ci
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm run start-server
+          browser: edge
