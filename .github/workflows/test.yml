@@ -66,9 +66,18 @@ jobs:
       - name: Run web tests
         run: npm run test
 
-      - name: Run cypress tests
+      - name: Run cypress tests (ubuntu)
         uses: cypress-io/github-action@v5
+        if: contains(matrix.platform, 'ubuntu')
         with:
           start: npm run start-server
-          browser: edge
+          browser: firefox
           cache-key: ${{ matrix.platform }}-${{ runner.os }}-hash-${{ hashFiles('package-lock.json') }}
+
+      - name: Run cypress tests (windows and macos)
+        uses: cypress-io/github-action@v5
+        if: contains(matrix.platform, 'windows') || contains(matrix.platform, 'macos')
+        with:
+            start: npm run start-server
+            browser: edge
+            cache-key: ${{ matrix.platform }}-${{ runner.os }}-hash-${{ hashFiles('package-lock.json') }}
