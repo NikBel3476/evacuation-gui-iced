@@ -5,6 +5,7 @@
     },
     "ignoreFiles": [
         "dist/**/*",
-        "**/target/**/*"
+        "**/target/**/*",
+        "coverage/**/*"
     ]
 }
