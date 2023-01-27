@@ -16,6 +16,59 @@
 #include "bim_tools.h"
 #include "bim_tools/src/bim_tools_rust.h"
 
+bim_zone_t* _outside_init(const bim_json_object_t * bim_json)
+{
+    bim_zone_t * outside = (bim_zone_t*)malloc(sizeof (bim_zone_t));
+    if (!outside) {
+        return NULL;
+    }
+    outside->id = 0;
+    outside->name = strdup("Outside");
+    outside->sign = OUTSIDE;
+    outside->polygon = NULL;
+    strcpy((void *)outside->uuid.x, "outside0-safe-zone-0000-000000000000");
+    outside->z_level = 0;
+    outside->size_z = FLT_MAX;
+    outside->numofpeople = 0;
+    outside->hazard_level = 0;
+    outside->is_safe = true;
+
+    size_t numofoutputs = 0;
+    uuid_t *outputs = (uuid_t*)malloc(sizeof (uuid_t) * 100);
+
+    for(size_t i = 0; i < bim_json->numoflevels; i++)
+    {
+        for(size_t j = 0; j < bim_json->levels[i].numofelements; j++)
+        {
+            bim_json_element_t *element = &bim_json->levels[i].elements[j];
+            if (element->sign == DOOR_WAY_OUT)
+            {
+                uuid_t output = element->uuid;
+                strcpy((void *)outputs[numofoutputs].x, output.x);
+                numofoutputs++;
+            }
+            else if (element->sign == ROOM || element->sign == STAIRCASE)
+                outside->id++;
+        }
+    }
+
+    if (!numofoutputs) {
+        free(outputs);
+        free(outside);
+        return (bim_zone_t*)NULL;
+    }
+
+    outside->numofoutputs = numofoutputs;
+    outside->outputs = (uuid_t*)realloc(outputs, outside->numofoutputs * sizeof (uuid_t));
+    outside->is_blocked = false;
+    outside->is_visited = false;
+    outside->potential = 0;
+    outside->area = FLT_MAX;
+    outside->numofpeople = 0;
+
+    return outside;
+}
+
 bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     const bim_json_object_t *const jbim = bim_json;
 
@@ -247,7 +300,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
         }
     }
 
-    bim_zone_t *outside = outside_init_rust(bim_json);
+    bim_zone_t *outside = _outside_init(bim_json);
     arraylist_append(zones_list, outside);
 
     arraylist_sort(zones_list, zone_id_cmp);

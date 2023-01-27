@@ -15,7 +15,7 @@ pub struct bim_transit_t {
 	/// UUID идентификатор элемента
 	pub uuid: uuid_t,
 	/// Внутренний номер элемента
-	pub id: u64,
+	pub id: usize,
 	/// Название элемента
 	pub name: *mut char,
 	/// Массив UUID элементов, которые являются соседними
@@ -46,7 +46,7 @@ pub struct bim_zone_t {
 	/// UUID идентификатор элемента
 	pub uuid: uuid_t,
 	/// Внутренний номер элемента
-	pub id: u64,
+	pub id: usize,
 	/// Название элемента
 	pub name: *mut c_char,
 	/// Полигон элемента
@@ -285,6 +285,7 @@ pub extern "C" fn width_door_way_rust(
 	(distance12 + distance34) * 0.5
 }
 
+// FIXME: causes segfault on replace _outside_init c function
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn outside_init_rust(bim_json: *const bim_json_object_t_rust) -> *mut bim_zone_t {
