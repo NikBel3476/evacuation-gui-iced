@@ -1,4 +1,5 @@
 use fnv::FnvHashMap;
+use petgraph::Undirected;
 use std::hash::Hash;
 
 struct Graph<VId, E = (), V = ()> {
@@ -47,4 +48,18 @@ where
 		self.push_edge(from.clone(), to.clone(), edge.clone());
 		self.push_edge(to, from, edge);
 	}
+}
+
+pub struct node {
+	dest: u64,
+	edge_id: u64,
+}
+
+pub struct edge {
+	src: u64,
+	dest: u64,
+}
+
+pub fn graph_new() -> petgraph::Graph<node, edge, Undirected> {
+	petgraph::Graph::new_undirected()
 }

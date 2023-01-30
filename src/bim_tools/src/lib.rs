@@ -96,17 +96,15 @@ pub struct bim_level_t {
 
 /// Структура, описывающая здание
 #[repr(C)]
-pub struct bim_t {
+pub struct bim_t_rust {
 	/// Массив уровней здания
-	pub levels: *mut bim_level_t,
+	pub levels: Vec<bim_level_t>,
 	/// Название здания
-	pub name: *mut c_char,
+	pub name: String,
 	/// Список зон объекта
 	pub zones: Vec<bim_zone_t>,
 	/// Список переходов объекта
 	pub transits: Vec<bim_transit_t>,
-	/// Количество уровней в здании
-	pub numoflevels: u8,
 }
 
 // #[no_mangle]
@@ -435,3 +433,26 @@ pub extern "C" fn find_zone_callback_rust(value1: *mut bim_zone_t, value2: *mut 
 
 	1
 }
+
+/*fn bim_tools_new(bim_json: &bim_json_object) -> bim_t_rust {
+	let mut zones_list: Vec<bim_zone_t> = vec![];
+	let mut transits_list: Vec<bim_transit_t> = vec![];
+
+	let name = unsafe {
+		CString::from_raw(bim_json.name as *mut i8).into_string().unwrap_or_else(|e| {
+			panic!(
+				"Failed to convert CString to String. CString: {:?}. Error: {:?}",
+				bim_json.name, e
+			)
+		})
+	};
+
+
+
+	bim_t_rust {
+		transits: transits_list,
+		zones: zones_list,
+		levels: ,
+		name
+	}
+}*/
