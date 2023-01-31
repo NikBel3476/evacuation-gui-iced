@@ -161,6 +161,7 @@ name = "bim_polygon_tools"
 version = "0.1.0"
 dependencies = [
  "cc",
+ "json_object",
  "libc",
 ]
 
@@ -170,6 +171,7 @@ version = "0.1.0"
 dependencies = [
  "bim_json_object",
  "bim_polygon_tools",
+ "json_object",
  "libc",
 ]
 

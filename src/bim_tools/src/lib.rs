@@ -1,9 +1,10 @@
 use bim_json_object::{bim_element_sign_t_rust, bim_json_object_t_rust, uuid_t, BimElementSign};
 use bim_polygon_tools::{
 	geom_tools_is_intersect_line_rust, geom_tools_length_side_rust, geom_tools_nearest_point_rust,
-	line_t, point_t, polygon_t, polygon_t_rust,
+	is_intersect_line, is_point_in_polygon, line_t, nearest_point, point_t, polygon_t,
+	polygon_t_rust, side_length, Line,
 };
-use json_object::BuildingStruct;
+use json_object::{BuildingStruct, Point};
 use libc::{c_char, c_double, c_int};
 use std::cmp::Ordering;
 use std::ffi::CString;
@@ -106,7 +107,7 @@ pub struct bim_zone_t {
 }
 
 /// Структура, расширяющая элемент типа ROOM и STAIR
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct bim_zone_t_rust {
 	/// UUID идентификатор элемента
 	pub uuid: String,
@@ -251,6 +252,41 @@ pub extern "C" fn intersected_edge_rust(
 	Box::into_raw(Box::new(line_intersected))
 }
 
+pub fn intersected_edge(polygon_element: &polygon_t_rust, line: &Line) -> Line {
+	let mut line_intersected = Line {
+		p1: Point { x: 0.0, y: 0.0 },
+		p2: Point { x: 0.0, y: 0.0 },
+	};
+
+	let mut num_of_intersections = 0;
+	for i in 1..polygon_element.points.len() {
+		// FIXME: bypass to get double mut ref
+		let (left, right) = polygon_element.points.split_at(i);
+		let point_element_a = left.last().unwrap_or_else(|| {
+			panic!("Failed to get last element of left part at intersected_edge_rust fn in bim_tools crate");
+		});
+		let point_element_b = right.first().unwrap_or_else(|| {
+			panic!("Failed to get first element of right part at intersected_edge_rust fn in bim_tools crate");
+		});
+		let line_tmp = Line {
+			p1: *point_element_a,
+			p2: *point_element_b,
+		};
+		let is_intersected = is_intersect_line(line, &line_tmp);
+		if is_intersected {
+			line_intersected.p1 = *point_element_a;
+			line_intersected.p2 = *point_element_b;
+			num_of_intersections += 1;
+		}
+	}
+
+	if num_of_intersections != 1 {
+		panic!("[func: intersected_edge_rust] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов.");
+	}
+
+	line_intersected
+}
+
 /// Возможные варианты стыковки помещений, которые соединены проемом
 ///
 /// Код ниже определяет область их пересечения
@@ -357,10 +393,57 @@ pub extern "C" fn width_door_way_rust(
 	(distance12 + distance34) * 0.5
 }
 
+pub fn door_way_width(
+	zone1: &polygon_t_rust,
+	zone2: &polygon_t_rust,
+	edge1: &Line,
+	edge2: &Line,
+) -> c_double {
+	// TODO: l1p1 == l2p1 and l1p2 == l2p2 ??? figure out why this is so
+	/* old c code
+	point_t *l1p1 = edge1->p1;
+	point_t *l1p2 = edge2->p2;
+	double length1 = geom_tools_length_side_rust( l1p1, l1p2);
+
+	point_t *l2p1 = edge1->p1;
+	point_t *l2p2 = edge2->p2;
+	double length2 = geom_tools_length_side_rust(l2p1, l2p2);
+	 */
+	let l1p1 = edge1.p1;
+	let l1p2 = edge2.p2;
+	let length1 = side_length(&l1p1, &l1p2);
+
+	let l2p1 = edge1.p1;
+	let l2p2 = edge2.p2;
+	let length2 = side_length(&l2p1, &l2p2);
+
+	// Короткая линия проема, которая пересекает оба помещения
+	let d_line = match length1.total_cmp(&length2) {
+		Ordering::Greater | Ordering::Equal => Line { p1: l2p1, p2: l2p2 },
+		Ordering::Less => Line { p1: l1p1, p2: l1p2 },
+	};
+
+	// Линии, которые находятся друг напротив друга и связаны проемом
+	let edge_element_a = intersected_edge(zone1, &d_line);
+	let edge_element_b = intersected_edge(zone2, &d_line);
+
+	// Поиск точек, которые являются ближайшими к отрезку edgeElement
+	// Расстояние между этими точками и является шириной проема
+	let point1 = nearest_point(&edge_element_a.p1, &edge_element_b);
+	let point2 = nearest_point(&edge_element_a.p2, &edge_element_b);
+	let distance12 = side_length(&point1, &point2);
+
+	let point3 = nearest_point(&edge_element_b.p1, &edge_element_a);
+	let point4 = nearest_point(&edge_element_b.p2, &edge_element_a);
+	let distance34 = side_length(&point3, &point4);
+
+	(distance12 + distance34) * 0.5
+}
+
 // FIXME: causes segfault on replace _outside_init c function
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn outside_init_rust(bim_json: *const bim_json_object_t_rust) -> *mut bim_zone_t {
+pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) -> *mut bim_zone_t {
 	let bim_json =
 		unsafe {
 			bim_json.as_ref().unwrap_or_else(|| {
@@ -442,6 +525,47 @@ pub extern "C" fn outside_init_rust(bim_json: *const bim_json_object_t_rust) -> 
 	Box::into_raw(Box::new(outside))
 }
 
+pub fn outside_init_rust(bim_json: &BuildingStruct) -> bim_zone_t_rust {
+	let mut outputs: Vec<String> = vec![];
+	let mut id = 0u64;
+
+	for level in &bim_json.levels {
+		for element in &level.build_elements {
+			match element.sign.as_str() {
+				"DoorWayOut" => {
+					outputs.push(element.uuid.clone());
+				}
+				"Room" | "Staircase" => {
+					id += 1;
+				}
+				_ => {}
+			}
+		}
+	}
+
+	if outputs.is_empty() {
+		panic!("Failed to find any output at outside_init_rust fn in bim_tools crate")
+	}
+
+	bim_zone_t_rust {
+		id,
+		name: String::from("Outside"),
+		sign: BimElementSign::OUTSIDE,
+		polygon: polygon_t_rust::default(), // TODO: replace null_mut with polygon
+		uuid: String::from("outside0-safe-zone-0000-000000000000"),
+		z_level: 0.0,
+		size_z: f64::from(f32::MAX),
+		hazard_level: 0,
+		potential: 0.0,
+		area: f64::from(f32::MAX),
+		outputs,
+		is_blocked: false,
+		is_visited: false,
+		is_safe: true,
+		number_of_people: 0.0,
+	}
+}
+
 /*/// Подсчитывает количество людей в здании по расширенной структуре
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
@@ -503,6 +627,125 @@ pub extern "C" fn find_zone_callback_rust(value1: *mut bim_zone_t, value2: *mut 
 	1
 }
 
+/// Вычисление ширины проема по данным из модели здания
+///
+/// # Parameters:
+/// * zones Список всех зон
+/// * transits - Список всех переходов
+///
+/// # Returns
+/// Ширина проёма
+pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_transit_t_rust]) {
+	for transit in transits {
+		let mut stair_sign_counter = 0u8; // Если stair_sign_counter = 2, то проем межэтажный (между лестницами)
+		let mut related_zones = [bim_zone_t_rust::default(), bim_zone_t_rust::default()];
+
+		for (i, output) in transit.outputs.iter().enumerate() {
+			let zone = zones.iter().find(|zone| zone.uuid.eq(output)).unwrap_or_else(|| {
+				panic!(
+					"Failed to find an element connected to transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
+					transit.id,
+					transit.uuid,
+					transit.name
+				);
+			});
+
+			if zone.sign == BimElementSign::STAIRCASE {
+				stair_sign_counter += 1;
+			}
+			related_zones[i] = zone.clone();
+		}
+
+		if stair_sign_counter == 2 {
+			// => Межэтажный проем
+			transit.width = ((related_zones[0].area + related_zones[1].area) / 2.0).sqrt();
+			continue;
+		}
+
+		let mut edge1 = Line {
+			p1: Point::default(),
+			p2: Point::default(),
+		};
+		let mut edge2 = Line {
+			p1: Point::default(),
+			p2: Point::default(),
+		};
+		let mut edge1_number_of_points = 2usize;
+		let mut edge2_number_of_points = 2usize;
+
+		for (i, tpoint) in transit.polygon.points.iter().enumerate() {
+			let point_in_polygon = is_point_in_polygon(tpoint, &related_zones[i].polygon);
+
+			match point_in_polygon {
+				true => {
+					match edge1_number_of_points {
+						2 => edge1.p1 = *tpoint,
+						1 => edge1.p2 = *tpoint,
+						_ => continue,
+					}
+					edge1_number_of_points -= 1;
+				}
+				false => {
+					match edge2_number_of_points {
+						2 => edge2.p1 = *tpoint,
+						1 => edge2.p2 = *tpoint,
+						_ => continue,
+					}
+					edge2_number_of_points -= 1;
+				}
+			}
+		}
+
+		let mut width = -1f64;
+		if edge1_number_of_points == 0 {
+			panic!(
+				"Failed to calculate width of transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
+				transit.id,
+				transit.uuid,
+				transit.name
+			);
+		}
+
+		match transit.sign {
+			BimElementSign::DOOR_WAY_IN | BimElementSign::DOOR_WAY_OUT => {
+				let width1 = side_length(&edge1.p1, &edge1.p2);
+				let width2 = side_length(&edge2.p1, &edge2.p2);
+
+				width = (width1 + width2) / 2.0;
+			}
+			BimElementSign::DOOR_WAY => {
+				width = door_way_width(
+					&related_zones[0].polygon,
+					&related_zones[1].polygon,
+					&edge1,
+					&edge2,
+				);
+			}
+			_ => {}
+		}
+
+		transit.width = width;
+
+		if transit.width < 0.0 {
+			panic!(
+				"Width of transit is not defined. Transit id: {}, Transit uuid: {}, Transit name: {}, Transit width: {}",
+				transit.id,
+				transit.uuid,
+				transit.name,
+				transit.width
+			);
+		} else if transit.width < 0.5 {
+			eprintln!(
+				"Warning: Width of transit is less than 0.5. Transit id: {}, Transit uuid: {}, Transit name: {}, Transit width: {}",
+				transit.id,
+				transit.uuid,
+				transit.name,
+				transit.width
+			);
+		}
+	}
+}
+
 fn bim_tools_new(bim_json: &BuildingStruct) -> bim_t_rust {
 	let mut zones_list: Vec<bim_zone_t_rust> = vec![];
 	let mut transits_list: Vec<bim_transit_t_rust> = vec![];
@@ -527,7 +770,7 @@ fn bim_tools_new(bim_json: &BuildingStruct) -> bim_t_rust {
 				"Room" => BimElementSign::ROOM,
 				"Staircase" => BimElementSign::STAIRCASE,
 				"DoorWay" => BimElementSign::DOOR_WAY,
-				"DoorWayInt" => BimElementSign::DOOR_WAY_INT,
+				"DoorWayInt" => BimElementSign::DOOR_WAY_IN,
 				"DoorWayOut" => BimElementSign::DOOR_WAY_OUT,
 				_ => BimElementSign::UNDEFINED,
 			};
@@ -587,13 +830,33 @@ fn bim_tools_new(bim_json: &BuildingStruct) -> bim_t_rust {
 			zones,
 			transits,
 		};
+
+		match bim_level.zones.is_empty() || bim_level.transits.is_empty() {
+			true => {
+				eprintln!(
+					"[func: bim_tools_new] :: number of zones ({}) or number of transits ({}) is zero",
+					bim_level.zones.len(),
+					bim_level.transits.len()
+				);
+			}
+			false => {}
+		}
+
 		levels_list.push(bim_level);
 	}
+
+	let outside = outside_init_rust(bim_json);
+	zones_list.push(outside);
+
+	zones_list.sort_by(|a, b| a.id.cmp(&b.id));
+	transits_list.sort_by(|a, b| a.id.cmp(&b.id));
+
+	calculate_transits_width(&zones_list, &mut transits_list);
 
 	bim_t_rust {
 		transits: transits_list,
 		zones: zones_list,
 		levels: levels_list,
-		name: bim_json.name_building.clone(),
+		name: bim_json.building_name.clone(),
 	}
 }
