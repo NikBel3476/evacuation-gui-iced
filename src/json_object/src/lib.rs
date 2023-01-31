@@ -13,10 +13,18 @@ pub struct Address {
 	pub add_info: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Point {
 	pub x: f64,
 	pub y: f64,
+}
+
+impl Point {
+	pub fn distance_to(&self, other: &Point) -> f64 {
+		let x = self.x - other.x;
+		let y = self.y - other.y;
+		(x * x + y * y).sqrt()
+	}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
