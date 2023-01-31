@@ -1,5 +1,3 @@
-#![allow(non_camel_case_types)]
-
 use json_object::parse_building_from_json;
 use libc::{c_char, c_double, c_ulonglong};
 use std::convert::TryInto;
@@ -17,7 +15,6 @@ pub struct point_t_rust {
 	pub y: c_double,
 }
 
-#[repr(C)]
 pub struct polygon_t_rust {
 	pub numofpoints: c_ulonglong,
 	pub points: *mut point_t_rust,
@@ -39,6 +36,24 @@ pub enum bim_element_sign_t_rust {
 	OUTSIDE = 5,
 	/// Указывает, что тип элемента не определен
 	UNDEFINDED = 6,
+}
+
+#[derive(Debug, Clone)]
+pub enum BimElementSign {
+	/// Указывает, что элемент здания является помещением/комнатой
+	ROOM,
+	/// Указывает, что элемент здания является лестницей
+	STAIRCASE,
+	/// Указывает, что элемент здания является проемом (без дверного полотна)
+	DOOR_WAY,
+	/// Указывает, что элемент здания является дверью, которая соединяет два элемента: ROOM и ROOM или ROOM и STAIR
+	DOOR_WAY_INT,
+	/// Указывает, что элемент здания является эвакуационным выходом
+	DOOR_WAY_OUT,
+	/// Указывает, что элемент является зоной вне здания
+	OUTSIDE,
+	/// Указывает, что тип элемента не определен
+	UNDEFINED,
 }
 
 /// Структура, описывающая элемент
