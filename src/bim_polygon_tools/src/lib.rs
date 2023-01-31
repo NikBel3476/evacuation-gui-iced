@@ -1,5 +1,4 @@
-#![allow(non_camel_case_types)]
-
+use json_object::Point;
 use libc::{c_char, c_double, c_int};
 use std::cmp::Ordering;
 use std::ffi::CString;
@@ -20,6 +19,90 @@ pub struct line_t {
 pub struct polygon_t {
 	pub numofpoints: u64,
 	pub points: *mut point_t,
+}
+
+#[derive(Debug, Clone)]
+pub struct polygon_t_rust {
+	pub points: Vec<Point>,
+}
+
+impl polygon_t_rust {
+	pub fn area(&self) -> f64 {
+		let num_of_triangle_corner = (self.points.len() - 2) * 3;
+
+		let mut triangle_list = vec![0; usize::try_from(num_of_triangle_corner)
+			.unwrap_or_else(|e|
+				panic!("Failed to convert num_of_triangle_corner to usize at geom_tools_area_polygon fn in bim_polygon_tools crate, {e}"))];
+
+		let number_of_triangles = self.triangulate(triangle_list.as_mut_ptr());
+
+		// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
+		// p=(ab+bc+ca)0.5
+		let mut area_element = 0.0;
+		for i in 0..number_of_triangles {
+			let a = &self.points[triangle_list[(i * 3) as usize] as usize];
+			let b = &self.points[triangle_list[(i * 3 + 1) as usize] as usize];
+			let c = &self.points[triangle_list[(i * 3 + 2) as usize] as usize];
+			let ab = a.distance_to(b);
+			let bc = b.distance_to(c);
+			let ca = c.distance_to(a);
+			let p = (ab + bc + ca) * 0.5;
+			area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
+		}
+
+		area_element
+	}
+
+	pub fn triangulate(&self, triangle_list: *mut i32) -> u64 {
+		let mut point_list = vec![0.0; 2 * self.points.len()];
+
+		for i in 0..self.points.len() {
+			point_list[i * 2] = self.points[i].x;
+			point_list[i * 2 + 1] = self.points[i].y;
+		}
+
+		let mut polygon_to_triangulate = triangulateio {
+			pointlist: point_list.as_mut_ptr(),
+			pointattributelist: std::ptr::null_mut(),
+			pointmarkerlist: std::ptr::null_mut(),
+			numberofpoints: self.points.len() as i32,
+			trianglelist: triangle_list, // Индексы точек треугольников против часовой стрелки
+			numberofpointattributes: 0,
+			triangleattributelist: std::ptr::null_mut(),
+			trianglearealist: std::ptr::null_mut(),
+			neighborlist: std::ptr::null_mut(),
+			numberoftriangles: 0,
+			numberofcorners: 0,
+			numberoftriangleattributes: 0,
+			segmentlist: std::ptr::null_mut(),
+			segmentmarkerlist: std::ptr::null_mut(),
+			numberofsegments: 0,
+			holelist: std::ptr::null_mut(),
+			numberofholes: 0,
+			regionlist: std::ptr::null_mut(),
+			numberofregions: 0,
+			edgelist: std::ptr::null_mut(),
+			edgemarkerlist: std::ptr::null_mut(),
+			normlist: std::ptr::null_mut(),
+			numberofedges: 0,
+		};
+
+		let triswitches = CString::new("zQ").unwrap_or_else(|_| {
+			panic!("Failed to create CString from \"zQ\" at triangle_polygon_rust fn in bim_polygon_tools crate")
+		});
+		unsafe {
+			triangulate(
+				triswitches.into_raw(),
+				&mut polygon_to_triangulate,
+				&mut polygon_to_triangulate,
+				std::ptr::null_mut(),
+			)
+		}
+
+		u64::try_from(polygon_to_triangulate.numberoftriangles).unwrap_or_else(|e| {
+			panic!("Failed to convert numberoftriangles to u64 at triangle_polygon_rust fn in bim_polygon_tools crate. {e}")
+		})
+	}
 }
 
 /// cbindgen:ignore
