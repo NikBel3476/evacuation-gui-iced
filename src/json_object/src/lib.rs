@@ -13,7 +13,7 @@ pub struct Address {
 	pub add_info: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Default)]
 pub struct Point {
 	pub x: f64,
 	pub y: f64,
@@ -67,7 +67,7 @@ pub struct BuildingStruct {
 	#[serde(rename = "Devs")]
 	pub devs: Vec<i64>,
 	#[serde(rename = "NameBuilding")]
-	pub name_building: String,
+	pub building_name: String,
 	#[serde(rename = "Address")]
 	pub address: Address,
 	#[serde(rename = "Level")]
