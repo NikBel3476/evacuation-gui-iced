@@ -38,7 +38,7 @@ pub enum bim_element_sign_t_rust {
 	UNDEFINDED = 6,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum BimElementSign {
 	/// Указывает, что элемент здания является помещением/комнатой
 	ROOM,
@@ -47,12 +47,13 @@ pub enum BimElementSign {
 	/// Указывает, что элемент здания является проемом (без дверного полотна)
 	DOOR_WAY,
 	/// Указывает, что элемент здания является дверью, которая соединяет два элемента: ROOM и ROOM или ROOM и STAIR
-	DOOR_WAY_INT,
+	DOOR_WAY_IN,
 	/// Указывает, что элемент здания является эвакуационным выходом
 	DOOR_WAY_OUT,
 	/// Указывает, что элемент является зоной вне здания
 	OUTSIDE,
 	/// Указывает, что тип элемента не определен
+	#[default]
 	UNDEFINED,
 }
 
@@ -137,7 +138,7 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 			add_info: CString::new(building.address.add_info).unwrap().into_raw(),
 		})),
 		numoflevels: c_ulonglong::try_from(building.levels.len()).unwrap(),
-		name: CString::new(building.name_building).unwrap().into_raw(),
+		name: CString::new(building.building_name).unwrap().into_raw(),
 		levels: {
 			let mut levels = building
 				.levels
