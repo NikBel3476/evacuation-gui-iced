@@ -15,13 +15,18 @@ pub struct line_t {
 	pub p2: *mut point_t,
 }
 
+pub struct Line {
+	pub p1: Point,
+	pub p2: Point,
+}
+
 #[repr(C)]
 pub struct polygon_t {
 	pub numofpoints: u64,
 	pub points: *mut point_t,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct polygon_t_rust {
 	pub points: Vec<Point>,
 }
@@ -239,6 +244,61 @@ pub extern "C" fn triangle_polygon_rust(polygon: *const polygon_t, triangle_list
 	})
 }
 
+/// #Returns
+/// Массив номеров точек треугольников
+///
+/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
+pub fn triangle_polygon(polygon: &polygon_t_rust, triangle_list: &mut Vec<i32>) -> u64 {
+	let mut point_list = vec![0.0; 2 * polygon.points.len()];
+
+	for i in 0..polygon.points.len() {
+		point_list[i * 2] = polygon.points[i].x;
+		point_list[i * 2 + 1] = polygon.points[i].y;
+	}
+
+	let mut polygon_to_triangulate = triangulateio {
+		pointlist: point_list.as_mut_ptr(),
+		pointattributelist: std::ptr::null_mut(),
+		pointmarkerlist: std::ptr::null_mut(),
+		numberofpoints: polygon.points.len() as i32,
+		trianglelist: triangle_list.as_mut_ptr(), // Индексы точек треугольников против часовой стрелки
+		numberofpointattributes: 0,
+		triangleattributelist: std::ptr::null_mut(),
+		trianglearealist: std::ptr::null_mut(),
+		neighborlist: std::ptr::null_mut(),
+		numberoftriangles: 0,
+		numberofcorners: 0,
+		numberoftriangleattributes: 0,
+		segmentlist: std::ptr::null_mut(),
+		segmentmarkerlist: std::ptr::null_mut(),
+		numberofsegments: 0,
+		holelist: std::ptr::null_mut(),
+		numberofholes: 0,
+		regionlist: std::ptr::null_mut(),
+		numberofregions: 0,
+		edgelist: std::ptr::null_mut(),
+		edgemarkerlist: std::ptr::null_mut(),
+		normlist: std::ptr::null_mut(),
+		numberofedges: 0,
+	};
+
+	let triswitches = CString::new("zQ").unwrap_or_else(|_| {
+		panic!("Failed to create CString from \"zQ\" at triangle_polygon_rust fn in bim_polygon_tools crate")
+	});
+	unsafe {
+		triangulate(
+			triswitches.into_raw(),
+			&mut polygon_to_triangulate,
+			&mut polygon_to_triangulate,
+			std::ptr::null_mut(),
+		)
+	}
+
+	u64::try_from(polygon_to_triangulate.numberoftriangles).unwrap_or_else(|e| {
+		panic!("Failed to convert numberoftriangles to u64 at triangle_polygon_rust fn in bim_polygon_tools crate. {e}")
+	})
+}
+
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn geom_tools_length_side_rust(p1: *const point_t, p2: *const point_t) -> c_double {
@@ -252,6 +312,10 @@ pub extern "C" fn geom_tools_length_side_rust(p1: *const point_t, p2: *const poi
 			panic!("Failed to dereference pointer p2 at geom_tools_length_side_rust fn in bim_polygon_tools crate"))
 	};
 
+	((point1.x - point2.x).powi(2) + (point1.y - point2.y).powi(2)).sqrt()
+}
+
+pub fn side_length(point1: &Point, point2: &Point) -> f64 {
 	((point1.x - point2.x).powi(2) + (point1.y - point2.y).powi(2)).sqrt()
 }
 
@@ -365,6 +429,25 @@ pub extern "C" fn geom_tools_is_point_in_polygon_rust(
 	0
 }
 
+pub fn is_point_in_polygon(point: &Point, polygon: &polygon_t_rust) -> bool {
+	let num_of_triangle_corner = (polygon.points.len() - 2) * 3;
+
+	let mut triangle_list = vec![0; num_of_triangle_corner];
+
+	let number_of_triangles = triangle_polygon(polygon, &mut triangle_list);
+
+	for i in 0..number_of_triangles {
+		let a = &polygon.points[triangle_list[(i * 3) as usize] as usize];
+		let b = &polygon.points[triangle_list[(i * 3 + 1) as usize] as usize];
+		let c = &polygon.points[triangle_list[(i * 3 + 2) as usize] as usize];
+		if is_point_in_triangle_rust(a.x, a.y, b.x, b.y, c.x, c.y, point.x, point.y) == 1 {
+			return true;
+		}
+	}
+
+	false
+}
+
 /// signed area of a triangle
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
@@ -391,6 +474,11 @@ pub extern "C" fn area_rust(
 		})
 	};
 
+	(p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
+}
+
+/// signed area of a triangle
+pub fn area(p1: &Point, p2: &Point, p3: &Point) -> f64 {
 	(p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
 }
 
@@ -469,6 +557,19 @@ pub extern "C" fn geom_tools_is_intersect_line_rust(l1: *const line_t, l2: *cons
 	.unwrap_or_else(|e| panic!("Failed to convert boolean to u8. {e}"))
 }
 
+/// check if two segments intersect
+pub fn is_intersect_line(l1: &Line, l2: &Line) -> bool {
+	let p1 = &l1.p1;
+	let p2 = &l1.p2;
+	let p3 = &l2.p1;
+	let p4 = &l2.p2;
+
+	intersect_1_rust(p1.x, p2.x, p3.x, p4.x) == 1
+		&& intersect_1_rust(p1.y, p2.y, p3.y, p4.y) == 1
+		&& area(p1, p2, p3) * area(p1, p2, p4) <= 0.0
+		&& area(p3, p4, p1) * area(p3, p4, p2) <= 0.0
+}
+
 /// Определение точки на линии, расстояние до которой от заданной точки является минимальным из существующих
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
@@ -532,4 +633,44 @@ pub extern "C" fn geom_tools_nearest_point_rust(
 	}
 
 	Box::into_raw(Box::new(point_t { x: xx, y: yy }))
+}
+
+/// Определение точки на линии, расстояние до которой от заданной точки является минимальным из существующих
+pub fn nearest_point(point_start: &Point, line: &Line) -> Point {
+	let p1 = &line.p1;
+
+	let p2 = &line.p2;
+
+	if side_length(p1, p2) < 1e-9 {
+		return line.p1;
+	}
+
+	let a = point_start.x - p1.x;
+	let b = point_start.y - p1.y;
+	let c = p2.x - p1.x;
+	let d = p2.y - p1.y;
+
+	let dot = a * c + b * d;
+	let len_sq = c * c + d * d;
+	let mut param = -1.0;
+
+	if len_sq != 0.0 {
+		param = dot / len_sq;
+	}
+
+	let xx;
+	let yy;
+
+	if param < 0.0 {
+		xx = p1.x;
+		yy = p1.y;
+	} else if param > 1.0 {
+		xx = p2.x;
+		yy = p2.y;
+	} else {
+		xx = p1.x + param * c;
+		yy = p1.y + param * d;
+	}
+
+	Point { x: xx, y: yy }
 }
