@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 libc = "0.2"
 json_object = { path = "../json_object" }
+bim_polygon_tools = { path = "../bim_polygon_tools" }
 
 [lib]
 crate-type=["staticlib", "lib"]
