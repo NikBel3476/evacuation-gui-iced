@@ -2,14 +2,14 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all(deserialize = "snake_case"))]
 pub enum DistributionType {
 	FromBim,
 	Uniform,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all(deserialize = "snake_case"))]
 pub enum TransitionType {
 	FromBim,
