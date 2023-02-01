@@ -248,7 +248,7 @@ pub extern "C" fn triangle_polygon_rust(polygon: *const polygon_t, triangle_list
 /// Массив номеров точек треугольников
 ///
 /// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
-pub fn triangle_polygon(polygon: &polygon_t_rust, triangle_list: &mut Vec<i32>) -> u64 {
+pub fn triangle_polygon(polygon: &polygon_t_rust, triangle_list: &mut [i32]) -> u64 {
 	let mut point_list = vec![0.0; 2 * polygon.points.len()];
 
 	for i in 0..polygon.points.len() {
@@ -430,7 +430,12 @@ pub extern "C" fn geom_tools_is_point_in_polygon_rust(
 }
 
 pub fn is_point_in_polygon(point: &Point, polygon: &polygon_t_rust) -> bool {
-	let num_of_triangle_corner = (polygon.points.len() - 2) * 3;
+	let num_of_triangle_corner = polygon.points.len().checked_sub(2).unwrap_or_else(|| {
+		panic!(
+			"Attempt to subtract with overflow. Number of polygon points: {}",
+			polygon.points.len()
+		)
+	}) * 3;
 
 	let mut triangle_list = vec![0; num_of_triangle_corner];
 
