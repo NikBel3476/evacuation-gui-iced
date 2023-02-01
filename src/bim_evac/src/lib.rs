@@ -14,6 +14,16 @@ static mut EVAC_DENSITY_MAX: f64 = 5.0;
 static mut EVAC_MODELING_STEP: f64 = 0.01;
 static mut EVAC_TIME: f64 = 0.0;
 
+/// м/мин
+static mut EVAC_SPEED_MAX_RUST: f64 = 100.0;
+/// чел/м^2
+static mut EVAC_DENSITY_MIN_RUST: f64 = 0.1;
+/// чел/м^2
+static mut EVAC_DENSITY_MAX_RUST: f64 = 5.0;
+/// мин
+static mut EVAC_MODELING_STEP_RUST: f64 = 0.01;
+static mut EVAC_TIME_RUST: f64 = 0.0;
+
 // TODO: change parameters naming
 /// Функция скорости. Базовая зависимость, которая позволяет определить скорость
 /// людского потока по его плотности
@@ -444,5 +454,49 @@ pub extern "C" fn evac_time_inc_rust() {
 pub extern "C" fn evac_time_reset_rust() {
 	unsafe {
 		EVAC_TIME = 0.0;
+	}
+}
+
+pub fn set_speed_max(speed: f64) {
+	unsafe {
+		EVAC_SPEED_MAX_RUST = speed;
+	}
+}
+
+pub fn set_density_min(density: f64) {
+	unsafe {
+		EVAC_DENSITY_MIN_RUST = density;
+	}
+}
+
+pub fn set_density_max(density: f64) {
+	unsafe {
+		EVAC_DENSITY_MAX_RUST = density;
+	}
+}
+
+pub fn set_modeling_step(step: f64) {
+	unsafe {
+		EVAC_MODELING_STEP_RUST = step;
+	}
+}
+
+pub fn get_time_s() -> f64 {
+	unsafe { EVAC_TIME_RUST * 60.0 }
+}
+
+pub fn get_time_m() -> f64 {
+	unsafe { EVAC_TIME_RUST }
+}
+
+pub fn time_inc() {
+	unsafe {
+		EVAC_TIME_RUST += EVAC_MODELING_STEP_RUST;
+	}
+}
+
+pub fn time_reset() {
+	unsafe {
+		EVAC_TIME_RUST = 0.0;
 	}
 }
