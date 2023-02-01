@@ -77,19 +77,17 @@ pub struct BuildingStruct {
 #[no_mangle]
 pub fn parse_building_from_json(path_to_file: &str) -> Result<Box<BuildingStruct>, Box<dyn Error>> {
 	let json_content = fs::read_to_string(path_to_file).unwrap_or_else(|err| {
-		eprintln!(
+		panic!(
 			"Ошибка чтения файла конфигурации здания {}: {}",
 			path_to_file, err
 		);
-		process::exit(1);
 	});
 
 	let data: BuildingStruct = serde_json::from_str(&json_content).unwrap_or_else(|err| {
-		eprintln!(
+		panic!(
 			"Ошибка десериализации файла конфигурации здания {}: {}",
 			path_to_file, err
 		);
-		process::exit(1);
 	});
 
 	Ok(Box::new(data))
