@@ -1,4 +1,7 @@
-use bim_json_object::{bim_element_sign_t_rust, bim_json_object_t_rust, uuid_t, BimElementSign};
+use bim_json_object::{
+	bim_element_sign_t_rust, bim_json_object_t_rust, uuid_t, BimElementSign, BimJsonElement,
+	BimJsonObject,
+};
 use bim_polygon_tools::{
 	geom_tools_is_intersect_line_rust, geom_tools_length_side_rust, geom_tools_nearest_point_rust,
 	is_intersect_line, is_point_in_polygon, line_t, nearest_point, point_t, polygon_t,
@@ -525,17 +528,17 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 	Box::into_raw(Box::new(outside))
 }
 
-pub fn outside_init_rust(bim_json: &BuildingStruct) -> bim_zone_t_rust {
+pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 	let mut outputs: Vec<String> = vec![];
 	let mut id = 0u64;
 
 	for level in &bim_json.levels {
 		for element in &level.build_elements {
-			match element.sign.as_str() {
-				"DoorWayOut" => {
+			match element.sign {
+				BimElementSign::DOOR_WAY_OUT => {
 					outputs.push(element.uuid.clone());
 				}
-				"Room" | "Staircase" => {
+				BimElementSign::ROOM | BimElementSign::STAIRCASE => {
 					id += 1;
 				}
 				_ => {}
@@ -599,6 +602,13 @@ pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_o
 	};
 
 	zone.numofpeople = f64::try_from(num_of_people).unwrap_or_else(|e| {
+		panic!("Failed to convert f32 to f64. f32: {num_of_people}. Error: {e:?}")
+	});
+}
+
+/// Устанавливает в помещение заданное количество людей
+pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f32) {
+	zone.number_of_people = f64::try_from(num_of_people).unwrap_or_else(|e| {
 		panic!("Failed to convert f32 to f64. f32: {num_of_people}. Error: {e:?}")
 	});
 }
@@ -673,8 +683,8 @@ pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_t
 		let mut edge1_number_of_points = 2usize;
 		let mut edge2_number_of_points = 2usize;
 
-		for (i, tpoint) in transit.polygon.points.iter().enumerate() {
-			let point_in_polygon = is_point_in_polygon(tpoint, &related_zones[i].polygon);
+		for tpoint in &transit.polygon.points {
+			let point_in_polygon = is_point_in_polygon(tpoint, &related_zones[0].polygon);
 
 			match point_in_polygon {
 				true => {
@@ -697,7 +707,7 @@ pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_t
 		}
 
 		let mut width = -1f64;
-		if edge1_number_of_points == 0 {
+		if edge1_number_of_points > 0 {
 			panic!(
 				"Failed to calculate width of transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
 				transit.id,
@@ -746,7 +756,7 @@ pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_t
 	}
 }
 
-fn bim_tools_new(bim_json: &BuildingStruct) -> bim_t_rust {
+pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 	let mut zones_list: Vec<bim_zone_t_rust> = vec![];
 	let mut transits_list: Vec<bim_transit_t_rust> = vec![];
 	let mut levels_list: Vec<bim_level_t_rust> = vec![];
@@ -756,31 +766,17 @@ fn bim_tools_new(bim_json: &BuildingStruct) -> bim_t_rust {
 		let mut transits: Vec<bim_transit_t_rust> = vec![];
 
 		for build_element in &level.build_elements {
-			let id = build_element.id.parse().unwrap_or_else(|e| {
-				panic!(
-					"Failed to parse id to u64. id: {}. Error: {:?}",
-					build_element.id, e
-				)
-			});
+			let id = build_element.id;
 			let uuid = build_element.uuid.clone();
 			let name = build_element.name.clone();
 			let size_z = build_element.size_z;
 			let z_level = level.z_level;
-			let sign = match build_element.sign.as_str() {
-				"Room" => BimElementSign::ROOM,
-				"Staircase" => BimElementSign::STAIRCASE,
-				"DoorWay" => BimElementSign::DOOR_WAY,
-				"DoorWayInt" => BimElementSign::DOOR_WAY_IN,
-				"DoorWayOut" => BimElementSign::DOOR_WAY_OUT,
-				_ => BimElementSign::UNDEFINED,
-			};
+			let sign = build_element.sign;
 			let outputs = build_element.outputs.clone();
-			let polygon = polygon_t_rust {
-				points: build_element.xy[0].points.clone(),
-			};
+			let polygon = build_element.polygon.clone();
 			// TODO: replace string on enum
-			match build_element.sign.as_str() {
-				"Room" | "Staircase" => {
+			match build_element.sign {
+				BimElementSign::ROOM | BimElementSign::STAIRCASE => {
 					let zone = bim_zone_t_rust {
 						id,
 						uuid,
@@ -802,7 +798,9 @@ fn bim_tools_new(bim_json: &BuildingStruct) -> bim_t_rust {
 					zones.push(zone.clone());
 					zones_list.push(zone);
 				}
-				"DoorWay" | "DoorWayOut" | "WoorWayInt" => {
+				BimElementSign::DOOR_WAY
+				| BimElementSign::DOOR_WAY_OUT
+				| BimElementSign::DOOR_WAY_IN => {
 					let transit = bim_transit_t_rust {
 						id,
 						name,
