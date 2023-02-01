@@ -6,3 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+cli = { path = "../cli" }
+configuration = { path = "../configuration" }
+bim_tools = { path = "../bim_tools" }
+bim_json_object = { path = "../bim_json_object" }
+bim_evac = { path = "../bim_evac" }
+bim_output = { path = "../../src-tauri/src/bim_output" }
+json_object = { path = "../json_object" }
