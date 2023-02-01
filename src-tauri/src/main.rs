@@ -3,6 +3,7 @@
 	windows_subsystem = "windows"
 )]
 
+use std::thread::sleep;
 use tauri::{AppHandle, WindowBuilder};
 
 use bim_cli;
@@ -15,6 +16,7 @@ use bim_tools;
 use cli;
 use configuration;
 use json_object;
+use run::run_rust;
 
 mod run_bindings;
 
@@ -90,4 +92,5 @@ async fn open_building_view_window(handle: AppHandle) {
 #[tauri::command]
 async fn bim_start() {
 	unsafe { run_bindings::run() };
+	run_rust();
 }
