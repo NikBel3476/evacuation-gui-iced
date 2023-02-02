@@ -18,7 +18,7 @@ int find_zone_callback_rust(ArrayListValue value1, ArrayListValue value2);
 
 line_t *intersected_edge_rust(const polygon_t *polygon_element, line_t *line);
 
-struct bim_zone_t *outside_init_rust(const bim_json_object_t *bim_json);
+struct bim_zone_t *_outside_init_rust(const bim_json_object_t *bim_json);
 
 /**
  * Возможные варианты стыковки помещений, которые соединены проемом

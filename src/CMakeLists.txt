@@ -7,6 +7,7 @@ project(
 )
 
 set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build")
 
@@ -24,7 +25,14 @@ add_library(EvacuationC
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}../thirdparty/triangle"
-        "${CMAKE_CURRENT_SOURCE_DIR}../thirdparty/arraylist"
-        "${CMAKE_CURRENT_SOURCE_DIR}../thirdparty/c-logger"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty/triangle"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty/arraylist"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty/c-logger"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        triangle
+        arraylist
+        logger_static
 )
