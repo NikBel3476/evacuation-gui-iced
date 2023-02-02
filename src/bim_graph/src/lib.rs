@@ -22,6 +22,7 @@ pub struct bim_graph_t_rust {
 #[repr(C)]
 pub struct bim_node_t {
 	dest: size_t,
+	/// edge id
 	eid: size_t,
 	next: *mut bim_node_t,
 }
@@ -81,6 +82,7 @@ pub extern "C" fn graph_create_rust(
 	edge_count: size_t,
 	node_count: size_t,
 ) -> *mut bim_graph_t {
+	// initialize head pointer for all vertices
 	let mut graph_head: Vec<*mut bim_node_t> = vec![std::ptr::null_mut(); node_count];
 
 	let src: size_t = 0;
@@ -95,6 +97,7 @@ pub extern "C" fn graph_create_rust(
 		let dest = edge.dest;
 		let eid = edge.id;
 
+		// 1. allocate a new node of adjacency list from `src` to `dest`
 		let mut new_node = bim_node_t {
 			dest,
 			eid,
@@ -119,7 +122,8 @@ pub extern "C" fn graph_create_rust(
 		graph_head[dest] = Box::into_raw(Box::new(new_node_dest_to_src));
 	}
 
-	let mut graph = bim_graph_t {
+	// allocate storage for the graph data structure
+	let graph = bim_graph_t {
 		head: graph_head.as_mut_ptr(),
 		node_count,
 	};
