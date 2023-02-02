@@ -872,6 +872,31 @@ pub extern "C" fn zone_id_cmp_rust(value1: *const bim_zone_t, value2: *const bim
 			.as_ref()
 			.unwrap_or_else(|| panic!("Failed to dereference value2"))
 	};
+
+	match e1.id.cmp(&e2.id) {
+		Ordering::Greater => 1,
+		Ordering::Less => -1,
+		Ordering::Equal => 0,
+	}
+}
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn transit_id_cmp_rust(
+	value1: *const bim_transit_t,
+	value2: *const bim_transit_t,
+) -> i32 {
+	let e1 = unsafe {
+		value1
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value1"))
+	};
+	let e2 = unsafe {
+		value2
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value2"))
+	};
+
 	match e1.id.cmp(&e2.id) {
 		Ordering::Greater => 1,
 		Ordering::Less => -1,
