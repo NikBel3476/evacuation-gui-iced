@@ -1,10 +1,11 @@
 use bim_polygon_tools;
 use json_object::{parse_building_from_json, Point};
-use libc::{c_char, c_double, c_ulonglong};
+use libc::{c_char, c_double, c_ulonglong, size_t};
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 
 /// Количество символов в UUID + NUL символ
+#[derive(Clone)]
 #[repr(C)]
 pub struct uuid_t {
 	pub x: [c_char; 36 + 1],
@@ -21,6 +22,7 @@ pub struct polygon_t_rust {
 	pub points: *mut point_t_rust,
 }
 
+#[derive(Clone, Copy)]
 #[repr(C)]
 pub enum bim_element_sign_t_rust {
 	/// Указывает, что элемент здания является помещением/комнатой
@@ -70,11 +72,11 @@ pub struct bim_json_element_t_rust {
 	/// [JSON] Массив UUID элементов, которые являются соседними к элементу
 	pub outputs: *mut uuid_t,
 	/// Внутренний номер элемента (генерируется)
-	pub id: c_ulonglong,
+	pub id: size_t,
 	/// [JSON] Количество людей в элементе
-	pub numofpeople: c_ulonglong,
+	pub numofpeople: size_t,
 	/// Количество связанных с текущим элементов
-	pub numofoutputs: c_ulonglong,
+	pub numofoutputs: size_t,
 	/// [JSON] Высота элемента
 	pub size_z: c_double,
 	/// Уровень, на котором находится элемент
@@ -136,7 +138,7 @@ pub struct bim_json_level_t_rust {
 	/// [JSON] Высота этажа над нулевой отметкой
 	pub z_level: c_double,
 	/// Количство элементов на этаже
-	pub numofelements: c_ulonglong,
+	pub numofelements: size_t,
 }
 
 /// Структура, описывающая этаж
@@ -159,7 +161,7 @@ pub struct bim_json_object_t_rust {
 	/// [JSON] Массив уровней здания
 	pub levels: *mut bim_json_level_t_rust,
 	/// Количество уровней в здании
-	pub numoflevels: c_ulonglong,
+	pub numoflevels: size_t,
 }
 
 /// Структура, описывающая здание
@@ -179,8 +181,8 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 		parse_building_from_json(CStr::from_ptr(path_to_file).to_str().unwrap())
 			.expect("Ошибка парсинга здания")
 	};
-	let mut bim_element_rs_id: u64 = 0;
-	let mut bim_element_d_id: u64 = 0;
+	let mut bim_element_rs_id: size_t = 0;
+	let mut bim_element_d_id: size_t = 0;
 
 	let bim_json_object = bim_json_object_t_rust {
 		address: Box::into_raw(Box::new(bim_json_address_t_rust {
@@ -190,7 +192,7 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 				.into_raw(),
 			add_info: CString::new(building.address.add_info).unwrap().into_raw(),
 		})),
-		numoflevels: c_ulonglong::try_from(building.levels.len()).unwrap(),
+		numoflevels: size_t::try_from(building.levels.len()).unwrap(),
 		name: CString::new(building.building_name).unwrap().into_raw(),
 		levels: {
 			let mut levels = building
@@ -198,7 +200,7 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 				.iter()
 				.map(|level| bim_json_level_t_rust {
 					name: CString::new(level.name.clone()).unwrap().into_raw(),
-					numofelements: c_ulonglong::try_from(level.build_elements.len()).unwrap(),
+					numofelements: size_t::try_from(level.build_elements.len()).unwrap(),
 					z_level: level.z_level,
 					elements: {
 						let mut build_elements = level
@@ -255,8 +257,8 @@ pub extern "C" fn bim_json_new(path_to_file: *const c_char) -> *const bim_json_o
 								},
 								size_z: element.size_z,
 								z_level: level.z_level,
-								numofpeople: element.number_of_people,
-								numofoutputs: c_ulonglong::try_from(element.outputs.len()).unwrap(),
+								numofpeople: element.number_of_people as usize,
+								numofoutputs: size_t::try_from(element.outputs.len()).unwrap(),
 								sign: match element.sign.as_str() {
 									"Room" => bim_element_sign_t_rust::ROOM,
 									"Staircase" => bim_element_sign_t_rust::STAIRCASE,

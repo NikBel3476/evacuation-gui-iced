@@ -300,7 +300,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
         }
     }
 
-    bim_zone_t *outside = _outside_init(bim_json);
+    bim_zone_t *outside = _outside_init_rust(bim_json);
     arraylist_append(zones_list, outside);
 
     arraylist_sort(zones_list, zone_id_cmp_rust);
