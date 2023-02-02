@@ -33,7 +33,7 @@ bim_graph_t *bim_graph_new(const bim_t *const bim) {
     graph_create_edges(bim->transits, arraylist_equal_callback_rust, edges, bim->zones);
 
     bim_graph_t *bim_graph = NULL;
-    bim_graph = graph_create(edges, bim->transits->length, bim->zones->length);
+    bim_graph = graph_create_rust(edges, bim->transits->length, bim->zones->length);
     free(edges);
     if (!bim_graph) {
         return NULL;
@@ -66,7 +66,7 @@ void bim_graph_free(bim_graph_t *graph) {
 }
 
 // Function to create an adjacency list from specified edges
-bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count) {
+/*bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count) {
     if (!node_count || !edge_count) {
         return NULL;
     }
@@ -138,7 +138,7 @@ bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t no
     }
 
     return graph;
-}
+}*/
 
 void graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc callback,
                         bim_edge_t edges[], const ArrayList *const zones) {

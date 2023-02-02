@@ -36,9 +36,9 @@ pub struct bim_node_t_rust {
 /// Data structure to store a graph edge
 #[repr(C)]
 pub struct bim_edge_t {
-	src: c_ulong,
-	dest: c_ulong,
-	id: c_ulong,
+	src: size_t,
+	dest: size_t,
+	id: size_t,
 }
 
 pub struct bim_edge_t_rust {
@@ -73,13 +73,61 @@ pub struct bim_edge_t_rust {
 	graph
 }*/
 
-// #[no_mangle]
-// pub extern "C" fn graph_create_rust(
-// 	edges: *const bim_edge_t,
-// 	edge_count: c_ulong,
-// 	node_count: c_ulong,
-// ) -> *mut bim_graph_t {
-// }
+/// Function to create an adjacency list from specified edges
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn graph_create_rust(
+	edges: *const bim_edge_t,
+	edge_count: size_t,
+	node_count: size_t,
+) -> *mut bim_graph_t {
+	let mut graph_head: Vec<*mut bim_node_t> = vec![std::ptr::null_mut(); node_count];
+
+	let src: size_t = 0;
+	let dest: size_t = 0;
+	let eid: size_t = 0;
+	let edges = unsafe { std::slice::from_raw_parts(edges, edge_count) };
+	// add edges to the directed graph one by one
+	for i in 0..edge_count {
+		let edge = &edges[i];
+		// get the source and destination vertex
+		let src = edge.src;
+		let dest = edge.dest;
+		let eid = edge.id;
+
+		let mut new_node = bim_node_t {
+			dest,
+			eid,
+			next: std::ptr::null_mut(),
+		};
+
+		// point new node to the current head
+		new_node.next = graph_head[src];
+
+		// point head pointer to the new node
+		graph_head[src] = Box::into_raw(Box::new(new_node));
+
+		// 2. allocate a new node of adjacency list from `dest` to `src`
+		let new_node_dest_to_src = bim_node_t {
+			dest: src,
+			eid,
+			// point new node to the current head
+			next: graph_head[dest],
+		};
+
+		// change head pointer to point to the new node
+		graph_head[dest] = Box::into_raw(Box::new(new_node_dest_to_src));
+	}
+
+	let mut graph = bim_graph_t {
+		head: graph_head.as_mut_ptr(),
+		node_count,
+	};
+
+	std::mem::forget(graph_head);
+
+	Box::into_raw(Box::new(graph))
+}
 
 pub fn graph_create_edges(
 	list_doors: &[bim_transit_t_rust],
@@ -117,6 +165,34 @@ pub fn equal_callback(zone: &bim_zone_t_rust, transit: &bim_transit_t_rust) -> b
 
 	false
 }
+
+/*#[no_mangle]
+pub extern "C" fn graph_create_edges_rust(
+	list_doors: &[bim_transit_t_rust],
+	zones: &[bim_zone_t_rust],
+) -> Vec<bim_edge_t_rust> {
+	let mut edges: Vec<bim_edge_t_rust> = vec![];
+
+	for (i, transition) in list_doors.iter().enumerate() {
+		let mut ids = [0, zones.len()];
+		let mut j = 0usize;
+		for (k, zone) in zones.iter().enumerate() {
+			if equal_callback(zone, transition) && j != 2 {
+				ids[j] = k;
+				j += 1;
+			}
+		}
+
+		let edge = bim_edge_t_rust {
+			id: i,
+			src: ids[0],
+			dest: ids[1],
+		};
+		edges.push(edge);
+	}
+
+	edges
+}*/
 
 /*#[no_mangle]
 pub extern "C" fn create_graph(edges: *const bim_edge_t, edge_count: c_ulong, node_count: c_ulong) -> *mut bim_graph_t {
