@@ -461,7 +461,7 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 	let mut outside = bim_zone_t {
 		id: 0,
 		name: CString::new("Outside").unwrap().into_raw(),
-		sign: 5, // bim_element_sign_t_rust::OUTSIDE as u8,
+		sign: bim_element_sign_t_rust::OUTSIDE as u8,
 		polygon: std::ptr::null_mut(),
 		uuid: uuid_t {
 			x: uuid.try_into().unwrap_or_else(|v| {
@@ -497,15 +497,15 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 
 			let element = &elements[j];
 
-			match element.sign as u8 {
-				4 /*bim_element_sign_t_rust::DOOR_WAY_OUT*/ => {
+			match element.sign {
+				bim_element_sign_t_rust::DOOR_WAY_OUT => {
 					outputs.push(element.uuid.clone());
 					num_of_outputs += 1;
 				}
-				0 /*bim_element_sign_t_rust::ROOM*/ | 1 /*bim_element_sign_t_rust::STAIRCASE*/ => {
+				bim_element_sign_t_rust::ROOM | bim_element_sign_t_rust::STAIRCASE => {
 					outside.id += 1;
 				}
-				_ => {},
+				_ => {}
 			}
 		}
 	}
