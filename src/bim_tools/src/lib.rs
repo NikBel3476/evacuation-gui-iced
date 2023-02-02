@@ -483,17 +483,12 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 
 	let mut num_of_outputs = 0usize;
 	let mut outputs: Vec<uuid_t> = vec![];
-	let levels =
-		unsafe { std::slice::from_raw_parts(bim_json.levels, bim_json.numoflevels as usize) };
+	let levels = unsafe { std::slice::from_raw_parts(bim_json.levels, bim_json.numoflevels) };
 
 	for i in 0..bim_json.numoflevels {
-		for j in 0..levels[i as usize].numofelements {
-			let elements = unsafe {
-				std::slice::from_raw_parts(
-					levels[i as usize].elements,
-					levels[i as usize].numofelements as usize,
-				)
-			};
+		for j in 0..levels[i].numofelements {
+			let elements =
+				unsafe { std::slice::from_raw_parts(levels[i].elements, levels[i].numofelements) };
 
 			let element = &elements[j];
 
