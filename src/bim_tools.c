@@ -303,7 +303,7 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     bim_zone_t *outside = _outside_init(bim_json);
     arraylist_append(zones_list, outside);
 
-    arraylist_sort(zones_list, zone_id_cmp);
+    arraylist_sort(zones_list, zone_id_cmp_rust);
     arraylist_sort(transits_list, transit_id_cmp);
 
     calculate_transits_width(zones_list, transits_list);
@@ -475,13 +475,13 @@ void bim_tools_print_element(const bim_zone_t *zone) {
 // *******************************************************
 // -------------------------------------------------------
 
-int32_t zone_id_cmp(ArrayListValue value1, ArrayListValue value2) {
+/*int32_t zone_id_cmp(ArrayListValue value1, ArrayListValue value2) {
     const bim_zone_t *e1 = (bim_zone_t *) value1;
     const bim_zone_t *e2 = (bim_zone_t *) value2;
     if (e1->id > e2->id) return 1;
     else if (e1->id < e2->id) return -1;
     else return 0;
-}
+}*/
 
 int32_t transit_id_cmp(ArrayListValue value1, ArrayListValue value2) {
     const bim_transit_t *e1 = (bim_transit_t *) value1;

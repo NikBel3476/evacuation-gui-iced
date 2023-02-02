@@ -8,7 +8,7 @@ use bim_polygon_tools::{
 	polygon_t_rust, side_length, Line,
 };
 use json_object::{BuildingStruct, Point};
-use libc::{c_char, c_double, c_int};
+use libc::{c_char, c_double, c_int, size_t};
 use std::cmp::Ordering;
 use std::ffi::CString;
 
@@ -78,7 +78,7 @@ pub struct bim_zone_t {
 	/// UUID идентификатор элемента
 	pub uuid: uuid_t,
 	/// Внутренний номер элемента
-	pub id: usize,
+	pub id: size_t,
 	/// Название элемента
 	pub name: *mut c_char,
 	/// Полигон элемента
@@ -856,5 +856,25 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 		zones: zones_list,
 		levels: levels_list,
 		name: bim_json.building_name.clone(),
+	}
+}
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn zone_id_cmp_rust(value1: *const bim_zone_t, value2: *const bim_zone_t) -> i32 {
+	let e1 = unsafe {
+		value1
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value1"))
+	};
+	let e2 = unsafe {
+		value2
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value2"))
+	};
+	match e1.id.cmp(&e2.id) {
+		Ordering::Greater => 1,
+		Ordering::Less => -1,
+		Ordering::Equal => 0,
 	}
 }
