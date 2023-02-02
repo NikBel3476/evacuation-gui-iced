@@ -14,13 +14,10 @@
  */
 
 #include "bim_graph.h"
-
-bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count);
+#include "bim_graph/src/bim_graph_rust.h"
 
 void graph_create_edges(const ArrayList *list_doors, ArrayListEqualFunc callback,
                         bim_edge_t edges[], const ArrayList *zones);
-
-int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2);
 
 bim_graph_t *bim_graph_new(const bim_t *const bim) {
     bim_edge_t *edges = NULL;
@@ -29,10 +26,10 @@ bim_graph_t *bim_graph_new(const bim_t *const bim) {
         return NULL;
     }
 
-    graph_create_edges(bim->transits, arraylist_equal_callback, edges, bim->zones);
+    graph_create_edges(bim->transits, arraylist_equal_callback_rust, edges, bim->zones);
 
     bim_graph_t *bim_graph = NULL;
-    bim_graph = graph_create(edges, bim->transits->length, bim->zones->length);
+    bim_graph = graph_create_rust(edges, bim->transits->length, bim->zones->length);
     free(edges);
     if (!bim_graph) {
         return NULL;
@@ -64,81 +61,6 @@ void bim_graph_free(bim_graph_t *graph) {
     free(graph);
 }
 
-// Function to create an adjacency list from specified edges
-bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count) {
-    if (!node_count || !edge_count) {
-        return NULL;
-    }
-
-    // allocate storage for the graph data structure
-    bim_graph_t *graph = NULL;
-    graph = (bim_graph_t *) calloc(1, sizeof(bim_graph_t));
-    if (!graph) {
-        return NULL;
-    }
-
-    // initialize head pointer for all vertices
-    graph->head = NULL;
-    graph->head = (bim_node_t **) calloc(node_count, sizeof(bim_node_t *));
-    if (!graph->head) {
-        free(graph);
-        return NULL;
-    }
-
-    for (size_t i = 0; i < node_count; i++) {
-        graph->head[i] = NULL;
-    }
-    graph->node_count = node_count;
-
-    size_t src;
-    size_t dest;
-    size_t eid;
-    // add edges to the directed graph one by one
-    for (size_t i = 0; i < edge_count; ++i) {
-        const bim_edge_t *edge = &edges[i];
-        // get the source and destination vertex
-        src = edge->src;
-        dest = edge->dest;
-        eid = edge->id;
-
-        // 1. allocate a new node of adjacency list from `src` to `dest`
-
-        bim_node_t *newNode = (bim_node_t *) calloc(1, sizeof(bim_node_t));
-        if (!newNode) {
-            free(graph->head);
-            free(graph);
-            return NULL;
-        }
-        newNode->dest = dest;
-        newNode->eid = eid;
-
-        // point new node to the current head
-        newNode->next = graph->head[src];
-
-        // point head pointer to the new node
-        graph->head[src] = newNode;
-
-        // 2. allocate a new node of adjacency list from `dest` to `src`
-
-        newNode = (bim_node_t *) calloc(1, sizeof(bim_node_t));
-        if (!newNode) {
-            free(graph->head);
-            free(graph);
-            return NULL;
-        }
-        newNode->dest = src;
-        newNode->eid = eid;
-
-        // point new node to the current head
-        newNode->next = graph->head[dest];
-
-        // change head pointer to point to the new node
-        graph->head[dest] = newNode;
-    }
-
-    return graph;
-}
-
 void graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc callback,
                         bim_edge_t edges[], const ArrayList *const zones) {
     for (size_t i = 0; i < list_doors->length; ++i) {
@@ -153,16 +75,4 @@ void graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc ca
         edge->src = ids[0];
         edge->dest = ids[1];
     }
-}
-
-int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2) {
-    const bim_zone_t *element1 = (bim_zone_t *) value1;
-    const bim_transit_t *element2 = (bim_transit_t *) value2;
-
-    for (size_t i = 0; i < element1->numofoutputs; ++i) {
-        if (strcmp(element1->outputs[i].x, element2->uuid.x) == 0)
-            return 1;
-    }
-
-    return 0;
 }

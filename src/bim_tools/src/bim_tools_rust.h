@@ -18,6 +18,10 @@ int find_zone_callback_rust(ArrayListValue value1, ArrayListValue value2);
 
 line_t *intersected_edge_rust(const polygon_t *polygon_element, line_t *line);
 
+int32_t zone_id_cmp_rust(ArrayListValue value1, ArrayListValue value2);
+
+int32_t transit_id_cmp_rust(ArrayListValue value1, ArrayListValue value2);
+
 struct bim_zone_t *_outside_init_rust(const bim_json_object_t *bim_json);
 
 /**

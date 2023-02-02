@@ -8,7 +8,7 @@ use bim_polygon_tools::{
 	polygon_t_rust, side_length, Line,
 };
 use json_object::{BuildingStruct, Point};
-use libc::{c_char, c_double, c_int};
+use libc::{c_char, c_double, c_int, size_t};
 use std::cmp::Ordering;
 use std::ffi::CString;
 
@@ -78,7 +78,7 @@ pub struct bim_zone_t {
 	/// UUID идентификатор элемента
 	pub uuid: uuid_t,
 	/// Внутренний номер элемента
-	pub id: usize,
+	pub id: size_t,
 	/// Название элемента
 	pub name: *mut c_char,
 	/// Полигон элемента
@@ -443,7 +443,6 @@ pub fn door_way_width(
 	(distance12 + distance34) * 0.5
 }
 
-// FIXME: causes segfault on replace _outside_init c function
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) -> *mut bim_zone_t {
@@ -458,11 +457,11 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 		.chars()
 		.map(|c| c as c_char)
 		.collect();
+
 	let mut outside = bim_zone_t {
 		id: 0,
 		name: CString::new("Outside").unwrap().into_raw(),
 		sign: bim_element_sign_t_rust::OUTSIDE as u8,
-		is_visited: false,
 		polygon: std::ptr::null_mut(),
 		uuid: uuid_t {
 			x: uuid.try_into().unwrap_or_else(|v| {
@@ -470,42 +469,38 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 			}),
 		},
 		z_level: 0.0,
-		size_z: f64::MAX,
+		size_z: f64::from(f32::MAX),
 		numofpeople: 0.0,
 		hazard_level: 0,
 		is_safe: true,
 		numofoutputs: 0,
 		potential: 0.0,
-		area: 0.0,
+		area: f64::from(f32::MAX),
 		outputs: std::ptr::null_mut(),
 		is_blocked: false,
+		is_visited: false,
 	};
 
-	let mut num_of_outputs: usize = 0;
-	let mut outputs: Vec<uuid_t> = Vec::new();
-	let levels =
-		unsafe { std::slice::from_raw_parts(bim_json.levels, bim_json.numoflevels as usize) };
+	let mut num_of_outputs = 0usize;
+	let mut outputs: Vec<uuid_t> = vec![];
+	let levels = unsafe { std::slice::from_raw_parts(bim_json.levels, bim_json.numoflevels) };
 
 	for i in 0..bim_json.numoflevels {
-		for j in 0..levels[i as usize].numofelements {
-			let element = unsafe {
-				std::slice::from_raw_parts(
-					levels[i as usize].elements,
-					levels[i as usize].numofelements as usize,
-				)
-				.get(j as usize)
-				.expect("Failed to get element at outside_init_rust fn in bim_tools crate")
-			};
+		for j in 0..levels[i].numofelements {
+			let elements =
+				unsafe { std::slice::from_raw_parts(levels[i].elements, levels[i].numofelements) };
+
+			let element = &elements[j];
 
 			match element.sign {
 				bim_element_sign_t_rust::DOOR_WAY_OUT => {
-					outputs.push(uuid_t { x: element.uuid.x });
+					outputs.push(element.uuid.clone());
 					num_of_outputs += 1;
 				}
 				bim_element_sign_t_rust::ROOM | bim_element_sign_t_rust::STAIRCASE => {
 					outside.id += 1;
 				}
-				_ => (),
+				_ => {}
 			}
 		}
 	}
@@ -514,16 +509,14 @@ pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) ->
 		panic!("Failed to find any output at outside_init fn in bim_tools crate")
 	}
 
-	outside.numofoutputs = num_of_outputs.try_into().unwrap_or_else(|e| {
+	let numofoutputs = num_of_outputs.try_into().unwrap_or_else(|e| {
 		panic!("Failed to convert usize to u32. usize: {num_of_outputs}. Error: {e:?}")
 	});
 
+	outside.numofoutputs = numofoutputs;
 	outside.outputs = outputs.as_mut_ptr();
-	outside.is_blocked = false;
-	outside.is_visited = false;
-	outside.potential = 0.0;
-	outside.area = f64::MAX;
-	outside.numofpeople = 0.0;
+
+	std::mem::forget(outputs);
 
 	Box::into_raw(Box::new(outside))
 }
@@ -856,5 +849,50 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 		zones: zones_list,
 		levels: levels_list,
 		name: bim_json.building_name.clone(),
+	}
+}
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn zone_id_cmp_rust(value1: *const bim_zone_t, value2: *const bim_zone_t) -> i32 {
+	let e1 = unsafe {
+		value1
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value1"))
+	};
+	let e2 = unsafe {
+		value2
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value2"))
+	};
+
+	match e1.id.cmp(&e2.id) {
+		Ordering::Greater => 1,
+		Ordering::Less => -1,
+		Ordering::Equal => 0,
+	}
+}
+
+#[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub extern "C" fn transit_id_cmp_rust(
+	value1: *const bim_transit_t,
+	value2: *const bim_transit_t,
+) -> i32 {
+	let e1 = unsafe {
+		value1
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value1"))
+	};
+	let e2 = unsafe {
+		value2
+			.as_ref()
+			.unwrap_or_else(|| panic!("Failed to dereference value2"))
+	};
+
+	match e1.id.cmp(&e2.id) {
+		Ordering::Greater => 1,
+		Ordering::Less => -1,
+		Ordering::Equal => 0,
 	}
 }

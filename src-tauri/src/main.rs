@@ -9,6 +9,7 @@ use tauri::{AppHandle, WindowBuilder};
 use bim_cli;
 use bim_configure;
 use bim_evac;
+use bim_graph;
 use bim_json_object;
 use bim_output;
 use bim_polygon_tools;
