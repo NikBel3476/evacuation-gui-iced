@@ -14,6 +14,7 @@
  */
 
 #include "bim_graph.h"
+#include "bim_graph/src/bim_graph_rust.h"
 
 bim_graph_t *graph_create(const bim_edge_t edges[], size_t edge_count, size_t node_count);
 
@@ -29,7 +30,7 @@ bim_graph_t *bim_graph_new(const bim_t *const bim) {
         return NULL;
     }
 
-    graph_create_edges(bim->transits, arraylist_equal_callback, edges, bim->zones);
+    graph_create_edges(bim->transits, arraylist_equal_callback_rust, edges, bim->zones);
 
     bim_graph_t *bim_graph = NULL;
     bim_graph = graph_create(edges, bim->transits->length, bim->zones->length);
@@ -155,7 +156,7 @@ void graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc ca
     }
 }
 
-int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2) {
+/*int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2) {
     const bim_zone_t *element1 = (bim_zone_t *) value1;
     const bim_transit_t *element2 = (bim_transit_t *) value2;
 
@@ -165,4 +166,4 @@ int32_t arraylist_equal_callback(ArrayListValue value1, ArrayListValue value2) {
     }
 
     return 0;
-}
+}*/

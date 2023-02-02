@@ -23,6 +23,7 @@ fn main() {
 		"../src/bim_json_object/src",
 		"../src/bim_polygon_tools/src",
 		"../src/bim_tools/src",
+		"../src/bim_graph/src",
 		"src/bim_output/src",
 		"../thirdparty/arraylist",
 		"../thirdparty/triangle",
