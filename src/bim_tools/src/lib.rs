@@ -852,6 +852,34 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 	}
 }
 
+pub fn bim_tools_get_area_bim(bim: &bim_t_rust) -> f64 {
+	let mut area = -1.0;
+
+	if area < 0.0 {
+		area = 0.0;
+		for level in &bim.levels {
+			for zone in &level.zones {
+				if zone.sign == BimElementSign::ROOM || zone.sign == BimElementSign::STAIRCASE {
+					area += zone.area;
+				}
+			}
+		}
+	}
+
+	area
+}
+
+pub fn bim_tools_get_num_of_people(bim: &bim_t_rust) -> f64 {
+	let mut num_of_people = 0.0;
+	for level in &bim.levels {
+		for zone in &level.zones {
+			num_of_people += zone.number_of_people;
+		}
+	}
+
+	num_of_people
+}
+
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn zone_id_cmp_rust(value1: *const bim_zone_t, value2: *const bim_zone_t) -> i32 {

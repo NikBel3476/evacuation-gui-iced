@@ -9,6 +9,7 @@ edition = "2021"
 libc = "0.2"
 bim_json_object = { path = "../bim_json_object" }
 bim_tools = { path = "../bim_tools" }
+bim_graph = { path = "../bim_graph" }
 
 [lib]
 crate-type=["staticlib", "lib"]

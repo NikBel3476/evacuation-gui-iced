@@ -2,7 +2,7 @@
 
 extern crate core;
 
-use bim_tools::{bim_transit_t, bim_transit_t_rust, bim_zone_t, bim_zone_t_rust};
+use bim_tools::{bim_t_rust, bim_transit_t, bim_transit_t_rust, bim_zone_t, bim_zone_t_rust};
 use libc::{c_ulong, size_t};
 
 /// https://www.techiedelight.com/implement-graph-data-structure-c
@@ -10,8 +10,8 @@ use libc::{c_ulong, size_t};
 #[repr(C)]
 pub struct bim_graph_t {
 	/// An array of pointers to Node to represent an adjacency list
-	head: *mut *mut bim_node_t,
-	node_count: size_t,
+	pub head: *mut *mut bim_node_t,
+	pub node_count: size_t,
 }
 
 pub struct bim_graph_t_rust {
@@ -21,10 +21,10 @@ pub struct bim_graph_t_rust {
 /// Data structure to store adjacency list nodes of the graph
 #[repr(C)]
 pub struct bim_node_t {
-	dest: size_t,
+	pub dest: size_t,
 	/// edge id
-	eid: size_t,
-	next: *mut bim_node_t,
+	pub eid: size_t,
+	pub next: *mut bim_node_t,
 }
 
 #[derive(Default, Clone)]
@@ -46,6 +46,16 @@ pub struct bim_edge_t_rust {
 	src: usize,
 	dest: usize,
 	id: usize,
+}
+
+pub fn bim_graph_new(bim: &bim_t_rust) -> *mut bim_graph_t {
+	let edges = graph_create_edges_rust(&bim.transits, &bim.zones);
+
+	graph_create_rust(
+		edges.as_ptr(),
+		edges.len() as size_t,
+		bim.zones.len() as size_t,
+	)
 }
 
 /*pub fn graph_create(edges: &[bim_edge_t_rust], node_count: usize) -> bim_graph_t_rust {
@@ -133,11 +143,11 @@ pub extern "C" fn graph_create_rust(
 	Box::into_raw(Box::new(graph))
 }
 
-pub fn graph_create_edges(
+pub fn graph_create_edges_rust(
 	list_doors: &[bim_transit_t_rust],
 	zones: &[bim_zone_t_rust],
-) -> Vec<bim_edge_t_rust> {
-	let mut edges: Vec<bim_edge_t_rust> = vec![];
+) -> Vec<bim_edge_t> {
+	let mut edges: Vec<bim_edge_t> = vec![];
 
 	for (i, transition) in list_doors.iter().enumerate() {
 		let mut ids = [0, zones.len()];
@@ -149,7 +159,7 @@ pub fn graph_create_edges(
 			}
 		}
 
-		let edge = bim_edge_t_rust {
+		let edge = bim_edge_t {
 			id: i,
 			src: ids[0],
 			dest: ids[1],

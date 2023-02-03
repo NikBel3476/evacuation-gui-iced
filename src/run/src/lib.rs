@@ -1,12 +1,18 @@
 use bim_evac;
-use bim_evac::{set_density_max, set_density_min, set_modeling_step, set_speed_max};
+use bim_evac::{
+	evac_def_modeling_step, evac_get_time_m_rust, evac_get_time_s_rust, evac_moving_step_rust,
+	evac_time_inc_rust, set_density_max, set_density_min, set_modeling_step, set_speed_max,
+	time_reset,
+};
+use bim_graph::bim_graph_new;
 use bim_json_object::{bim_json_object_new, BimElementSign};
 use bim_output::{
 	bim_basename_rust, bim_create_file_name, bim_create_file_name_rust, bim_output_body,
 	bim_output_head, OUTPUT_DETAIL_FILE_RUST, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX,
 };
 use bim_tools::{
-	bim_t_rust, bim_tools_new_rust, bim_tools_set_people_to_zone_rust, set_people_to_zone,
+	bim_t_rust, bim_tools_get_num_of_people, bim_tools_new_rust, bim_tools_set_people_to_zone_rust,
+	set_people_to_zone,
 };
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
@@ -44,6 +50,45 @@ pub fn run_rust() {
 
 		bim_output_head(&bim, &mut fp_detail);
 		bim_output_body(&bim, 0.0, &mut fp_detail);
+
+		let graph = bim_graph_new(&bim);
+		// TODO: add print graph
+
+		evac_def_modeling_step(&bim);
+		time_reset();
+
+		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
+		loop {
+			evac_moving_step_rust(graph, &mut bim.zones, &mut bim.transits);
+			evac_time_inc_rust();
+			bim_output_body(&bim, evac_get_time_m_rust(), &mut fp_detail);
+
+			let mut num_of_people = 0.0;
+			for zone in &bim.zones {
+				if zone.is_visited {
+					num_of_people += zone.number_of_people;
+				}
+			}
+
+			if num_of_people <= remainder {
+				break;
+			}
+		}
+
+		let num_of_evacuated_people = bim_tools_get_num_of_people(&bim);
+		let evacuation_time = evac_get_time_m_rust();
+
+		println!(
+			"Длительность эвакуации: {:.2} с. ({:.2} мин.)",
+			evac_get_time_s_rust(),
+			evacuation_time
+		);
+		println!(
+			"Количество человек: в здании - {:.2} (в безопасной зоне - {:.2}) чел.",
+			num_of_evacuated_people,
+			bim.zones[bim.zones.len() - 1].number_of_people
+		);
+		println!("---------------------------------------");
 	}
 }
 
