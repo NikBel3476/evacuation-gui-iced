@@ -88,7 +88,13 @@ void run() {
                       ((bim_zone_t *) bim->zones->data[bim->zones->length - 1])->uuid.x);
         }
 
+        printf("before scenario. people amount: %.2f\n", bim_tools_get_num_of_people(bim));
+        printf("before scenario. area: %.2f\n", bim_tools_get_area_bim(bim));
+
         applying_scenario_bim_params(bim, bim_cfg_scenario);
+
+        printf("people amount: %.2f\n", bim_tools_get_num_of_people(bim));
+        printf("area: %.2f\n", bim_tools_get_area_bim(bim));
 
         // Files with results
         char *output_detail = bim_create_file_name(filename, OUTPUT_DETAIL_FILE, OUTPUT_SUFFIX);
@@ -191,7 +197,9 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
     ArrayList *zones = bim->zones;
     for (size_t i = 0; i < zones->length; ++i) {
         bim_zone_t *zone = zones->data[i];
-        if (zone->sign == OUTSIDE) continue;
+        if (zone->sign == OUTSIDE) {
+            continue;
+        }
 
         if (cfg_scenario->distribution.type == distribution_uniform) {
             bim_tools_set_people_to_zone_rust(zone, (float)(zone->area * cfg_scenario->distribution.density));
@@ -209,11 +217,11 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
     }
 
     evac_set_modeling_step(cfg_scenario->modeling.step);
-//    evac_set_modeling_step_rust(cfg_scenario->modeling.step);
+    evac_set_modeling_step_rust(cfg_scenario->modeling.step);
     evac_set_speed_max(cfg_scenario->modeling.speed_max);
-//    evac_set_speed_max_rust(cfg_scenario->modeling.speed_max);
+    evac_set_speed_max_rust(cfg_scenario->modeling.speed_max);
     evac_set_density_max(cfg_scenario->modeling.density_max);
-//    evac_set_density_max_rust(cfg_scenario->modeling.density_max);
+    evac_set_density_max_rust(cfg_scenario->modeling.density_max);
     evac_set_density_min(cfg_scenario->modeling.density_min);
-//    evac_set_density_min_rust(cfg_scenario->modeling.density_min);
+    evac_set_density_min_rust(cfg_scenario->modeling.density_min);
 }

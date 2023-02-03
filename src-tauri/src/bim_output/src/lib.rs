@@ -104,16 +104,16 @@ pub fn bim_output_head(bim: &bim_t_rust, file: &mut File) {
 }
 
 pub fn bim_output_body(bim: &bim_t_rust, time: f64, file: &mut File) {
-	file.write_all(format!("{time},").as_bytes())
+	file.write_all(format!("{time:.2},").as_bytes())
 		.expect("Failed to write to file");
 
 	for zone in &bim.zones {
-		file.write_all(format!("{},", zone.number_of_people).as_bytes())
+		file.write_all(format!("{:.2},", zone.number_of_people).as_bytes())
 			.expect("Failed to write zone number of people to file");
 	}
 
 	for transition in &bim.transits {
-		file.write_all(format!("{},", transition.no_proceeding).as_bytes())
+		file.write_all(format!("{:.2},", transition.no_proceeding).as_bytes())
 			.expect("Failed to write transition no_proceeding to file");
 	}
 

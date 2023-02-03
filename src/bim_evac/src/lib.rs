@@ -1,4 +1,4 @@
-use bim_graph::bim_graph_t;
+use bim_graph::{bim_graph_t, bim_graph_t_rust};
 use bim_json_object::{bim_element_sign_t_rust, BimElementSign};
 use bim_tools::{
 	bim_t_rust, bim_tools_get_area_bim, bim_transit_t, bim_transit_t_rust, bim_zone_t,
@@ -197,23 +197,14 @@ pub extern "C" fn speed_in_element_rust(
 ///
 /// # Returns
 /// Скорость людского потока в зоне
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn speed_in_element(
-	receiving_zone: *const bim_zone_t_rust,
-	transmitting_zone: *const bim_zone_t_rust,
-) -> c_double {
-	let receiving_zone = unsafe {
-		receiving_zone.as_ref().expect("Failed to dereference pointer receiving_zone at speed_in_element_rust fn in bim_evac crate")
-	};
-
-	let transmitting_zone = unsafe {
-		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at speed_in_element_rust fn in bim_evac crate")
-	};
-
+pub fn speed_in_element(
+	receiving_zone: &bim_zone_t_rust,
+	transmitting_zone: &bim_zone_t_rust,
+) -> f64 {
 	let density_in_transmitting_zone = transmitting_zone.number_of_people / transmitting_zone.area;
 	// По умолчанию, используется скорость движения по горизонтальной поверхности
-	let mut v_zone = unsafe { speed_in_room_rust(density_in_transmitting_zone, EVAC_SPEED_MAX) };
+	let mut v_zone =
+		unsafe { speed_in_room_rust(density_in_transmitting_zone, EVAC_SPEED_MAX_RUST) };
 	// Разница высот зон
 	let dh = receiving_zone.z_level - transmitting_zone.z_level;
 
@@ -286,21 +277,11 @@ pub extern "C" fn speed_at_exit_rust(
 ///
 /// # Returns
 /// Скорость на выходе из отдающего помещения
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn speed_at_exit(
-	receiving_zone: *const bim_zone_t_rust,
-	transmitting_zone: *const bim_zone_t_rust,
-	transit_width: c_double,
-) -> c_double {
-	let receiving_zone = unsafe {
-		receiving_zone.as_ref().expect("Failed to dereference pointer receiving_zone at speed_at_exit_rust fn in bim_evac crate")
-	};
-
-	let transmitting_zone = unsafe {
-		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at speed_at_exit_rust fn in bim_evac crate")
-	};
-
+pub fn speed_at_exit(
+	receiving_zone: &bim_zone_t_rust,
+	transmitting_zone: &bim_zone_t_rust,
+	transit_width: f64,
+) -> f64 {
 	let zone_speed = speed_in_element(receiving_zone, transmitting_zone);
 	let density_in_transmitting_element =
 		transmitting_zone.number_of_people / transmitting_zone.area;
@@ -308,7 +289,7 @@ pub extern "C" fn speed_at_exit(
 		speed_through_transit_rust(
 			transit_width,
 			density_in_transmitting_element,
-			EVAC_SPEED_MAX,
+			EVAC_SPEED_MAX_RUST,
 		)
 	};
 
@@ -354,23 +335,17 @@ pub extern "C" fn change_num_of_people_rust(
 ///
 /// # Returns
 ///
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn change_num_of_people(
-	transmitting_zone: *const bim_zone_t_rust,
-	transit_width: c_double,
-	speed_at_exit: c_double,
-) -> c_double {
-	let transmitting_zone = unsafe {
-		transmitting_zone.as_ref().expect("Failed to dereference pointer transmitting_zone at change_num_of_people_rust fn in bim_evac crate")
-	};
-
+	transmitting_zone: &bim_zone_t_rust,
+	transit_width: f64,
+	speed_at_exit: f64,
+) -> f64 {
 	let density_in_element = transmitting_zone.number_of_people / transmitting_zone.area;
 	// Величина людского потока, через проем, чел./мин
 	let people_flow = density_in_element * speed_at_exit * transit_width;
 	// Зная скорость потока, можем вычислить конкретное количество человек,
 	// которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
-	unsafe { people_flow * EVAC_MODELING_STEP }
+	unsafe { people_flow * EVAC_MODELING_STEP_RUST }
 }
 
 // TODO: Уточнить корректность подсчета потенциала
@@ -534,8 +509,8 @@ pub fn part_people_flow(
 	let people_in_transmitting_zone = transmitting_zone.number_of_people;
 	let density_in_transmitting_zone = people_in_transmitting_zone / area_transmitting_zone;
 	let density_min_transmitting_zone = unsafe {
-		match EVAC_DENSITY_MIN > 0.0 {
-			true => EVAC_DENSITY_MIN,
+		match EVAC_DENSITY_MIN_RUST > 0.0 {
+			true => EVAC_DENSITY_MIN_RUST,
 			false => 0.5 / area_transmitting_zone,
 		}
 	};
@@ -560,7 +535,7 @@ pub fn part_people_flow(
 	// вместиться до достижения максимальной плотности
 	// => если может вместить больше, чем может выйти, то вмещает всех вышедших,
 	// иначе вмещает только возможное количество.
-	let max_num_of_people = unsafe { EVAC_DENSITY_MAX * receiving_zone.area };
+	let max_num_of_people = unsafe { EVAC_DENSITY_MAX_RUST * receiving_zone.area };
 	let capacity_receiving_zone = max_num_of_people - receiving_zone.number_of_people;
 
 	// Такая ситуация возникает при плотности в принимающем помещении более Dmax чел./м2
@@ -583,7 +558,7 @@ pub fn evac_def_modeling_step(bim: &bim_t_rust) {
 	unsafe {
 		EVAC_MODELING_STEP_RUST = match EVAC_MODELING_STEP_RUST == 0.0 {
 			true => hxy / EVAC_SPEED_MAX_RUST * 0.1,
-			false => EVAC_MODELING_STEP_RUST,
+			false => EVAC_MODELING_STEP_RUST, // Шаг моделирования, мин
 		}
 	}
 }
@@ -660,6 +635,153 @@ pub fn evac_moving_step_rust(
 						panic!("Failed to dereference graph head pointer for receiving zone.")
 					})
 			};
+		}
+
+		if unprocessed_zones_count == 0 {
+			break;
+		}
+		unprocessed_zones_count -= 1;
+	}
+}
+
+pub fn evac_moving_step(graph: &bim_graph_t_rust, bim: &mut bim_t_rust) {
+	let zones = &mut bim.zones;
+	let transits = &mut bim.transits;
+
+	reset_zones(zones);
+	for level in &mut bim.levels {
+		reset_zones(&mut level.zones);
+	}
+
+	reset_transits(transits);
+	for level in &mut bim.levels {
+		reset_transits(&mut level.transits);
+	}
+
+	let mut unprocessed_zones_count = zones.len();
+	let mut zones_to_process: Vec<bim_zone_t_rust> = vec![];
+
+	let outside_id = graph.head.len() - 1;
+	let mut ptr = Some(graph.head[outside_id].clone());
+	let mut receiving_zone_id = outside_id;
+
+	loop {
+		for _ in 0..zones[receiving_zone_id].outputs.len() {
+			match ptr {
+				Some(ptr_ref) => {
+					let mut transit = &mut transits[ptr_ref.eid];
+
+					if transit.is_visited || transit.is_blocked {
+						ptr = ptr_ref.next;
+						continue;
+					}
+
+					let giving_zone_id = ptr_ref.dest;
+					zones[receiving_zone_id].potential = potential_element(
+						&zones[receiving_zone_id],
+						&zones[giving_zone_id],
+						transit,
+					);
+					for level in &mut bim.levels {
+						if let Some(level_receiving_zone) = level
+							.zones
+							.iter_mut()
+							.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
+						{
+							level_receiving_zone.potential = potential_element(
+								&zones[receiving_zone_id],
+								&zones[giving_zone_id],
+								transit,
+							);
+						}
+					}
+
+					let moved_people = part_people_flow(
+						&zones[receiving_zone_id],
+						&zones[giving_zone_id],
+						transit,
+					);
+					zones[receiving_zone_id].number_of_people += moved_people;
+					for level in &mut bim.levels {
+						if let Some(level_receiving_zone) = level
+							.zones
+							.iter_mut()
+							.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
+						{
+							level_receiving_zone.number_of_people += moved_people;
+						}
+					}
+
+					zones[giving_zone_id].number_of_people -= moved_people;
+					for level in &mut bim.levels {
+						if let Some(level_giving_zone) = level
+							.zones
+							.iter_mut()
+							.find(|x| x.uuid.eq(&zones[giving_zone_id].uuid))
+						{
+							level_giving_zone.number_of_people -= moved_people;
+						}
+					}
+
+					transit.no_proceeding = moved_people;
+					for level in &mut bim.levels {
+						if let Some(level_transit) =
+							level.transits.iter_mut().find(|x| x.uuid.eq(&transit.uuid))
+						{
+							level_transit.no_proceeding = moved_people;
+						}
+					}
+
+					zones[giving_zone_id].is_visited = true;
+					for level in &mut bim.levels {
+						if let Some(level_giving_zone) = level
+							.zones
+							.iter_mut()
+							.find(|x| x.uuid.eq(&zones[giving_zone_id].uuid))
+						{
+							level_giving_zone.is_visited = true;
+						}
+					}
+
+					transit.is_visited = true;
+					for level in &mut bim.levels {
+						if let Some(level_transit) =
+							level.transits.iter_mut().find(|x| x.uuid.eq(&transit.uuid))
+						{
+							level_transit.is_visited = true;
+						}
+					}
+
+					if zones[giving_zone_id].outputs.len() > 1
+						&& !zones[giving_zone_id].is_blocked
+						&& !zones_to_process
+							.iter()
+							.any(|x| x.id == zones[giving_zone_id].id)
+					{
+						zones_to_process.push(zones[giving_zone_id].clone());
+					}
+
+					ptr = ptr_ref.next;
+				}
+				None => break,
+			}
+		}
+
+		zones_to_process.sort_by(|a, b| a.potential.partial_cmp(&b.potential).unwrap());
+
+		if zones_to_process.len() > 0 {
+			let deleted_zone = zones_to_process.remove(0);
+			for level in &mut bim.levels {
+				if let Some(level_receiving_zone) = level
+					.zones
+					.iter_mut()
+					.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
+				{
+					*level_receiving_zone = deleted_zone.clone();
+				}
+			}
+			zones[receiving_zone_id] = deleted_zone;
+			ptr = Some(graph.head[zones[receiving_zone_id].id as usize].clone());
 		}
 
 		if unprocessed_zones_count == 0 {

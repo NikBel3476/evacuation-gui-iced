@@ -15,7 +15,7 @@ pub struct bim_graph_t {
 }
 
 pub struct bim_graph_t_rust {
-	head: Vec<bim_node_t_rust>,
+	pub head: Vec<Box<bim_node_t_rust>>,
 }
 
 /// Data structure to store adjacency list nodes of the graph
@@ -29,23 +29,23 @@ pub struct bim_node_t {
 
 #[derive(Default, Clone)]
 pub struct bim_node_t_rust {
-	dest: usize,
-	eid: usize,
-	next: Option<Box<bim_node_t_rust>>,
+	pub dest: usize,
+	pub eid: usize,
+	pub next: Option<Box<bim_node_t_rust>>,
 }
 
 /// Data structure to store a graph edge
 #[repr(C)]
 pub struct bim_edge_t {
-	src: size_t,
-	dest: size_t,
-	id: size_t,
+	pub src: size_t,
+	pub dest: size_t,
+	pub id: size_t,
 }
 
 pub struct bim_edge_t_rust {
-	src: usize,
-	dest: usize,
-	id: usize,
+	pub src: usize,
+	pub dest: usize,
+	pub id: usize,
 }
 
 pub fn bim_graph_new(bim: &bim_t_rust) -> *mut bim_graph_t {
@@ -56,6 +56,12 @@ pub fn bim_graph_new(bim: &bim_t_rust) -> *mut bim_graph_t {
 		edges.len() as size_t,
 		bim.zones.len() as size_t,
 	)
+}
+
+pub fn bim_graph_new_rust(bim: &bim_t_rust) -> bim_graph_t_rust {
+	let edges = graph_create_edges_rust(&bim.transits, &bim.zones);
+
+	graph_create(&edges, edges.len() as size_t, bim.zones.len() as size_t)
 }
 
 /*pub fn graph_create(edges: &[bim_edge_t_rust], node_count: usize) -> bim_graph_t_rust {
@@ -168,6 +174,56 @@ pub fn graph_create_edges_rust(
 	}
 
 	edges
+}
+
+/// Function to create an adjacency list from specified edges
+pub fn graph_create(
+	edges: &[bim_edge_t],
+	edge_count: usize,
+	node_count: usize,
+) -> bim_graph_t_rust {
+	// initialize head pointer for all vertices
+	let mut graph_head: Vec<Box<bim_node_t_rust>> = vec![Box::default(); node_count];
+
+	let mut src = 0usize;
+	let mut dest = 0usize;
+	let mut eid = 0usize;
+
+	// add edges to the directed graph one by one
+	for i in 0..edge_count {
+		let edge = &edges[i];
+		// get the source and destination vertex
+		src = edge.src;
+		dest = edge.dest;
+		eid = edge.id;
+
+		// 1. allocate a new node of adjacency list from `src` to `dest`
+		let mut new_node = bim_node_t_rust {
+			dest,
+			eid,
+			next: None,
+		};
+
+		// point new node to the current head
+		new_node.next = Some(graph_head[src].clone());
+
+		// point head pointer to the new node
+		graph_head[src] = Box::new(new_node);
+
+		// 2. allocate a new node of adjacency list from `dest` to `src`
+		let new_node_dest_to_src = bim_node_t_rust {
+			dest: src,
+			eid,
+			// point new node to the current head
+			next: Some(graph_head[dest].clone()),
+		};
+
+		// change head pointer to point to the new node
+		graph_head[dest] = Box::new(new_node_dest_to_src);
+	}
+
+	// allocate storage for the graph data structure
+	bim_graph_t_rust { head: graph_head }
 }
 
 pub fn equal_callback(zone: &bim_zone_t_rust, transit: &bim_transit_t_rust) -> bool {
