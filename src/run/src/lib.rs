@@ -61,13 +61,17 @@ pub fn run_rust() {
 		bim_output_body(&bim, 0.0, &mut fp_detail);
 
 		let graph = bim_graph_new_rust(&bim);
+		println!("node count: {}", graph.head.len());
 		// TODO: add print graph
 
 		evac_def_modeling_step(&bim);
 		time_reset();
 
+		println!("last zone: {}", bim.zones[bim.zones.len() - 1].name);
+		let mut iteration_count = 0;
 		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
 		loop {
+			iteration_count += 1;
 			evac_moving_step(&graph, &mut bim);
 			time_inc();
 			bim_output_body(&bim, get_time_m(), &mut fp_detail);
@@ -83,6 +87,7 @@ pub fn run_rust() {
 				break;
 			}
 		}
+		println!("iteration count: {iteration_count}");
 
 		let num_of_evacuated_people = bim_tools_get_num_of_people(&bim);
 		println!(
@@ -95,6 +100,7 @@ pub fn run_rust() {
 			num_of_evacuated_people,
 			bim.zones[bim.zones.len() - 1].number_of_people
 		);
+		println!("{}", bim.zones[bim.zones.len() - 1].name);
 		println!("---------------------------------------");
 	}
 }

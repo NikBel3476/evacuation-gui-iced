@@ -649,14 +649,14 @@ pub fn evac_moving_step(graph: &bim_graph_t_rust, bim: &mut bim_t_rust) {
 	let transits = &mut bim.transits;
 
 	reset_zones(zones);
-	for level in &mut bim.levels {
-		reset_zones(&mut level.zones);
-	}
+	// for level in &mut bim.levels {
+	// 	reset_zones(&mut level.zones);
+	// }
 
 	reset_transits(transits);
-	for level in &mut bim.levels {
-		reset_transits(&mut level.transits);
-	}
+	// for level in &mut bim.levels {
+	// 	reset_transits(&mut level.transits);
+	// }
 
 	let mut unprocessed_zones_count = zones.len();
 	let mut zones_to_process: Vec<bim_zone_t_rust> = vec![];
@@ -682,19 +682,19 @@ pub fn evac_moving_step(graph: &bim_graph_t_rust, bim: &mut bim_t_rust) {
 						&zones[giving_zone_id],
 						transit,
 					);
-					for level in &mut bim.levels {
-						if let Some(level_receiving_zone) = level
-							.zones
-							.iter_mut()
-							.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
-						{
-							level_receiving_zone.potential = potential_element(
-								&zones[receiving_zone_id],
-								&zones[giving_zone_id],
-								transit,
-							);
-						}
-					}
+					// for level in &mut bim.levels {
+					// 	if let Some(level_receiving_zone) = level
+					// 		.zones
+					// 		.iter_mut()
+					// 		.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
+					// 	{
+					// 		level_receiving_zone.potential = potential_element(
+					// 			&zones[receiving_zone_id],
+					// 			&zones[giving_zone_id],
+					// 			transit,
+					// 		);
+					// 	}
+					// }
 
 					let moved_people = part_people_flow(
 						&zones[receiving_zone_id],
@@ -702,61 +702,61 @@ pub fn evac_moving_step(graph: &bim_graph_t_rust, bim: &mut bim_t_rust) {
 						transit,
 					);
 					zones[receiving_zone_id].number_of_people += moved_people;
-					for level in &mut bim.levels {
-						if let Some(level_receiving_zone) = level
-							.zones
-							.iter_mut()
-							.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
-						{
-							level_receiving_zone.number_of_people += moved_people;
-						}
-					}
+					// for level in &mut bim.levels {
+					// 	if let Some(level_receiving_zone) = level
+					// 		.zones
+					// 		.iter_mut()
+					// 		.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
+					// 	{
+					// 		level_receiving_zone.number_of_people += moved_people;
+					// 	}
+					// }
 
 					zones[giving_zone_id].number_of_people -= moved_people;
-					for level in &mut bim.levels {
-						if let Some(level_giving_zone) = level
-							.zones
-							.iter_mut()
-							.find(|x| x.uuid.eq(&zones[giving_zone_id].uuid))
-						{
-							level_giving_zone.number_of_people -= moved_people;
-						}
-					}
+					// for level in &mut bim.levels {
+					// 	if let Some(level_giving_zone) = level
+					// 		.zones
+					// 		.iter_mut()
+					// 		.find(|x| x.uuid.eq(&zones[giving_zone_id].uuid))
+					// 	{
+					// 		level_giving_zone.number_of_people -= moved_people;
+					// 	}
+					// }
 
 					transit.no_proceeding = moved_people;
-					for level in &mut bim.levels {
-						if let Some(level_transit) =
-							level.transits.iter_mut().find(|x| x.uuid.eq(&transit.uuid))
-						{
-							level_transit.no_proceeding = moved_people;
-						}
-					}
+					// for level in &mut bim.levels {
+					// 	if let Some(level_transit) =
+					// 		level.transits.iter_mut().find(|x| x.uuid.eq(&transit.uuid))
+					// 	{
+					// 		level_transit.no_proceeding = moved_people;
+					// 	}
+					// }
 
 					zones[giving_zone_id].is_visited = true;
-					for level in &mut bim.levels {
-						if let Some(level_giving_zone) = level
-							.zones
-							.iter_mut()
-							.find(|x| x.uuid.eq(&zones[giving_zone_id].uuid))
-						{
-							level_giving_zone.is_visited = true;
-						}
-					}
+					// for level in &mut bim.levels {
+					// 	if let Some(level_giving_zone) = level
+					// 		.zones
+					// 		.iter_mut()
+					// 		.find(|x| x.uuid.eq(&zones[giving_zone_id].uuid))
+					// 	{
+					// 		level_giving_zone.is_visited = true;
+					// 	}
+					// }
 
 					transit.is_visited = true;
-					for level in &mut bim.levels {
-						if let Some(level_transit) =
-							level.transits.iter_mut().find(|x| x.uuid.eq(&transit.uuid))
-						{
-							level_transit.is_visited = true;
-						}
-					}
+					// for level in &mut bim.levels {
+					// 	if let Some(level_transit) =
+					// 		level.transits.iter_mut().find(|x| x.uuid.eq(&transit.uuid))
+					// 	{
+					// 		level_transit.is_visited = true;
+					// 	}
+					// }
 
 					if zones[giving_zone_id].outputs.len() > 1
 						&& !zones[giving_zone_id].is_blocked
 						&& !zones_to_process
 							.iter()
-							.any(|x| x.id == zones[giving_zone_id].id)
+							.any(|x| x.id.eq(&zones[giving_zone_id].id))
 					{
 						zones_to_process.push(zones[giving_zone_id].clone());
 					}
@@ -771,16 +771,19 @@ pub fn evac_moving_step(graph: &bim_graph_t_rust, bim: &mut bim_t_rust) {
 
 		if zones_to_process.len() > 0 {
 			let deleted_zone = zones_to_process.remove(0);
-			for level in &mut bim.levels {
-				if let Some(level_receiving_zone) = level
-					.zones
-					.iter_mut()
-					.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
-				{
-					*level_receiving_zone = deleted_zone.clone();
-				}
-			}
-			zones[receiving_zone_id] = deleted_zone;
+			// for level in &mut bim.levels {
+			// 	if let Some(level_receiving_zone) = level
+			// 		.zones
+			// 		.iter_mut()
+			// 		.find(|x| x.uuid.eq(&zones[receiving_zone_id].uuid))
+			// 	{
+			// 		*level_receiving_zone = deleted_zone.clone();
+			// 	}
+			// }
+			receiving_zone_id = zones
+				.iter()
+				.position(|zone| deleted_zone.uuid.eq(&zone.uuid))
+				.unwrap_or_else(|| panic!("Zone not found!"));
 			ptr = Some(graph.head[zones[receiving_zone_id].id as usize].clone());
 		}
 
@@ -939,5 +942,508 @@ pub fn time_inc() {
 pub fn time_reset() {
 	unsafe {
 		EVAC_TIME_RUST = 0.0;
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use bim_json_object::uuid_t;
+	use bim_polygon_tools::polygon_t_rust;
+	use std::ffi::CString;
+
+	#[test]
+	fn speed_in_element_eq() {
+		unsafe {
+			EVAC_SPEED_MAX_RUST = 100.0;
+		}
+		let receiving_zone = bim_zone_t_rust {
+			id: 1,
+			name: "Receiving zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t_rust {
+			id: 2,
+			name: "Transmitting zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+
+		assert_eq!(
+			speed_in_element(&receiving_zone, &transmitting_zone),
+			80.13633567871892
+		);
+	}
+
+	#[test]
+	fn speed_in_element_rust_eq() {
+		unsafe {
+			EVAC_SPEED_MAX = 100.0;
+		}
+		let receiving_zone = bim_zone_t {
+			id: 1,
+			name: CString::new("Receiving zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t {
+			id: 2,
+			name: CString::new("Transmitting zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+
+		assert_eq!(
+			speed_in_element_rust(&receiving_zone, &transmitting_zone),
+			80.13633567871892
+		);
+	}
+
+	#[test]
+	fn speed_at_exit_eq() {
+		unsafe {
+			EVAC_SPEED_MAX_RUST = 100.0;
+		}
+		let receiving_zone = bim_zone_t_rust {
+			id: 1,
+			name: "Receiving zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t_rust {
+			id: 2,
+			name: "Transmitting zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transit_width = 1.0;
+
+		assert_eq!(
+			speed_at_exit(&receiving_zone, &transmitting_zone, transit_width),
+			80.13633567871892
+		);
+	}
+
+	#[test]
+	fn speed_at_exit_rust_eq() {
+		unsafe {
+			EVAC_SPEED_MAX = 100.0;
+		}
+		let receiving_zone = bim_zone_t {
+			id: 1,
+			name: CString::new("Receiving zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t {
+			id: 2,
+			name: CString::new("Transmitting zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transit_width = 1.0;
+
+		assert_eq!(
+			speed_at_exit_rust(&receiving_zone, &transmitting_zone, transit_width),
+			80.13633567871892
+		);
+	}
+
+	#[test]
+	fn change_num_of_people_eq() {
+		unsafe {
+			EVAC_MODELING_STEP_RUST = 0.01;
+		}
+		let transmitting_zone = bim_zone_t_rust {
+			id: 2,
+			name: "Transmitting zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transit_width = 1.0;
+		let speed_at_exit = 50.0;
+
+		assert_eq!(
+			change_num_of_people(&transmitting_zone, transit_width, speed_at_exit),
+			0.5
+		);
+	}
+
+	#[test]
+	fn change_num_of_people_rust_eq() {
+		unsafe {
+			EVAC_MODELING_STEP = 0.01;
+		}
+		let transmitting_zone = bim_zone_t {
+			id: 2,
+			name: CString::new("Transmitting zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transit_width = 1.0;
+		let speed_at_exit = 50.0;
+
+		assert_eq!(
+			change_num_of_people_rust(&transmitting_zone, transit_width, speed_at_exit),
+			0.5
+		);
+	}
+
+	#[test]
+	fn potential_element_eq() {
+		let receiving_zone = bim_zone_t_rust {
+			id: 1,
+			name: "Receiving zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t_rust {
+			id: 2,
+			name: "Transmitting zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transit = bim_transit_t_rust {
+			uuid: "".to_string(),
+			id: 1,
+			name: "Transit".to_string(),
+			outputs: vec!["".to_string()],
+			polygon: polygon_t_rust::default(),
+			size_z: 2.0,
+			z_level: 1.0,
+			width: 1.0,
+			no_proceeding: 0.0,
+			sign: BimElementSign::DOOR_WAY,
+			is_visited: false,
+			is_blocked: false,
+		};
+
+		assert_eq!(
+			potential_element(&receiving_zone, &transmitting_zone, &transit),
+			1.039461221097587
+		);
+	}
+
+	#[test]
+	fn potential_element_rust_eq() {
+		let receiving_zone = bim_zone_t {
+			id: 1,
+			name: CString::new("Receiving zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t {
+			id: 2,
+			name: CString::new("Transmitting zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transit = bim_transit_t {
+			uuid: uuid_t::default(),
+			id: 1,
+			name: CString::new("Transit").unwrap().into_raw() as *mut char,
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			polygon: std::ptr::null_mut(),
+			size_z: 2.0,
+			z_level: 1.0,
+			width: 1.0,
+			nop_proceeding: 0.0,
+			sign: bim_element_sign_t_rust::DOOR_WAY as u8,
+			numofoutputs: 1,
+			is_visited: false,
+			is_blocked: false,
+		};
+
+		assert_eq!(
+			potential_element_rust(&receiving_zone, &transmitting_zone, &transit),
+			1.039461221097587
+		);
+	}
+
+	#[test]
+	fn part_people_flow_eq() {
+		unsafe {
+			EVAC_DENSITY_MIN_RUST = 0.1;
+			EVAC_DENSITY_MAX_RUST = 5.0;
+		}
+		let receiving_zone = bim_zone_t_rust {
+			id: 1,
+			name: "Receiving zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t_rust {
+			id: 2,
+			name: "Transmitting zone".to_string(),
+			uuid: "".to_string(),
+			outputs: vec!["".to_string()],
+			area: 10.0,
+			z_level: 1.0,
+			number_of_people: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: BimElementSign::ROOM,
+			size_z: 2.0,
+			polygon: polygon_t_rust::default(),
+			potential: 1.0,
+		};
+		let transit = bim_transit_t_rust {
+			uuid: "".to_string(),
+			id: 1,
+			name: "Transit".to_string(),
+			outputs: vec!["".to_string()],
+			polygon: polygon_t_rust::default(),
+			size_z: 2.0,
+			z_level: 1.0,
+			width: 1.0,
+			no_proceeding: 0.0,
+			sign: BimElementSign::DOOR_WAY,
+			is_visited: false,
+			is_blocked: false,
+		};
+
+		assert_eq!(
+			part_people_flow(&receiving_zone, &transmitting_zone, &transit),
+			0.8013633567871893
+		);
+	}
+
+	#[test]
+	fn part_people_flow_rust_eq() {
+		unsafe {
+			EVAC_DENSITY_MIN = 0.1;
+			EVAC_DENSITY_MAX = 5.0;
+		}
+		let receiving_zone = bim_zone_t {
+			id: 1,
+			name: CString::new("Receiving zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transmitting_zone = bim_zone_t {
+			id: 2,
+			name: CString::new("Transmitting zone").unwrap().into_raw(),
+			uuid: uuid_t::default(),
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			area: 10.0,
+			z_level: 1.0,
+			numofoutputs: 1,
+			numofpeople: 10.0,
+			hazard_level: 0,
+			is_blocked: false,
+			is_visited: false,
+			is_safe: true,
+			sign: bim_element_sign_t_rust::ROOM as u8,
+			size_z: 2.0,
+			polygon: std::ptr::null_mut(),
+			potential: 1.0,
+		};
+		let transit = bim_transit_t {
+			uuid: uuid_t::default(),
+			id: 1,
+			name: CString::new("Transit").unwrap().into_raw() as *mut char,
+			outputs: vec![uuid_t::default()].as_mut_ptr(),
+			polygon: std::ptr::null_mut(),
+			size_z: 2.0,
+			z_level: 1.0,
+			width: 1.0,
+			nop_proceeding: 0.0,
+			sign: bim_element_sign_t_rust::DOOR_WAY as u8,
+			numofoutputs: 1,
+			is_visited: false,
+			is_blocked: false,
+		};
+
+		assert_eq!(
+			part_people_flow_rust(&receiving_zone, &transmitting_zone, &transit),
+			0.8013633567871893
+		);
 	}
 }

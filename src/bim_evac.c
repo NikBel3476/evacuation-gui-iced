@@ -14,7 +14,6 @@
  */
 
 #include "bim_evac.h"
-#include "bim_evac/src/bim_evac_rust.h"
 
 static double evac_speed_max;//= 100;  // м/мин
 static double evac_density_min;//= 0.1;  // чел/м^2

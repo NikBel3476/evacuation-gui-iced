@@ -109,6 +109,7 @@ void run() {
         bim_output_body(bim, 0, fp_detail);
 
         bim_graph_t *graph = bim_graph_new(bim);
+        printf("node count: %zu\n", graph->node_count);
         bim_graph_print(graph);
 
         ArrayList *transits = bim->transits;
@@ -116,8 +117,10 @@ void run() {
         evac_def_modeling_step(bim);
         evac_time_reset();
 
+        int iteration_count = 0;
         double remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
         while (true) {
+            iteration_count++;
             evac_moving_step(graph, zones, transits);
             evac_time_inc();
             bim_output_body(bim, (float)evac_get_time_m(), fp_detail);
@@ -132,6 +135,7 @@ void run() {
 
             if (num_of_people <= remainder) break;
         }
+        printf("iteration count: %d\n", iteration_count);
 
         double num_of_evacuated_people = bim_tools_get_num_of_people(bim);
         double evacuation_time = evac_get_time_m();
@@ -140,6 +144,7 @@ void run() {
         LOG_INFO("Количество человек: в здании - %.2f (в безопасной зоне - %.2f) чел.",
                  num_of_evacuated_people,
                  ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->numofpeople);
+        printf("%s\n", ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->name);
         LOG_INFO("---------------------------------------");
 
         {

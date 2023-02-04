@@ -45,7 +45,7 @@ pub struct bim_transit_t {
 }
 
 /// Структура, расширяющая элемент DOOR_*
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct bim_transit_t_rust {
 	/// UUID идентификатор элемента
 	pub uuid: String,
@@ -548,7 +548,7 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 		id,
 		name: String::from("Outside"),
 		sign: BimElementSign::OUTSIDE,
-		polygon: polygon_t_rust::default(), // TODO: replace null_mut with polygon
+		polygon: polygon_t_rust::default(),
 		uuid: String::from("outside0-safe-zone-0000-000000000000"),
 		z_level: 0.0,
 		size_z: f64::from(f32::MAX),
@@ -870,13 +870,21 @@ pub fn bim_tools_get_area_bim(bim: &bim_t_rust) -> f64 {
 
 pub fn bim_tools_get_num_of_people(bim: &bim_t_rust) -> f64 {
 	let mut num_of_people = 0.0;
-	for level in &bim.levels {
-		for zone in &level.zones {
-			num_of_people += zone.number_of_people;
+	for zone in &bim.zones {
+		if zone.sign == BimElementSign::OUTSIDE {
+			continue;
 		}
+		num_of_people += zone.number_of_people;
 	}
-
 	num_of_people
+	// let mut num_of_people = 0.0;
+	// for level in &bim.levels {
+	// 	for zone in &level.zones {
+	// 		num_of_people += zone.number_of_people;
+	// 	}
+	// }
+	//
+	// num_of_people
 
 	// bim.levels.iter().fold(0.0, |acc, level| {
 	// 	acc + level

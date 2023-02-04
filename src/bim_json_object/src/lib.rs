@@ -11,6 +11,12 @@ pub struct uuid_t {
 	pub x: [c_char; 36 + 1],
 }
 
+impl Default for uuid_t {
+	fn default() -> Self {
+		Self { x: [0; 36 + 1] }
+	}
+}
+
 #[repr(C)]
 pub struct point_t_rust {
 	pub x: c_double,
