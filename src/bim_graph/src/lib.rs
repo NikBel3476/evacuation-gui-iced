@@ -3,7 +3,7 @@
 extern crate core;
 
 use bim_tools::{bim_t_rust, bim_transit_t, bim_transit_t_rust, bim_zone_t, bim_zone_t_rust};
-use libc::{c_ulong, size_t};
+use libc::size_t;
 
 /// https://www.techiedelight.com/implement-graph-data-structure-c
 /// Data structure to store a graph object
@@ -218,7 +218,6 @@ pub fn graph_create_edges_rust(
 			src: ids[0],
 			dest: ids[1],
 		};
-		// println!("EDGE id: {} src: {} dest: {}", edge.id, edge.src, edge.dest);
 		edges.push(edge);
 	}
 
