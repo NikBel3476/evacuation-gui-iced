@@ -4,9 +4,10 @@ use bim_tools::{
 	bim_t_rust, bim_tools_get_area_bim, bim_transit_t, bim_transit_t_rust, bim_zone_t,
 	bim_zone_t_rust,
 };
-use libc::{c_double, c_int};
+use libc::{c_char, c_double, c_int};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
+use std::ffi::CString;
 use std::ptr::{null, null_mut};
 
 /// м/мин
@@ -256,6 +257,14 @@ pub extern "C" fn speed_at_exit_rust(
 	};
 
 	let zone_speed = speed_in_element_rust(receiving_zone, transmitting_zone);
+	// println!(
+	// 	"rz: {:.20} tz: {:.20} {:.20} {:.20} r: {:.20}",
+	// 	receiving_zone.z_level,
+	// 	transmitting_zone.numofpeople,
+	// 	transmitting_zone.area,
+	// 	transmitting_zone.z_level,
+	// 	zone_speed
+	// );
 	let density_in_transmitting_element = transmitting_zone.numofpeople / transmitting_zone.area;
 	let transition_speed = unsafe {
 		speed_through_transit_rust(
@@ -283,6 +292,14 @@ pub fn speed_at_exit(
 	transit_width: f64,
 ) -> f64 {
 	let zone_speed = speed_in_element(receiving_zone, transmitting_zone);
+	// println!(
+	// 	"rz: {:.20} tz: {:.20} {:.20} {:.20} r: {:.20}",
+	// 	receiving_zone.z_level,
+	// 	transmitting_zone.number_of_people,
+	// 	transmitting_zone.area,
+	// 	transmitting_zone.z_level,
+	// 	zone_speed
+	// );
 	let density_in_transmitting_element =
 		transmitting_zone.number_of_people / transmitting_zone.area;
 	let transition_speed = unsafe {
@@ -322,6 +339,12 @@ pub extern "C" fn change_num_of_people_rust(
 	let people_flow = density_in_element * speed_at_exit * transit_width;
 	// Зная скорость потока, можем вычислить конкретное количество человек,
 	// которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
+	// unsafe {
+	// 	println!(
+	// 		"people_flow: {people_flow:.5} MODELING_STEP: {EVAC_MODELING_STEP} p: {:.5}",
+	// 		transmitting_zone.numofpeople
+	// 	);
+	// }
 	unsafe { people_flow * EVAC_MODELING_STEP }
 }
 
@@ -345,6 +368,12 @@ pub extern "C" fn change_num_of_people(
 	let people_flow = density_in_element * speed_at_exit * transit_width;
 	// Зная скорость потока, можем вычислить конкретное количество человек,
 	// которое может перейти в принимющую зону (путем умножения потока на шаг моделирования)
+	// unsafe {
+	// 	println!(
+	// 		"people_flow: {people_flow:.5} MODELING_STEP: {EVAC_MODELING_STEP_RUST} p: {:.5}",
+	// 		transmitting_zone.number_of_people
+	// 	);
+	// }
 	unsafe { people_flow * EVAC_MODELING_STEP_RUST }
 }
 
@@ -446,8 +475,22 @@ pub extern "C" fn part_people_flow_rust(
 		)
 	};
 
+	// unsafe {
+	// 	println!(
+	// 		"part_people_flow_rust rz: {}, tz: {} t: {}",
+	// 		CString::from_raw(receiving_zone.name)
+	// 			.to_str()
+	// 			.expect("name error"),
+	// 		CString::from_raw(transmitting_zone.name).to_str().unwrap(),
+	// 		CString::from_raw(transit.name as *mut c_char)
+	// 			.to_str()
+	// 			.unwrap()
+	// 	);
+	// }
+
 	let area_transmitting_zone = transmitting_zone.area;
 	let people_in_transmitting_zone = transmitting_zone.numofpeople;
+	// println!("area: {area_transmitting_zone} p_in: {people_in_transmitting_zone}");
 	let density_in_transmitting_zone = people_in_transmitting_zone / area_transmitting_zone;
 	let density_min_transmitting_zone = unsafe {
 		match EVAC_DENSITY_MIN > 0.0 {
@@ -455,18 +498,32 @@ pub extern "C" fn part_people_flow_rust(
 			false => 0.5 / area_transmitting_zone,
 		}
 	};
+	// unsafe {
+	// 	println!("DENSITY_MIN: {EVAC_DENSITY_MIN}");
+	// }
+	// 	println!("density_min: {density_min_transmitting_zone}");
 
 	// Ширина перехода между зонами зависит от количества человек,
 	// которое осталось в помещении. Если там слишком мало людей,
 	// то они переходят все сразу, чтоб не дробить их
 	let door_width = transit.width; //(densityInElement > densityMin) ? aDoor.VCn().getWidth() : std::sqrt(areaElement);
 	let speed_at_exit = speed_at_exit_rust(receiving_zone, transmitting_zone, door_width);
+	// println!("width: {door_width} speed: {speed_at_exit}");
 
 	// Количество людей, которые могут покинуть помещение
+	// println!(
+	// 	"change_num_of_people {:.5} {:.5} {:.5} {:.5}",
+	// 	change_num_of_people_rust(transmitting_zone, door_width, speed_at_exit),
+	// 	transmitting_zone.area,
+	// 	door_width,
+	// 	speed_at_exit
+	// );
+	// println!("d_in: {density_in_transmitting_zone} d_min: {density_min_transmitting_zone}");
 	let part_of_people_flow = match density_in_transmitting_zone > density_min_transmitting_zone {
 		true => change_num_of_people_rust(transmitting_zone, door_width, speed_at_exit),
 		false => people_in_transmitting_zone,
 	};
+	// println!("part_of_people_flow: {part_of_people_flow}");
 
 	// Т.к. зона вне здания принята безразмерной,
 	// в нее может войти максимально возможное количество человек
@@ -485,6 +542,7 @@ pub extern "C" fn part_people_flow_rust(
 		return 0.0;
 	}
 
+	// println!("capacity: {capacity_receiving_zone:.5} part: {part_of_people_flow:.5}");
 	match capacity_receiving_zone > part_of_people_flow {
 		true => part_of_people_flow,
 		false => capacity_receiving_zone,
@@ -505,8 +563,14 @@ pub fn part_people_flow(
 	transmitting_zone: &bim_zone_t_rust,
 	transit: &bim_transit_t_rust,
 ) -> f64 {
+	// println!(
+	// 	"part_people_flow rz: {}, tz: {} t: {}",
+	// 	receiving_zone.name, transmitting_zone.name, transit.name
+	// );
+
 	let area_transmitting_zone = transmitting_zone.area;
 	let people_in_transmitting_zone = transmitting_zone.number_of_people;
+	// println!("area: {area_transmitting_zone} p_in: {people_in_transmitting_zone}");
 	let density_in_transmitting_zone = people_in_transmitting_zone / area_transmitting_zone;
 	let density_min_transmitting_zone = unsafe {
 		match EVAC_DENSITY_MIN_RUST > 0.0 {
@@ -514,18 +578,32 @@ pub fn part_people_flow(
 			false => 0.5 / area_transmitting_zone,
 		}
 	};
+	// unsafe {
+	// 	println!("DENSITY_MIN {EVAC_DENSITY_MIN_RUST}");
+	// }
+	// 	println!("density_min: {density_min_transmitting_zone}");
 
 	// Ширина перехода между зонами зависит от количества человек,
 	// которое осталось в помещении. Если там слишком мало людей,
 	// то они переходят все сразу, чтоб не дробить их
 	let door_width = transit.width; //(densityInElement > densityMin) ? aDoor.VCn().getWidth() : std::sqrt(areaElement);
 	let speed_at_exit = speed_at_exit(receiving_zone, transmitting_zone, door_width);
+	// println!("width: {door_width} speed: {speed_at_exit}");
 
 	// Количество людей, которые могут покинуть помещение
+	// println!(
+	// 	"change_num_of_people_rust {:.5} {:.5} {:.5} {:.5}",
+	// 	change_num_of_people(transmitting_zone, door_width, speed_at_exit),
+	// 	transmitting_zone.area,
+	// 	door_width,
+	// 	speed_at_exit
+	// );
+	// println!("d_in: {density_in_transmitting_zone} d_min: {density_min_transmitting_zone}");
 	let part_of_people_flow = match density_in_transmitting_zone > density_min_transmitting_zone {
 		true => change_num_of_people(transmitting_zone, door_width, speed_at_exit),
 		false => people_in_transmitting_zone,
 	};
+	// println!("part_of_people_flow: {part_of_people_flow}");
 
 	// Т.к. зона вне здания принята безразмерной,
 	// в нее может войти максимально возможное количество человек
@@ -544,6 +622,7 @@ pub fn part_people_flow(
 		return 0.0;
 	}
 
+	// println!("capacity: {capacity_receiving_zone:.5} part: {part_of_people_flow:.5}");
 	match capacity_receiving_zone > part_of_people_flow {
 		true => part_of_people_flow,
 		false => capacity_receiving_zone,
@@ -563,6 +642,7 @@ pub fn evac_def_modeling_step(bim: &bim_t_rust) {
 	}
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub fn evac_moving_step_rust(
 	graph: *const bim_graph_t,
 	zones: &mut [bim_zone_t_rust],
@@ -794,6 +874,306 @@ pub fn evac_moving_step(graph: &bim_graph_t_rust, bim: &mut bim_t_rust) {
 	}
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub fn evac_moving_step_test(
+	graph: *mut bim_graph_t,
+	zones: &mut [bim_zone_t_rust],
+	transits: &mut [bim_transit_t_rust],
+) {
+	reset_zones(zones);
+	reset_transits(transits);
+
+	let mut unprocessed_zones_count = zones.len();
+	let mut zones_to_process: Vec<bim_zone_t_rust> = vec![];
+
+	let graph_head = unsafe { std::slice::from_raw_parts((*graph).head, (*graph).node_count) };
+
+	let outside_id = unsafe { (*graph).node_count - 1 };
+	let mut ptr = graph_head[outside_id];
+	let mut receiving_zone_id = outside_id;
+
+	let mut potential_sum = 0.0;
+	loop {
+		for i in 0..zones[receiving_zone_id].outputs.len() {
+			if ptr.is_null() {
+				break;
+			}
+			let mut transit = unsafe { &mut transits[(*ptr).eid] };
+
+			if transit.is_visited || transit.is_blocked {
+				ptr = unsafe { (*ptr).next };
+				continue;
+			}
+
+			let giving_zone_id = unsafe { (*ptr).dest };
+
+			zones[receiving_zone_id].potential =
+				potential_element(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
+			potential_sum += zones[receiving_zone_id].potential;
+
+			let moved_people =
+				part_people_flow(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
+			zones[receiving_zone_id].number_of_people += moved_people;
+			zones[giving_zone_id].number_of_people -= moved_people;
+			transit.no_proceeding = moved_people;
+
+			zones[giving_zone_id].is_visited = true;
+			transit.is_visited = true;
+
+			if zones[giving_zone_id].outputs.len() > 1
+				&& !zones[giving_zone_id].is_blocked
+				&& !zones_to_process
+					.iter()
+					.any(|x| x.id == zones[giving_zone_id].id)
+			{
+				zones_to_process.push(zones[giving_zone_id].clone());
+			}
+
+			ptr = unsafe { (*ptr).next };
+		}
+
+		zones_to_process.sort_by(|a, b| match a.potential < b.potential {
+			true => std::cmp::Ordering::Greater,
+			false => std::cmp::Ordering::Less,
+		});
+
+		if zones_to_process.len() > 0 {
+			let deleted_zone = zones_to_process.remove(0);
+			receiving_zone_id = zones
+				.iter()
+				.position(|zone| deleted_zone.uuid.eq(&zone.uuid))
+				.unwrap_or_else(|| panic!("Zone not found!"));
+			ptr = graph_head[deleted_zone.id as usize];
+		}
+
+		if unprocessed_zones_count == 0 {
+			break;
+		}
+		unprocessed_zones_count -= 1;
+	}
+}
+
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+pub fn evac_moving_step_test_with_log(
+	graph: *mut bim_graph_t,
+	zones: &mut [bim_zone_t_rust],
+	transits: &mut [bim_transit_t_rust],
+) {
+	reset_zones(zones);
+	reset_transits(transits);
+	// for zone in zones.iter() {
+	// 	println!(
+	// 		"Zone: {} numofpeople: {:.20} potential: {:.20}",
+	// 		zone.name, zone.number_of_people, zone.potential
+	// 	);
+	// }
+	// for transit in transits.iter() {
+	// 	println!(
+	// 		"Transit: {} width: {:.20} np: {:.20}",
+	// 		transit.name, transit.width, transit.no_proceeding
+	// 	);
+	// }
+
+	let mut unprocessed_zones_count = zones.len();
+	let mut zones_to_process: Vec<bim_zone_t_rust> = vec![];
+
+	let graph_head = unsafe { std::slice::from_raw_parts((*graph).head, (*graph).node_count) };
+
+	let outside_id = unsafe { (*graph).node_count - 1 };
+	let mut ptr = graph_head[outside_id];
+	let mut receiving_zone_id = outside_id;
+
+	let mut potential_sum = 0.0;
+	loop {
+		for i in 0..zones[receiving_zone_id].outputs.len() {
+			if ptr.is_null() {
+				break;
+			}
+			let mut transit = unsafe { &mut transits[(*ptr).eid] };
+
+			if transit.is_visited || transit.is_blocked {
+				ptr = unsafe { (*ptr).next };
+				continue;
+			}
+
+			let giving_zone_id = unsafe { (*ptr).dest };
+
+			// println!(
+			// 	"a: {:.20} p: {:.20} r: {:.20}",
+			// 	&zones[giving_zone_id].area,
+			// 	&zones[receiving_zone_id].potential,
+			// 	potential_element(&zones[receiving_zone_id], &zones[giving_zone_id], transit)
+			// );
+			zones[receiving_zone_id].potential =
+				potential_element(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
+			potential_sum += zones[receiving_zone_id].potential;
+			// println!(
+			// 	"rz: {} numofpeople: {:.20} potential: {:.20}",
+			// 	&zones[receiving_zone_id].name,
+			// 	zones[receiving_zone_id].number_of_people,
+			// 	zones[receiving_zone_id].potential
+			// );
+			// println!(
+			// 	"rz: {} p: {:.15}",
+			// 	&zones[receiving_zone_id].name, zones[receiving_zone_id].number_of_people
+			// );
+
+			// println!(
+			// 	"rz: {} tz: {} t: {}",
+			// 	&zones[receiving_zone_id].name, &zones[giving_zone_id].name, transit.name
+			// );
+			let moved_people =
+				part_people_flow(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
+			zones[receiving_zone_id].number_of_people += moved_people;
+			zones[giving_zone_id].number_of_people -= moved_people;
+			transit.no_proceeding = moved_people;
+			// println!(
+			// 	"rz: {} mp: {:.20}",
+			// 	&zones[receiving_zone_id].name, moved_people
+			// );
+
+			zones[giving_zone_id].is_visited = true;
+			transit.is_visited = true;
+
+			if zones[giving_zone_id].outputs.len() > 1
+				&& !zones[giving_zone_id].is_blocked
+				&& !zones_to_process
+					.iter()
+					.any(|x| x.id == zones[giving_zone_id].id)
+			{
+				zones_to_process.push(zones[giving_zone_id].clone());
+			}
+
+			// println!(
+			// 	"UNPROCESSED ZONES: {unprocessed_zones_count} zones_to_process: {}",
+			// 	zones_to_process.len()
+			// );
+			// println!("STEP: {i}");
+			// unsafe {
+			// 	println!(
+			// 		"PTR dest: {} eid: {} moved_people: {:.20}",
+			// 		(*ptr).dest,
+			// 		(*ptr).eid,
+			// 		moved_people
+			// 	);
+			// 	if !(*ptr).next.is_null() {
+			// 		println!(
+			// 			"NEXT dest: {} eid: {}",
+			// 			(*(*ptr).next).dest,
+			// 			(*(*ptr).next).eid
+			// 		);
+			// 	}
+			// }
+
+			ptr = unsafe { (*ptr).next };
+			// println!("Transit: {} width: {:.5}", transit.name, transit.width);
+			// println!(
+			// 	"Zone: {} numofpeople: {:.5} potential: {:.5}",
+			// 	zones[receiving_zone_id].name,
+			// 	zones[receiving_zone_id].number_of_people,
+			// 	zones[receiving_zone_id].potential
+			// );
+			// println!(
+			// 	"Zone: {} numofpeople: {:.5} potential: {:.5}",
+			// 	zones[giving_zone_id].name,
+			// 	zones[giving_zone_id].number_of_people,
+			// 	zones[giving_zone_id].potential
+			// );
+		}
+
+		// for zone in &zones_to_process {
+		// 	println!(
+		// 		"Zone: {} numofpeople: {:.20} potential: {:.20}",
+		// 		zone.name, zone.number_of_people, zone.potential
+		// 	);
+		// }
+
+		// unsafe {
+		// 	if unprocessed_zones_count == zones.len() - 0 {
+		// 		println!("before sort");
+		// 		for zone in &zones_to_process {
+		// 			println!(
+		// 				"Zone: {} numofpeople: {:.20} potential: {:.20}",
+		// 				zone.name, zone.number_of_people, zone.potential
+		// 			);
+		// 		}
+		// 	}
+		// }
+
+		zones_to_process.sort_by(|a, b| a.potential.total_cmp(&b.potential));
+
+		// unsafe {
+		// 	if unprocessed_zones_count == zones.len() - 0 {
+		// 		println!("after sort");
+		// 		for zone in &zones_to_process {
+		// 			println!(
+		// 				"Zone: {} numofpeople: {:.20} potential: {:.20}",
+		// 				zone.name, zone.number_of_people, zone.potential
+		// 			);
+		// 		}
+		// 	}
+		// }
+		// break;
+
+		// for zone in zones.iter() {
+		// 	println!(
+		// 		"Zone: {} numofpeople: {:.20} potential: {:.20}",
+		// 		zone.name, zone.number_of_people, zone.potential
+		// 	);
+		// }
+		// break;
+
+		// unsafe {
+		// 	if unprocessed_zones_count == (*graph).node_count - 100 {
+		// 		for zone in zones.iter() {
+		// 			println!(
+		// 				"Zone: {} numofpeople: {:.20} potential: {:.20}",
+		// 				zone.name, zone.number_of_people, zone.potential
+		// 			);
+		// 		}
+		// 		break;
+		// 	}
+		// }
+
+		// for zone in zones.iter() {
+		// 	println!(
+		// 		"Zone: {} numofpeople: {:.20} potential: {:.20}",
+		// 		zone.name, zone.number_of_people, zone.potential
+		// 	);
+		// }
+
+		// for zone in &zones_to_process {
+		// 	println!("{} {}", zone.name, zone.potential);
+		// }
+
+		if zones_to_process.len() > 0 {
+			let deleted_zone = zones_to_process.remove(0);
+			// println!(
+			// 	"Zone: {} numofpeople: {:.5} potential: {:.5}",
+			// 	deleted_zone.name, deleted_zone.number_of_people, deleted_zone.potential
+			// );
+			receiving_zone_id = zones
+				.iter()
+				.position(|zone| deleted_zone.uuid.eq(&zone.uuid))
+				.unwrap_or_else(|| panic!("Zone not found!"));
+			ptr = graph_head[deleted_zone.id as usize];
+		}
+
+		if unprocessed_zones_count == 0 {
+			break;
+		}
+		unprocessed_zones_count -= 1;
+	}
+
+	// for zone in zones.iter() {
+	// 	println!(
+	// 		"Zone: {} numofpeople: {:.20} potential: {:.20}",
+	// 		zone.name, zone.number_of_people, zone.potential
+	// 	);
+	// }
+	// println!("potential_sum: {potential_sum:.5}");
+}
+
 pub fn reset_zones(zones: &mut [bim_zone_t_rust]) {
 	for zone in zones {
 		zone.is_visited = false;
@@ -844,9 +1224,21 @@ pub extern "C" fn potential_cmp_callback_rust(
 		value2.as_ref().expect("Failed to dereference pointer value2 at potential_cmp_callback_rust fn in bim_evac crate")
 	};
 
-	c_int::try_from(value1.potential < value2.potential).unwrap_or_else(|e| {
-		panic!("Failed to convert bool to c_int at potential_cmp_callback_rust fn in bim_evac crate. Error: {}", e)
-	})
+	let result = match value1.potential.total_cmp(&value2.potential) {
+		Ordering::Greater => 1,
+		Ordering::Less => -1,
+		Ordering::Equal => 0,
+	};
+
+	// println!(
+	// 	"cmp: {result} 1: {:.20} 2: {:.20}",
+	// 	value1.potential, value2.potential
+	// );
+	result
+
+	// c_int::try_from(value1.potential < value2.potential).unwrap_or_else(|e| {
+	// 	panic!("Failed to convert bool to c_int at potential_cmp_callback_rust fn in bim_evac crate. Error: {}", e)
+	// })
 }
 
 #[no_mangle]

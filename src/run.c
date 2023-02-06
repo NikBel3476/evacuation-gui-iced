@@ -17,6 +17,8 @@
 #include "bim_tools/src/bim_tools_rust.h"
 
 void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scenario);
+void print_zone(bim_zone_t *zone);
+void print_transit(bim_transit_t* transit);
 
 void run() {
 // TODO: разобраться с кодировкой в windows
@@ -88,13 +90,15 @@ void run() {
                       ((bim_zone_t *) bim->zones->data[bim->zones->length - 1])->uuid.x);
         }
 
-        printf("before scenario. people amount: %.2f\n", bim_tools_get_num_of_people(bim));
-        printf("before scenario. area: %.2f\n", bim_tools_get_area_bim(bim));
+//        printf("before scenario. people amount: %.2f\n", bim_tools_get_num_of_people(bim));
+//        printf("before scenario. area: %.2f\n", bim_tools_get_area_bim(bim));
 
         applying_scenario_bim_params(bim, bim_cfg_scenario);
 
-        printf("people amount: %.2f\n", bim_tools_get_num_of_people(bim));
-        printf("area: %.2f\n", bim_tools_get_area_bim(bim));
+//        printf("people amount: %.2f\n", bim_tools_get_num_of_people(bim));
+//        printf("area: %.2f\n", bim_tools_get_area_bim(bim));
+//        printf("number of zones: %d\n", bim->zones->length);
+//        printf("number of transits: %d\n", bim->transits->length);
 
         // Files with results
         char *output_detail = bim_create_file_name(filename, OUTPUT_DETAIL_FILE, OUTPUT_SUFFIX);
@@ -109,7 +113,7 @@ void run() {
         bim_output_body(bim, 0, fp_detail);
 
         bim_graph_t *graph = bim_graph_new(bim);
-        printf("node count: %zu\n", graph->node_count);
+//        printf("node count: %zu\n", graph->node_count);
         bim_graph_print(graph);
 
         ArrayList *transits = bim->transits;
@@ -117,11 +121,31 @@ void run() {
         evac_def_modeling_step(bim);
         evac_time_reset();
 
+//        printf("GRAPH_HEAD-------------------------------\n");
+//        for (size_t i = 0; i < graph->node_count; i++) {
+//             bim_node_t *node = graph->head[i];
+//             printf("NODE eid: %zu dest: %zu\n", node->eid, node->dest);
+//             if (node->next != NULL) {
+//                 printf("NEXT eid: %zu dest: %zu\n", node->next->eid, node->next->dest);
+//             }
+//        }
+
+//        printf("p: %.20f\n", bim_tools_get_num_of_people(bim));
+//        printf("ZONES-------------------------------\n");
+//        for (size_t i = 0; i < zones->length; i++) {
+//            bim_zone_t *zone = zones->data[i];
+//            print_zone(zone);
+//        }
+//        printf("TRANSITS-------------------------------\n");
+//        for (size_t i = 0; i < transits->length; i++) {
+//            bim_transit_t *transit = transits->data[i];
+//            print_transit(transit);
+//        }
         int iteration_count = 0;
         double remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
         while (true) {
             iteration_count++;
-            evac_moving_step(graph, zones, transits);
+            evac_moving_step_with_log(graph, zones, transits);
             evac_time_inc();
             bim_output_body(bim, (float)evac_get_time_m(), fp_detail);
 
@@ -135,7 +159,32 @@ void run() {
 
             if (num_of_people <= remainder) break;
         }
-        printf("iteration count: %d\n", iteration_count);
+//        iteration_count++;
+//        evac_moving_step_with_log(graph, zones, transits);
+//        evac_time_inc();
+//        bim_output_body(bim, (float)evac_get_time_m(), fp_detail);
+//
+//        double num_of_people = 0;
+//        for (size_t i = 0; i < zones->length; i++) {
+//            bim_zone_t *zone = zones->data[i];
+//            if (zone->is_visited) {
+//                num_of_people += zone->numofpeople;
+//            }
+//        }
+//        printf("num_of_people: %.20f\n", num_of_people);
+//        evac_moving_step_with_log(graph, zones, transits);
+
+//        printf("iteration count: %d\n", iteration_count);
+//        printf("ZONES-------------------------------\n");
+//        for (size_t i = 0; i < zones->length; i++) {
+//            bim_zone_t *zone = zones->data[i];
+//            print_zone(zone);
+//        }
+//        printf("TRANSITS-------------------------------\n");
+//        for (size_t i = 0; i < transits->length; i++) {
+//            bim_transit_t *transit = transits->data[i];
+//            print_transit(transit);
+//        }
 
         double num_of_evacuated_people = bim_tools_get_num_of_people(bim);
         double evacuation_time = evac_get_time_m();
@@ -221,6 +270,10 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
         }
     }
 
+//    printf("step: %.20f\n", cfg_scenario->modeling.step);
+//    printf("speed_max: %.20f\n", cfg_scenario->modeling.speed_max);
+//    printf("density_max: %.20f\n", cfg_scenario->modeling.density_max);
+//    printf("density_min: %.20f\n", cfg_scenario->modeling.density_min);
     evac_set_modeling_step(cfg_scenario->modeling.step);
     evac_set_modeling_step_rust(cfg_scenario->modeling.step);
     evac_set_speed_max(cfg_scenario->modeling.speed_max);
@@ -229,4 +282,18 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
     evac_set_density_max_rust(cfg_scenario->modeling.density_max);
     evac_set_density_min(cfg_scenario->modeling.density_min);
     evac_set_density_min_rust(cfg_scenario->modeling.density_min);
+}
+
+void print_zone(bim_zone_t* zone) {
+    printf(
+        "Zone: %s people: %.20f p: %.20f\n",
+        zone->name,
+        zone->numofpeople,
+        zone->potential
+    );
+}
+
+void print_transit(bim_transit_t* transit) {
+    printf("Transit: %s\n", transit->name);
+    printf("width: %f\n", transit->width);
 }

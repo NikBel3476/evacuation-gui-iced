@@ -27,6 +27,8 @@ void evac_bim_ext_init(const ArrayList *zones, const ArrayList *transits);
 
 void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const ArrayList *transits);
 
+void evac_moving_step_with_log(const bim_graph_t *graph, const ArrayList *zones, const ArrayList *transits);
+
 void evac_time_inc();
 
 void evac_time_reset();

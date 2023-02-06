@@ -1,11 +1,12 @@
 use bim_evac;
 use bim_evac::{
 	evac_def_modeling_step, evac_get_time_m_rust, evac_get_time_s_rust, evac_moving_step,
-	evac_set_density_max_rust, evac_set_density_min_rust, evac_set_modeling_step_rust,
-	evac_set_speed_max_rust, evac_time_inc_rust, get_time_m, get_time_s, set_density_max,
-	set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
+	evac_moving_step_test, evac_moving_step_test_with_log, evac_set_density_max_rust,
+	evac_set_density_min_rust, evac_set_modeling_step_rust, evac_set_speed_max_rust,
+	evac_time_inc_rust, get_time_m, get_time_s, set_density_max, set_density_min,
+	set_modeling_step, set_speed_max, time_inc, time_reset,
 };
-use bim_graph::{bim_graph_new, bim_graph_new_rust};
+use bim_graph::bim_graph_new_test;
 use bim_json_object::{bim_json_object_new, BimElementSign};
 use bim_output::{
 	bim_basename_rust, bim_create_file_name, bim_create_file_name_rust, bim_output_body,
@@ -37,16 +38,18 @@ pub fn run_rust() {
 		let bim_json = bim_json_object_new(file);
 
 		let mut bim = bim_tools_new_rust(&bim_json);
-		println!(
-			"before scenario. people amount: {:.2}",
-			bim_tools_get_num_of_people(&bim)
-		);
-		println!("before scenario. area: {:.2}", bim_tools_get_area_bim(&bim));
+		// println!(
+		// 	"before scenario. people amount: {:.2}",
+		// 	bim_tools_get_num_of_people(&bim)
+		// );
+		// println!("before scenario. area: {:.2}", bim_tools_get_area_bim(&bim));
 
 		applying_scenario_bim_params(&mut bim, &scenario_configuration);
 
-		println!("people amount: {:.2}", bim_tools_get_num_of_people(&bim));
-		println!("area: {:.2}", bim_tools_get_area_bim(&bim));
+		// println!("people amount: {:.2}", bim_tools_get_num_of_people(&bim));
+		// println!("area: {:.2}", bim_tools_get_area_bim(&bim));
+		// println!("number of zones: {}", bim.zones.len());
+		// println!("number of transits: {}", bim.transits.len());
 
 		// Files with results
 		let output_detail =
@@ -60,19 +63,47 @@ pub fn run_rust() {
 		bim_output_head(&bim, &mut fp_detail);
 		bim_output_body(&bim, 0.0, &mut fp_detail);
 
-		let graph = bim_graph_new_rust(&bim);
-		println!("node count: {}", graph.head.len());
+		// let graph = bim_graph_new_rust(&bim);
+		let graph = bim_graph_new_test(&bim);
+		let graph_nodes = unsafe { std::slice::from_raw_parts((*graph).head, (*graph).node_count) };
+		// println!("node count: {}", graph_nodes.len());
 		// TODO: add print graph
 
 		evac_def_modeling_step(&bim);
 		time_reset();
 
-		println!("last zone: {}", bim.zones[bim.zones.len() - 1].name);
+		// println!("GRAPH_HEAD-------------------------------");
+		// for node in graph_nodes {
+		// 	unsafe {
+		// 		println!("NODE eid: {} dest: {}", (**node).eid, (**node).dest);
+		// 		if !(**node).next.is_null() {
+		// 			println!(
+		// 				"NEXT eid: {} dest: {}",
+		// 				(*(**node).next).eid,
+		// 				(*(**node).next).dest
+		// 			);
+		// 		}
+		// 	}
+		// }
+
+		// println!("p: {:.20}", bim_tools_get_num_of_people(&bim));
+		// println!("ZONES-------------------------------");
+		// for zone in &bim.zones {
+		// 	println!(
+		// 		"Zone: {} people: {:.20} p: {:.20}",
+		// 		zone.name, zone.number_of_people, zone.potential
+		// 	);
+		// }
+		// println!("TRANSITS-------------------------------");
+		// for transit in &bim.transits {
+		// 	println!("Transit: {}", transit.name);
+		// 	println!("width: {}", transit.width);
+		// }
 		let mut iteration_count = 0;
 		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
 		loop {
 			iteration_count += 1;
-			evac_moving_step(&graph, &mut bim);
+			evac_moving_step_test_with_log(graph, &mut bim.zones, &mut bim.transits);
 			time_inc();
 			bim_output_body(&bim, get_time_m(), &mut fp_detail);
 
@@ -87,7 +118,33 @@ pub fn run_rust() {
 				break;
 			}
 		}
-		println!("iteration count: {iteration_count}");
+		// iteration_count += 1;
+		// evac_moving_step_test_with_log(graph, &mut bim.zones, &mut bim.transits);
+		// time_inc();
+		// bim_output_body(&bim, get_time_m(), &mut fp_detail);
+		//
+		// let mut num_of_people = 0.0;
+		// for zone in &bim.zones {
+		// 	if zone.is_visited {
+		// 		num_of_people += zone.number_of_people;
+		// 	}
+		// }
+		// println!("num_of_people: {:.20}", num_of_people);
+		// evac_moving_step_test_with_log(graph, &mut bim.zones, &mut bim.transits);
+
+		// println!("iteration count: {iteration_count}");
+		// println!("ZONES-------------------------------");
+		// for zone in &bim.zones {
+		// 	println!(
+		// 		"Zone: {} people: {:.20} p: {:.20}",
+		// 		zone.name, zone.number_of_people, zone.potential
+		// 	);
+		// }
+		// println!("TRANSITS-------------------------------");
+		// for transit in &bim.transits {
+		// 	println!("Transit: {}", transit.name);
+		// 	println!("width: {}", transit.width);
+		// }
 
 		let num_of_evacuated_people = bim_tools_get_num_of_people(&bim);
 		println!(
@@ -110,10 +167,10 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		if scenario_configuration.transition.transitions_type == TransitionType::Users {
 			match transition.sign {
 				BimElementSign::DOOR_WAY_IN => {
-					transition.width = scenario_configuration.transition.doorway_in
+					transition.width = f64::from(scenario_configuration.transition.doorway_in)
 				}
 				BimElementSign::DOOR_WAY_OUT => {
-					transition.width = scenario_configuration.transition.doorway_out
+					transition.width = f64::from(scenario_configuration.transition.doorway_out)
 				}
 				_ => {}
 			}
@@ -123,7 +180,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for special in &scenario_configuration.transition.special {
 			for uuid in &special.uuid {
 				if transition.uuid.eq(uuid) {
-					transition.width = special.width;
+					transition.width = f64::from(special.width);
 				}
 			}
 		}
@@ -135,10 +192,10 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			if scenario_configuration.transition.transitions_type == TransitionType::Users {
 				match transition.sign {
 					BimElementSign::DOOR_WAY_IN => {
-						transition.width = scenario_configuration.transition.doorway_in
+						transition.width = f64::from(scenario_configuration.transition.doorway_in)
 					}
 					BimElementSign::DOOR_WAY_OUT => {
-						transition.width = scenario_configuration.transition.doorway_out
+						transition.width = f64::from(scenario_configuration.transition.doorway_out)
 					}
 					_ => {}
 				}
@@ -148,7 +205,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			for special in &scenario_configuration.transition.special {
 				for uuid in &special.uuid {
 					if transition.uuid.eq(uuid) {
-						transition.width = special.width;
+						transition.width = f64::from(special.width);
 					}
 				}
 			}
@@ -163,7 +220,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 			set_people_to_zone(
 				zone,
-				zone.area * scenario_configuration.distribution.density,
+				(zone.area * f64::from(scenario_configuration.distribution.density)) as f32,
 			);
 		}
 
@@ -171,7 +228,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for special in &scenario_configuration.distribution.special {
 			for uuid in &special.uuid {
 				if zone.uuid.eq(uuid) {
-					set_people_to_zone(zone, zone.area * special.density);
+					set_people_to_zone(zone, (zone.area * f64::from(special.density)) as f32);
 				}
 			}
 		}
@@ -187,7 +244,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 				set_people_to_zone(
 					zone,
-					zone.area * scenario_configuration.distribution.density,
+					(zone.area * f64::from(scenario_configuration.distribution.density)) as f32,
 				);
 			}
 
@@ -195,21 +252,34 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			for special in &scenario_configuration.distribution.special {
 				for uuid in &special.uuid {
 					if zone.uuid.eq(uuid) {
-						set_people_to_zone(zone, zone.area * special.density);
+						set_people_to_zone(zone, (zone.area * f64::from(special.density)) as f32);
 					}
 				}
 			}
 		}
 	}
 
-	set_modeling_step(scenario_configuration.modeling.step);
-	evac_set_modeling_step_rust(scenario_configuration.modeling.step);
-	set_speed_max(scenario_configuration.modeling.max_speed);
-	evac_set_speed_max_rust(scenario_configuration.modeling.max_speed);
-	set_density_max(scenario_configuration.modeling.max_density);
-	evac_set_density_max_rust(scenario_configuration.modeling.max_density);
-	set_density_min(scenario_configuration.modeling.min_density);
-	evac_set_density_min_rust(scenario_configuration.modeling.min_density);
+	// println!("step: {:.20}", scenario_configuration.modeling.step);
+	// println!(
+	// 	"speed_max: {:.20}",
+	// 	scenario_configuration.modeling.max_speed
+	// );
+	// println!(
+	// 	"density_max: {:.20}",
+	// 	scenario_configuration.modeling.max_density
+	// );
+	// println!(
+	// 	"density_min: {:.20}",
+	// 	scenario_configuration.modeling.min_density
+	// );
+	set_modeling_step(f64::from(scenario_configuration.modeling.step));
+	evac_set_modeling_step_rust(f64::from(scenario_configuration.modeling.step));
+	set_speed_max(f64::from(scenario_configuration.modeling.max_speed));
+	evac_set_speed_max_rust(f64::from(scenario_configuration.modeling.max_speed));
+	set_density_max(f64::from(scenario_configuration.modeling.max_density));
+	evac_set_density_max_rust(f64::from(scenario_configuration.modeling.max_density));
+	set_density_min(f64::from(scenario_configuration.modeling.min_density));
+	evac_set_density_min_rust(f64::from(scenario_configuration.modeling.min_density));
 }
 
 // fn applying_scenario_bim_params_rust(bim: &mut bim_t_rust, cfg_scenario: &ScenarioCfg) {

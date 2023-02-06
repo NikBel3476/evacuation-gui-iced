@@ -74,5 +74,6 @@ void graph_create_edges(const ArrayList *const list_doors, ArrayListEqualFunc ca
 
         edge->src = ids[0];
         edge->dest = ids[1];
+//        printf("EDGE id: %zu src: %zu dest: %zu\n", edge->id, edge->src, edge->dest);
     }
 }

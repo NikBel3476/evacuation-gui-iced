@@ -601,8 +601,8 @@ pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_o
 }
 
 /// Устанавливает в помещение заданное количество людей
-pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f64) {
-	zone.number_of_people = num_of_people;
+pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f32) {
+	zone.number_of_people = f64::from(num_of_people);
 }
 
 #[no_mangle]
