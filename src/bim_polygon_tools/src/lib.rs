@@ -354,6 +354,31 @@ pub extern "C" fn geom_tools_area_polygon_rust(polygon: *const polygon_t) -> c_d
 	area_element
 }
 
+pub fn geom_tools_area_polygon(polygon: &polygon_t_rust) -> f64 {
+	let num_of_triangle_corner = (polygon.points.len() - 2) * 3;
+
+	let mut triangle_list = vec![0; num_of_triangle_corner];
+
+	let number_of_triangles = triangle_polygon(polygon, &mut triangle_list);
+
+	// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
+	// p=(ab+bc+ca)0.5
+	let mut area_element = 0.0;
+
+	for i in 0..number_of_triangles {
+		let a = &polygon.points[triangle_list[(i * 3) as usize] as usize];
+		let b = &polygon.points[triangle_list[(i * 3 + 1) as usize] as usize];
+		let c = &polygon.points[triangle_list[(i * 3 + 2) as usize] as usize];
+		let ab = side_length(a, b);
+		let bc = side_length(b, c);
+		let ca = side_length(c, a);
+		let p = (ab + bc + ca) * 0.5;
+		area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
+	}
+
+	area_element
+}
+
 #[no_mangle]
 pub extern "C" fn where_point_rust(
 	a_ax: c_double,

@@ -3,9 +3,10 @@ use bim_json_object::{
 	BimJsonObject,
 };
 use bim_polygon_tools::{
-	geom_tools_is_intersect_line_rust, geom_tools_length_side_rust, geom_tools_nearest_point_rust,
-	is_intersect_line, is_point_in_polygon, line_t, nearest_point, point_t, polygon_t,
-	polygon_t_rust, side_length, Line,
+	geom_tools_area_polygon, geom_tools_area_polygon_rust, geom_tools_is_intersect_line_rust,
+	geom_tools_length_side_rust, geom_tools_nearest_point_rust, is_intersect_line,
+	is_point_in_polygon, line_t, nearest_point, point_t, polygon_t, polygon_t_rust, side_length,
+	Line,
 };
 use json_object::{BuildingStruct, Point};
 use libc::{c_char, c_double, c_int, size_t};
@@ -44,7 +45,7 @@ pub struct bim_transit_t {
 }
 
 /// Структура, расширяющая элемент DOOR_*
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct bim_transit_t_rust {
 	/// UUID идентификатор элемента
 	pub uuid: String,
@@ -547,7 +548,7 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 		id,
 		name: String::from("Outside"),
 		sign: BimElementSign::OUTSIDE,
-		polygon: polygon_t_rust::default(), // TODO: replace null_mut with polygon
+		polygon: polygon_t_rust::default(),
 		uuid: String::from("outside0-safe-zone-0000-000000000000"),
 		z_level: 0.0,
 		size_z: f64::from(f32::MAX),
@@ -601,9 +602,7 @@ pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_o
 
 /// Устанавливает в помещение заданное количество людей
 pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f32) {
-	zone.number_of_people = f64::try_from(num_of_people).unwrap_or_else(|e| {
-		panic!("Failed to convert f32 to f64. f32: {num_of_people}. Error: {e:?}")
-	});
+	zone.number_of_people = f64::from(num_of_people);
 }
 
 #[no_mangle]
@@ -638,7 +637,11 @@ pub extern "C" fn find_zone_callback_rust(value1: *mut bim_zone_t, value2: *mut 
 ///
 /// # Returns
 /// Ширина проёма
-pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_transit_t_rust]) {
+pub fn calculate_transits_width(
+	zones: &[bim_zone_t_rust],
+	transits: &mut [bim_transit_t_rust],
+	levels: &mut [bim_level_t_rust],
+) {
 	for transit in transits {
 		let mut stair_sign_counter = 0u8; // Если stair_sign_counter = 2, то проем межэтажный (между лестницами)
 		let mut related_zones = [bim_zone_t_rust::default(), bim_zone_t_rust::default()];
@@ -754,21 +757,21 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 	let mut transits_list: Vec<bim_transit_t_rust> = vec![];
 	let mut levels_list: Vec<bim_level_t_rust> = vec![];
 
-	for level in &bim_json.levels {
+	for level_json in &bim_json.levels {
 		let mut zones: Vec<bim_zone_t_rust> = vec![];
 		let mut transits: Vec<bim_transit_t_rust> = vec![];
 
-		for build_element in &level.build_elements {
-			let id = build_element.id;
-			let uuid = build_element.uuid.clone();
-			let name = build_element.name.clone();
-			let size_z = build_element.size_z;
-			let z_level = level.z_level;
-			let sign = build_element.sign;
-			let outputs = build_element.outputs.clone();
-			let polygon = build_element.polygon.clone();
+		for build_element_json in &level_json.build_elements {
+			let id = build_element_json.id;
+			let uuid = build_element_json.uuid.clone();
+			let name = build_element_json.name.clone();
+			let size_z = build_element_json.size_z;
+			let z_level = build_element_json.z_level;
+			let sign = build_element_json.sign;
+			let outputs = build_element_json.outputs.clone();
+			let polygon = build_element_json.polygon.clone();
 			// TODO: replace string on enum
-			match build_element.sign {
+			match build_element_json.sign {
 				BimElementSign::ROOM | BimElementSign::STAIRCASE => {
 					let zone = bim_zone_t_rust {
 						id,
@@ -778,9 +781,9 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 						z_level,
 						sign,
 						// FIXME: unsafe cast u64 to f64
-						number_of_people: build_element.number_of_people as f64,
+						number_of_people: build_element_json.number_of_people as f64,
 						outputs,
-						area: polygon.area(),
+						area: geom_tools_area_polygon(&polygon),
 						polygon,
 						is_blocked: false,
 						is_visited: false,
@@ -806,7 +809,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 						is_blocked: false,
 						is_visited: false,
 						no_proceeding: 0.0,
-						width: -1.0,
+						width: -1.0, //Calculated below
 					};
 					transits.push(transit.clone());
 					transits_list.push(transit);
@@ -816,8 +819,8 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 		}
 
 		let bim_level = bim_level_t_rust {
-			name: level.name.clone(),
-			z_level: level.z_level,
+			name: level_json.name.clone(),
+			z_level: level_json.z_level,
 			zones,
 			transits,
 		};
@@ -842,7 +845,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 	zones_list.sort_by(|a, b| a.id.cmp(&b.id));
 	transits_list.sort_by(|a, b| a.id.cmp(&b.id));
 
-	calculate_transits_width(&zones_list, &mut transits_list);
+	calculate_transits_width(&zones_list, &mut transits_list, &mut levels_list);
 
 	bim_t_rust {
 		transits: transits_list,
@@ -850,6 +853,45 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 		levels: levels_list,
 		name: bim_json.building_name.clone(),
 	}
+}
+
+pub fn bim_tools_get_area_bim(bim: &bim_t_rust) -> f64 {
+	let mut area = 0.0;
+	for level in &bim.levels {
+		for zone in &level.zones {
+			if zone.sign == BimElementSign::ROOM || zone.sign == BimElementSign::STAIRCASE {
+				area += zone.area;
+			}
+		}
+	}
+
+	area
+}
+
+pub fn bim_tools_get_num_of_people(bim: &bim_t_rust) -> f64 {
+	let mut num_of_people = 0.0;
+	for zone in &bim.zones {
+		if zone.sign == BimElementSign::OUTSIDE {
+			continue;
+		}
+		num_of_people += zone.number_of_people;
+	}
+	num_of_people
+	// let mut num_of_people = 0.0;
+	// for level in &bim.levels {
+	// 	for zone in &level.zones {
+	// 		num_of_people += zone.number_of_people;
+	// 	}
+	// }
+	//
+	// num_of_people
+
+	// bim.levels.iter().fold(0.0, |acc, level| {
+	// 	acc + level
+	// 		.zones
+	// 		.iter()
+	// 		.fold(0.0, |acc, zone| acc + zone.number_of_people)
+	// })
 }
 
 #[no_mangle]

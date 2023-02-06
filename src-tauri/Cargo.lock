@@ -138,7 +138,9 @@ dependencies = [
 name = "bim_evac"
 version = "0.1.0"
 dependencies = [
+ "bim_graph",
  "bim_json_object",
+ "bim_polygon_tools",
  "bim_tools",
  "libc",
 ]
@@ -2231,6 +2233,7 @@ name = "run"
 version = "0.1.0"
 dependencies = [
  "bim_evac",
+ "bim_graph",
  "bim_json_object",
  "bim_output",
  "bim_tools",

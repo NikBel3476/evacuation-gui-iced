@@ -391,7 +391,7 @@ double bim_tools_get_num_of_people(const bim_t *const bim) {
     return num_of_people;
 }
 
-double bim_tools_get_area_bim(const bim_t *const bim) {
+/*double bim_tools_get_area_bim(const bim_t *const bim) {
     static double area = -1;
     if (area < 0) {
         area = 0;
@@ -401,6 +401,17 @@ double bim_tools_get_area_bim(const bim_t *const bim) {
                 if (zone.sign == ROOM || zone.sign == STAIRCASE)
                     area += bim->levels[i].zones[j].area;
             }
+        }
+    }
+    return area;
+}*/
+double bim_tools_get_area_bim(const bim_t *const bim) {
+    double area = 0.0;
+    for (size_t i = 0; i < bim->numoflevels; i++) {
+        for (size_t j = 0; j < bim->levels[i].numofzones; j++) {
+            bim_zone_t zone = bim->levels[i].zones[j];
+            if (zone.sign == ROOM || zone.sign == STAIRCASE)
+                area += bim->levels[i].zones[j].area;
         }
     }
     return area;

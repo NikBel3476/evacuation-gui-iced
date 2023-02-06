@@ -3,7 +3,6 @@
 	windows_subsystem = "windows"
 )]
 
-use std::thread::sleep;
 use tauri::{AppHandle, WindowBuilder};
 
 use bim_cli;

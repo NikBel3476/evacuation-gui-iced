@@ -10,6 +10,7 @@ cli = { path = "../cli" }
 configuration = { path = "../configuration" }
 bim_tools = { path = "../bim_tools" }
 bim_json_object = { path = "../bim_json_object" }
-bim_evac = { path = "../bim_evac" }
+bim_evac = { path = "../../src-tauri/src/bim_evac" }
 bim_output = { path = "../../src-tauri/src/bim_output" }
 json_object = { path = "../json_object" }
+bim_graph = { path = "../bim_graph" }

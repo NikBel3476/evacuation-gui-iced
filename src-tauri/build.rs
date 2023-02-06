@@ -19,7 +19,7 @@ fn main() {
 		"../src",
 		"../src/bim_cli/src",
 		"../src/bim_configure/src",
-		"../src/bim_evac/src",
+		"src/bim_evac/src",
 		"../src/bim_json_object/src",
 		"../src/bim_polygon_tools/src",
 		"../src/bim_tools/src",
