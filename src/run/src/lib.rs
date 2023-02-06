@@ -13,6 +13,7 @@ use bim_output::{
 use bim_tools::{bim_t_rust, bim_tools_get_num_of_people, bim_tools_new_rust, set_people_to_zone};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
+use std::io::Write;
 
 pub fn run_rust() {
 	let cli_parameters = CliParameters {
@@ -43,6 +44,8 @@ pub fn run_rust() {
 
 		let mut fp_detail =
 			std::fs::File::create(&output_detail).expect("Error opening the output file");
+		let mut fp_short =
+			std::fs::File::create(&output_short).expect("Error opening the output file");
 
 		bim_output_head(&bim, &mut fp_detail);
 		bim_output_body(&bim, 0.0, &mut fp_detail);
@@ -73,18 +76,28 @@ pub fn run_rust() {
 		}
 
 		let num_of_evacuated_people = bim_tools_get_num_of_people(&bim);
+		let evacuation_time_m = get_time_m();
+		let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
+
 		println!(
 			"Длительность эвакуации: {:.2} с. ({:.2} мин.)",
 			get_time_s(),
-			get_time_m()
+			evacuation_time_m
 		);
 		println!(
-			"Количество человек: в здании - {:.2} (в безопасной зоне - {:.2}) чел.",
-			num_of_evacuated_people,
-			bim.zones[bim.zones.len() - 1].number_of_people
+			"Количество человек: в здании - {num_of_evacuated_people:.2} (в безопасной зоне - {evacuated_people:.2}) чел."
 		);
 		println!("{}", bim.zones[bim.zones.len() - 1].name);
 		println!("---------------------------------------");
+
+		fp_short
+			.write_all(
+				format!(
+					"{evacuation_time_m:.2},{num_of_evacuated_people:.2},{evacuated_people:.2}"
+				)
+				.as_bytes(),
+			)
+			.unwrap_or_else(|e| panic!("Failed to write fp_short to file. Error: {e}"));
 	}
 }
 
