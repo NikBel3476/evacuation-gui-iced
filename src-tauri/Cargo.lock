@@ -54,6 +54,7 @@ dependencies = [
  "bim_cli",
  "bim_configure",
  "bim_evac",
+ "bim_graph",
  "bim_json_object",
  "bim_output",
  "bim_polygon_tools",
@@ -62,6 +63,7 @@ dependencies = [
  "cli",
  "configuration",
  "json_object",
+ "run",
  "serde",
  "serde_json",
  "tauri",
@@ -136,7 +138,17 @@ dependencies = [
 name = "bim_evac"
 version = "0.1.0"
 dependencies = [
+ "bim_graph",
  "bim_json_object",
+ "bim_polygon_tools",
+ "bim_tools",
+ "libc",
+]
+
+[[package]]
+name = "bim_graph"
+version = "0.1.0"
+dependencies = [
  "bim_tools",
  "libc",
 ]
@@ -145,6 +157,7 @@ dependencies = [
 name = "bim_json_object"
 version = "0.1.0"
 dependencies = [
+ "bim_polygon_tools",
  "json_object",
  "libc",
 ]
@@ -153,6 +166,7 @@ dependencies = [
 name = "bim_output"
 version = "0.1.0"
 dependencies = [
+ "bim_tools",
  "libc",
 ]
 
@@ -161,6 +175,7 @@ name = "bim_polygon_tools"
 version = "0.1.0"
 dependencies = [
  "cc",
+ "json_object",
  "libc",
 ]
 
@@ -170,6 +185,7 @@ version = "0.1.0"
 dependencies = [
  "bim_json_object",
  "bim_polygon_tools",
+ "json_object",
  "libc",
 ]
 
@@ -2210,6 +2226,20 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "windows 0.37.0",
+]
+
+[[package]]
+name = "run"
+version = "0.1.0"
+dependencies = [
+ "bim_evac",
+ "bim_graph",
+ "bim_json_object",
+ "bim_output",
+ "bim_tools",
+ "cli",
+ "configuration",
+ "json_object",
 ]
 
 [[package]]

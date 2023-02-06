@@ -112,7 +112,7 @@ void run() {
 
         double remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
         while (true) {
-            evac_moving_step(graph, zones, transits);
+            evac_moving_step_with_log(graph, zones, transits);
             evac_time_inc();
             bim_output_body(bim, (float)evac_get_time_m(), fp_detail);
 
@@ -134,6 +134,7 @@ void run() {
         LOG_INFO("Количество человек: в здании - %.2f (в безопасной зоне - %.2f) чел.",
                  num_of_evacuated_people,
                  ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->numofpeople);
+        printf("%s\n", ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->name);
         LOG_INFO("---------------------------------------");
 
         {
@@ -191,7 +192,9 @@ void applying_scenario_bim_params(bim_t *bim, const bim_cfg_scenario_t *cfg_scen
     ArrayList *zones = bim->zones;
     for (size_t i = 0; i < zones->length; ++i) {
         bim_zone_t *zone = zones->data[i];
-        if (zone->sign == OUTSIDE) continue;
+        if (zone->sign == OUTSIDE) {
+            continue;
+        }
 
         if (cfg_scenario->distribution.type == distribution_uniform) {
             bim_tools_set_people_to_zone_rust(zone, (float)(zone->area * cfg_scenario->distribution.density));

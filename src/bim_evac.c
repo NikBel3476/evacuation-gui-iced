@@ -14,7 +14,6 @@
  */
 
 #include "bim_evac.h"
-#include "bim_evac/src/bim_evac_rust.h"
 
 static double evac_speed_max;//= 100;  // м/мин
 static double evac_density_min;//= 0.1;  // чел/м^2
@@ -68,6 +67,7 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
             bim_zone_t *giver_zone = zones->data[ptr->dest];
 
             receiving_zone->potential = potential_element_rust(receiving_zone, giver_zone, transit);
+
             double moved_people = part_people_flow_rust(receiving_zone, giver_zone, transit);
             receiving_zone->numofpeople += moved_people;
             giver_zone->numofpeople -= moved_people;
@@ -78,6 +78,56 @@ void evac_moving_step(const bim_graph_t *graph, const ArrayList *zones, const Ar
 
             if (giver_zone->numofoutputs > 1 && !giver_zone->is_blocked
                 && arraylist_index_of(zones_to_process, element_id_eq_callback_rust, giver_zone) < 0) {
+                arraylist_append(zones_to_process, giver_zone);
+            }
+        }
+
+        arraylist_sort(zones_to_process, potential_cmp_callback_rust);
+
+        if (zones_to_process->length > 0) {
+            receiving_zone = zones_to_process->data[0];
+            ptr = graph->head[receiving_zone->id];
+            arraylist_remove(zones_to_process, 0);
+        }
+
+        if (unprocessed_zones_count == 0) break;
+        --unprocessed_zones_count;
+    }
+
+    arraylist_free(zones_to_process);
+}
+
+void evac_moving_step_with_log(const bim_graph_t *graph, const ArrayList *zones, const ArrayList *transits) {
+    reset_zones(zones);
+    reset_transits(transits);
+
+    size_t unprocessed_zones_count = zones->length;
+    ArrayList *zones_to_process = arraylist_new(unprocessed_zones_count);
+
+    uint64_t outside_id = graph->node_count - 1;
+    bim_node_t *ptr = graph->head[outside_id];
+    bim_zone_t *outside = zones->data[outside_id];
+    bim_zone_t *receiving_zone = outside;
+
+    while (1) {
+        for (size_t i = 0; i < receiving_zone->numofoutputs && ptr != NULL; i++, ptr = ptr->next) {
+            bim_transit_t *transit = transits->data[ptr->eid];
+            if (transit->is_visited || transit->is_blocked) continue;
+
+            bim_zone_t *giver_zone = zones->data[ptr->dest];
+
+            receiving_zone->potential = potential_element_rust(receiving_zone, giver_zone, transit);
+            double moved_people = part_people_flow_rust(receiving_zone, giver_zone, transit);
+            receiving_zone->numofpeople += moved_people;
+            giver_zone->numofpeople -= moved_people;
+            transit->nop_proceeding = moved_people;
+
+            giver_zone->is_visited = true;
+            transit->is_visited = true;
+
+            if (giver_zone->numofoutputs > 1 && !giver_zone->is_blocked
+                &&
+                arraylist_index_of(zones_to_process, element_id_eq_callback_rust, giver_zone) < 0) {
                 arraylist_append(zones_to_process, giver_zone);
             }
         }

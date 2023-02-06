@@ -2,14 +2,14 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all(deserialize = "snake_case"))]
 pub enum DistributionType {
 	FromBim,
 	Uniform,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all(deserialize = "snake_case"))]
 pub enum TransitionType {
 	FromBim,
@@ -19,7 +19,7 @@ pub enum TransitionType {
 #[derive(Serialize, Deserialize)]
 pub struct DistributionSpecial {
 	pub uuid: Vec<String>,
-	pub density: f64,
+	pub density: f32, // TODO: change to f64
 	#[serde(rename(deserialize = "_comment"))]
 	pub comment: String,
 }
@@ -27,7 +27,7 @@ pub struct DistributionSpecial {
 #[derive(Serialize, Deserialize)]
 pub struct TransitionSpecial {
 	pub uuid: Vec<String>,
-	pub width: f64,
+	pub width: f32,
 	#[serde(rename(deserialize = "_comment"))]
 	pub comment: String,
 }
@@ -36,7 +36,7 @@ pub struct TransitionSpecial {
 pub struct Distribution {
 	#[serde(rename(deserialize = "type"))]
 	pub distribution_type: DistributionType,
-	pub density: f64,
+	pub density: f32, // TODO: change to f64
 	pub special: Vec<DistributionSpecial>,
 }
 
@@ -45,21 +45,21 @@ pub struct Transition {
 	#[serde(rename(deserialize = "type"))]
 	pub transitions_type: TransitionType,
 	#[serde(rename(deserialize = "doorwayin"))]
-	pub doorway_in: f64,
+	pub doorway_in: f32,
 	#[serde(rename(deserialize = "doorwayout"))]
-	pub doorway_out: f64,
+	pub doorway_out: f32,
 	pub special: Vec<TransitionSpecial>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Modeling {
-	pub step: f64,
+	pub step: f32,
 	#[serde(rename(deserialize = "speed_max"))]
-	pub max_speed: f64,
+	pub max_speed: f32,
 	#[serde(rename(deserialize = "density_max"))]
-	pub max_density: f64,
+	pub max_density: f32,
 	#[serde(rename(deserialize = "density_min"))]
-	pub min_density: f64,
+	pub min_density: f32,
 }
 
 #[derive(Serialize, Deserialize)]

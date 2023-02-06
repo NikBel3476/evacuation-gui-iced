@@ -1,10 +1,10 @@
 use std::error::Error;
 
-pub struct CliParams {
+pub struct CliParameters {
 	pub scenario_file: String,
 }
 
-pub fn read_cli_args() -> Result<CliParams, Box<dyn Error>> {
+pub fn read_cli_args() -> Result<CliParameters, Box<dyn Error>> {
 	let args: Vec<String> = std::env::args().collect();
 
 	if args.len() < 2 {
@@ -20,7 +20,7 @@ pub fn read_cli_args() -> Result<CliParams, Box<dyn Error>> {
 		std::process::exit(0);
 	}
 
-	Ok(CliParams {
+	Ok(CliParameters {
 		scenario_file: args[1].clone(),
 	})
 }

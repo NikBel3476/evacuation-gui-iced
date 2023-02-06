@@ -247,11 +247,11 @@ bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
         }
     }
 
-    bim_zone_t *outside = outside_init_rust(bim_json);
+    bim_zone_t *outside = _outside_init_rust(bim_json);
     arraylist_append(zones_list, outside);
 
-    arraylist_sort(zones_list, zone_id_cmp);
-    arraylist_sort(transits_list, transit_id_cmp);
+    arraylist_sort(zones_list, zone_id_cmp_rust);
+    arraylist_sort(transits_list, transit_id_cmp_rust);
 
     calculate_transits_width(zones_list, transits_list);
 
@@ -391,7 +391,7 @@ double bim_tools_get_num_of_people(const bim_t *const bim) {
     return num_of_people;
 }
 
-double bim_tools_get_area_bim(const bim_t *const bim) {
+/*double bim_tools_get_area_bim(const bim_t *const bim) {
     static double area = -1;
     if (area < 0) {
         area = 0;
@@ -401,6 +401,17 @@ double bim_tools_get_area_bim(const bim_t *const bim) {
                 if (zone.sign == ROOM || zone.sign == STAIRCASE)
                     area += bim->levels[i].zones[j].area;
             }
+        }
+    }
+    return area;
+}*/
+double bim_tools_get_area_bim(const bim_t *const bim) {
+    double area = 0.0;
+    for (size_t i = 0; i < bim->numoflevels; i++) {
+        for (size_t j = 0; j < bim->levels[i].numofzones; j++) {
+            bim_zone_t zone = bim->levels[i].zones[j];
+            if (zone.sign == ROOM || zone.sign == STAIRCASE)
+                area += bim->levels[i].zones[j].area;
         }
     }
     return area;
@@ -416,24 +427,4 @@ void bim_tools_print_element(const bim_zone_t *zone) {
     printf("\t%s: %f\n", "Area", zone->area);
     printf("\t%s: %u\n", "Is visited", zone->is_visited);
     printf("\t%s: %u\n", "Is blocked", zone->is_blocked);
-}
-
-// -------------------------------------------------------
-// *******************************************************
-// -------------------------------------------------------
-
-int32_t zone_id_cmp(ArrayListValue value1, ArrayListValue value2) {
-    const bim_zone_t *e1 = (bim_zone_t *) value1;
-    const bim_zone_t *e2 = (bim_zone_t *) value2;
-    if (e1->id > e2->id) return 1;
-    else if (e1->id < e2->id) return -1;
-    else return 0;
-}
-
-int32_t transit_id_cmp(ArrayListValue value1, ArrayListValue value2) {
-    const bim_transit_t *e1 = (bim_transit_t *) value1;
-    const bim_transit_t *e2 = (bim_transit_t *) value2;
-    if (e1->id > e2->id) return 1;
-    else if (e1->id < e2->id) return -1;
-    else return 0;
 }

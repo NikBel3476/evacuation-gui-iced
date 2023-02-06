@@ -13,10 +13,18 @@ pub struct Address {
 	pub add_info: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Default)]
 pub struct Point {
 	pub x: f64,
 	pub y: f64,
+}
+
+impl Point {
+	pub fn distance_to(&self, other: &Point) -> f64 {
+		let x = self.x - other.x;
+		let y = self.y - other.y;
+		(x * x + y * y).sqrt()
+	}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -59,7 +67,7 @@ pub struct BuildingStruct {
 	#[serde(rename = "Devs")]
 	pub devs: Vec<i64>,
 	#[serde(rename = "NameBuilding")]
-	pub name_building: String,
+	pub building_name: String,
 	#[serde(rename = "Address")]
 	pub address: Address,
 	#[serde(rename = "Level")]
@@ -69,19 +77,17 @@ pub struct BuildingStruct {
 #[no_mangle]
 pub fn parse_building_from_json(path_to_file: &str) -> Result<Box<BuildingStruct>, Box<dyn Error>> {
 	let json_content = fs::read_to_string(path_to_file).unwrap_or_else(|err| {
-		eprintln!(
+		panic!(
 			"Ошибка чтения файла конфигурации здания {}: {}",
 			path_to_file, err
 		);
-		process::exit(1);
 	});
 
 	let data: BuildingStruct = serde_json::from_str(&json_content).unwrap_or_else(|err| {
-		eprintln!(
+		panic!(
 			"Ошибка десериализации файла конфигурации здания {}: {}",
 			path_to_file, err
 		);
-		process::exit(1);
 	});
 
 	Ok(Box::new(data))

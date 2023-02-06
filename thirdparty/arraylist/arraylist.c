@@ -252,8 +252,11 @@ static void arraylist_sort_internal(ArrayListValue *list_data,
 	/* Move the pivot into place, by swapping it with the item
 	 * immediately following the end of list 1.  */
 
-	list_data[list_length-1] = list_data[list1_length];
-	list_data[list1_length] = pivot;
+    /* if list1_length == 0 then list is already sorted */
+    if (list1_length > 0) {
+        list_data[list_length-1] = list_data[list1_length];
+        list_data[list1_length] = pivot;
+    }
 
 	/* Recursively sort the sublists. */
 
