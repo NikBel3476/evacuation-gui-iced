@@ -134,7 +134,6 @@ void run() {
         LOG_INFO("Количество человек: в здании - %.2f (в безопасной зоне - %.2f) чел.",
                  num_of_evacuated_people,
                  ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->numofpeople);
-        printf("%s\n", ((bim_zone_t *) zones->data[OUTSIDE_IDX(bim)])->name);
         LOG_INFO("---------------------------------------");
 
         {
