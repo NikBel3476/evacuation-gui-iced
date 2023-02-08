@@ -35,9 +35,7 @@ impl polygon_t_rust {
 	pub fn area(&self) -> f64 {
 		let num_of_triangle_corner = (self.points.len() - 2) * 3;
 
-		let mut triangle_list = vec![0; usize::try_from(num_of_triangle_corner)
-			.unwrap_or_else(|e|
-				panic!("Failed to convert num_of_triangle_corner to usize at geom_tools_area_polygon fn in bim_polygon_tools crate, {e}"))];
+		let mut triangle_list = vec![0; num_of_triangle_corner];
 
 		let number_of_triangles = self.triangulate(triangle_list.as_mut_ptr());
 
