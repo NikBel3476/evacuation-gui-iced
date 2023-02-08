@@ -123,14 +123,14 @@ pub fn bim_output_body(bim: &bim_t_rust, time: f64, file: &mut File) {
 
 #[cfg(test)]
 mod tests {
-	use libc::c_char;
+	use super::*;
 	use std::ffi::{CStr, CString};
 
 	#[test]
 	#[cfg(any(target_os = "linux", target_os = "macos"))]
 	fn test_bim_basename_linux_and_macos() {
 		let path_ptr = CString::new("../res/two_levels.json").unwrap().into_raw();
-		let out_file_ptr = super::bim_basename(path_ptr);
+		let out_file_ptr = bim_basename(path_ptr);
 		let out_file = unsafe { CStr::from_ptr(out_file_ptr).to_str().expect("Invalid path") };
 		let expected_path = "../result/two_levels";
 
@@ -141,7 +141,7 @@ mod tests {
 	#[cfg(target_os = "windows")]
 	fn test_bim_basename_windows() {
 		let path_ptr = CString::new("../res/two_levels.json").unwrap().into_raw();
-		let out_file_ptr = super::bim_basename(path_ptr);
+		let out_file_ptr = bim_basename(path_ptr);
 		let out_file = unsafe { CStr::from_ptr(out_file_ptr).to_str().expect("Invalid path") };
 		let expected_path = "..\\result\\two_levels";
 
