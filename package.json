@@ -26,16 +26,10 @@
         "cypress:test:ci": "start-server-and-test start-server http://localhost:8080 cypress:run"
     },
     "lint-staged": {
-        "!(*.bs).js": [
+        "!(*.bs).{js, jsx}": [
             "prettier --write"
         ],
-        "!(*.gen).ts": [
-            "prettier --write"
-        ],
-        "*.jsx": [
-            "prettier --write"
-        ],
-        "!(*.gen).tsx": [
+        "!(*.gen).{ts, tsx}": [
             "prettier --write"
         ],
         "*.rs": [
