@@ -1,10 +1,10 @@
 use bim_evac::{
-	evac_def_modeling_step, evac_moving_step_test_with_log, evac_set_density_max_rust,
-	evac_set_density_min_rust, evac_set_modeling_step_rust, evac_set_speed_max_rust, get_time_m,
-	get_time_s, set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc,
-	time_reset,
+	evac_def_modeling_step, evac_moving_step_test_with_log, evac_moving_step_test_with_log_rust,
+	evac_set_density_max_rust, evac_set_density_min_rust, evac_set_modeling_step_rust,
+	evac_set_speed_max_rust, get_time_m, get_time_s, set_density_max, set_density_min,
+	set_modeling_step, set_speed_max, time_inc, time_reset,
 };
-use bim_graph::bim_graph_new_test;
+use bim_graph::{bim_graph_new, bim_graph_new_test};
 use bim_json_object::{bim_json_object_new, BimElementSign};
 use bim_output::{
 	bim_basename_rust, bim_create_file_name_rust, bim_output_body, bim_output_head,
@@ -16,6 +16,7 @@ use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 use std::io::Write;
 
 pub fn run_rust() {
+	// TODO: remove mock file path
 	let cli_parameters = CliParameters {
 		scenario_file: String::from("../scenario.json"),
 	};
@@ -28,7 +29,6 @@ pub fn run_rust() {
 	for file in &scenario_configuration.files {
 		let filename = bim_basename_rust(file);
 		let log_filename = bim_basename_rust("log.txt");
-		println!("The file name of the used bim `{filename}.json`");
 
 		// Чтение файла и разворачивание его в структуру
 		let bim_json = bim_json_object_new(file);
@@ -57,11 +57,21 @@ pub fn run_rust() {
 				.unwrap_or_else(|e| panic!("Error create the log file. Error: {e}")),
 		};
 
+		let current_time = chrono::Local::now()
+			.format("%Y-%m-%d %H:%M:%S.%6f")
+			.to_string();
+		let filename_log = format!("The file name of the used bim `{filename}.json`\n");
+		print!("{current_time} {filename_log}");
+		log_file
+			.write_all(filename_log.as_bytes())
+			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+
 		bim_output_head(&bim, &mut fp_detail);
 		bim_output_body(&bim, 0.0, &mut fp_detail);
 
 		// let graph = bim_graph_new_rust(&bim);
-		let graph = bim_graph_new_test(&bim);
+		let graph = bim_graph_new(&bim);
+		// let bim_graph = bim_graph_new_test(&bim);
 		// TODO: add print graph
 
 		evac_def_modeling_step(&bim);
@@ -69,7 +79,8 @@ pub fn run_rust() {
 
 		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
 		loop {
-			evac_moving_step_test_with_log(graph, &mut bim.zones, &mut bim.transits);
+			// evac_moving_step_test_with_log(bim_graph, &mut bim.zones, &mut bim.transits);
+			evac_moving_step_test_with_log_rust(&graph, &mut bim.zones, &mut bim.transits);
 			time_inc();
 			bim_output_body(&bim, get_time_m(), &mut fp_detail);
 
@@ -89,17 +100,12 @@ pub fn run_rust() {
 		let evacuation_time_m = get_time_m();
 		let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
 
-		let current_time = chrono::Local::now()
-			.format("%Y-%m-%d %H:%M:%S.%6f")
-			.to_string();
 		let evac_time_log = format!(
 			"{current_time} Длительность эвакуации: {:.2} с. ({:.2} мин.)\n",
 			get_time_s(),
 			evacuation_time_m
 		);
 		let number_of_people_log = format!("{current_time} Количество человек: в здании - {num_of_evacuated_people:.2} (в безопасной зоне - {evacuated_people:.2}) чел.\n");
-		let number_of_evacuated_people_log =
-			format!("{current_time} {}\n", &bim.zones[bim.zones.len() - 1].name);
 		let delimiter = format!("{current_time} ---------------------------------------\n");
 
 		print!("{evac_time_log}");
@@ -109,10 +115,6 @@ pub fn run_rust() {
 		print!("{number_of_people_log}");
 		log_file
 			.write_all(number_of_people_log.as_bytes())
-			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
-		print!("{number_of_evacuated_people_log}");
-		log_file
-			.write_all(number_of_evacuated_people_log.as_bytes())
 			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
 		print!("{delimiter}");
 		log_file

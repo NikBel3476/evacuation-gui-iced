@@ -48,15 +48,11 @@ pub struct bim_edge_t_rust {
 	pub id: usize,
 }
 
-// pub fn bim_graph_new(bim: &bim_t_rust) -> *mut bim_graph_t {
-// 	let edges = graph_create_edges_rust(&bim.transits, &bim.zones);
-//
-// 	graph_create_rust(
-// 		edges.as_ptr(),
-// 		edges.len() as size_t,
-// 		bim.zones.len() as size_t,
-// 	)
-// }
+pub fn bim_graph_new(bim: &bim_t_rust) -> bim_graph_t_rust {
+	let edges = graph_create_edges(&bim.transits, &bim.zones);
+
+	graph_create(&edges, edges.len(), bim.zones.len())
+}
 
 /*pub fn bim_graph_new_rust(bim: &bim_t_rust) -> bim_graph_t_rust {
 	let edges = graph_create_edges_rust(&bim.transits, &bim.zones);
@@ -156,6 +152,52 @@ pub extern "C" fn graph_create_rust(
 	Box::into_raw(Box::new(graph))
 }
 
+/// Function to create an adjacency list from specified edges
+pub fn graph_create(
+	edges: &[bim_edge_t_rust],
+	edge_count: usize,
+	node_count: usize,
+) -> bim_graph_t_rust {
+	// initialize head pointer for all vertices
+	let mut graph_head: Vec<Box<bim_node_t_rust>> = vec![Default::default(); node_count];
+
+	// add edges to the directed graph one by one
+	for i in 0..edge_count {
+		let edge = &edges[i];
+		// get the source and destination vertex
+		let src = edge.src;
+		let dest = edge.dest;
+		let eid = edge.id;
+
+		// 1. allocate a new node of adjacency list from `src` to `dest`
+		let mut new_node = bim_node_t_rust {
+			dest,
+			eid,
+			next: None,
+		};
+
+		// point new node to the current head
+		new_node.next = Some(graph_head[src].clone());
+
+		// point head pointer to the new node
+		graph_head[src] = Box::new(new_node);
+
+		// 2. allocate a new node of adjacency list from `dest` to `src`
+		let new_node_dest_to_src = bim_node_t_rust {
+			dest: src,
+			eid,
+			// point new node to the current head
+			next: Some(graph_head[dest].clone()),
+		};
+
+		// change head pointer to point to the new node
+		graph_head[dest] = Box::new(new_node_dest_to_src);
+	}
+
+	// allocate storage for the graph data structure
+	bim_graph_t_rust { head: graph_head }
+}
+
 // /// Function to create an adjacency list from specified edges
 // pub fn graph_create(edges: &[bim_edge_t], node_count: usize) -> bim_graph_t_rust {
 // 	// initialize head pointer for all vertices
@@ -214,6 +256,33 @@ pub fn graph_create_edges_rust(
 		}
 
 		let edge = bim_edge_t {
+			id: i,
+			src: ids[0],
+			dest: ids[1],
+		};
+		edges.push(edge);
+	}
+
+	edges
+}
+
+pub fn graph_create_edges(
+	list_doors: &[bim_transit_t_rust],
+	zones: &[bim_zone_t_rust],
+) -> Vec<bim_edge_t_rust> {
+	let mut edges: Vec<bim_edge_t_rust> = vec![];
+
+	for (i, transition) in list_doors.iter().enumerate() {
+		let mut ids = [0, zones.len()];
+		let mut j = 0usize;
+		for (k, zone) in zones.iter().enumerate() {
+			if equal_callback(zone, transition) && j != 2 {
+				ids[j] = k;
+				j += 1;
+			}
+		}
+
+		let edge = bim_edge_t_rust {
 			id: i,
 			src: ids[0],
 			dest: ids[1],
