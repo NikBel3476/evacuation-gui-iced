@@ -196,7 +196,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 			set_people_to_zone(
 				zone,
-				(zone.area * scenario_configuration.distribution.density) as f32,
+				zone.area * scenario_configuration.distribution.density,
 			);
 		}
 
@@ -204,7 +204,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for special in &scenario_configuration.distribution.special {
 			for uuid in &special.uuid {
 				if zone.uuid.eq(uuid) {
-					set_people_to_zone(zone, (zone.area * special.density) as f32);
+					set_people_to_zone(zone, zone.area * special.density);
 				}
 			}
 		}
@@ -220,7 +220,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 				set_people_to_zone(
 					zone,
-					(zone.area * scenario_configuration.distribution.density) as f32,
+					zone.area * scenario_configuration.distribution.density,
 				);
 			}
 
@@ -228,7 +228,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			for special in &scenario_configuration.distribution.special {
 				for uuid in &special.uuid {
 					if zone.uuid.eq(uuid) {
-						set_people_to_zone(zone, (zone.area * special.density) as f32);
+						set_people_to_zone(zone, zone.area * special.density);
 					}
 				}
 			}
