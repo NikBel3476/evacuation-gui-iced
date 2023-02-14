@@ -815,9 +815,8 @@ pub fn evac_moving_step_test(
 	let mut ptr = graph_head[outside_id];
 	let mut receiving_zone_id = outside_id;
 
-	let mut potential_sum = 0.0;
 	loop {
-		for i in 0..zones[receiving_zone_id].outputs.len() {
+		for _ in 0..zones[receiving_zone_id].outputs.len() {
 			if ptr.is_null() {
 				break;
 			}
@@ -832,7 +831,6 @@ pub fn evac_moving_step_test(
 
 			zones[receiving_zone_id].potential =
 				potential_element(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
-			potential_sum += zones[receiving_zone_id].potential;
 
 			let moved_people =
 				part_people_flow(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
@@ -894,9 +892,8 @@ pub fn evac_moving_step_test_with_log(
 	let mut ptr = graph_head[outside_id];
 	let mut receiving_zone_id = outside_id;
 
-	let mut potential_sum = 0.0;
 	loop {
-		for i in 0..zones[receiving_zone_id].outputs.len() {
+		for _ in 0..zones[receiving_zone_id].outputs.len() {
 			if ptr.is_null() {
 				break;
 			}
@@ -911,7 +908,6 @@ pub fn evac_moving_step_test_with_log(
 
 			zones[receiving_zone_id].potential =
 				potential_element(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
-			potential_sum += zones[receiving_zone_id].potential;
 
 			let moved_people =
 				part_people_flow(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
@@ -972,7 +968,7 @@ pub fn evac_moving_step_test_with_log_rust(
 	let mut receiving_zone_id = outside_id;
 
 	loop {
-		for i in 0..zones[receiving_zone_id].outputs.len() {
+		for _ in 0..zones[receiving_zone_id].outputs.len() {
 			if let Some(ptr_box) = ptr {
 				let mut transit = &mut transits[ptr_box.eid];
 
@@ -1061,7 +1057,7 @@ pub extern "C" fn element_id_eq_callback_rust(
 	};
 
 	c_int::try_from(value1.id == value2.id).unwrap_or_else(|e| {
-		panic!("Failed to convert bool to c_int at element_id_eq_callback_rust fn in bim_evac crate. Error: {}", e)
+		panic!("Failed to convert bool to c_int at element_id_eq_callback_rust fn in bim_evac crate. Error: {e}")
 	})
 }
 
