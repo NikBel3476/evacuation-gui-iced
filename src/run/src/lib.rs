@@ -143,10 +143,10 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		if scenario_configuration.transition.transitions_type == TransitionType::Users {
 			match transition.sign {
 				BimElementSign::DOOR_WAY_IN => {
-					transition.width = f64::from(scenario_configuration.transition.doorway_in)
+					transition.width = scenario_configuration.transition.doorway_in
 				}
 				BimElementSign::DOOR_WAY_OUT => {
-					transition.width = f64::from(scenario_configuration.transition.doorway_out)
+					transition.width = scenario_configuration.transition.doorway_out
 				}
 				_ => {}
 			}
@@ -156,7 +156,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for special in &scenario_configuration.transition.special {
 			for uuid in &special.uuid {
 				if transition.uuid.eq(uuid) {
-					transition.width = f64::from(special.width);
+					transition.width = special.width;
 				}
 			}
 		}
@@ -168,10 +168,10 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			if scenario_configuration.transition.transitions_type == TransitionType::Users {
 				match transition.sign {
 					BimElementSign::DOOR_WAY_IN => {
-						transition.width = f64::from(scenario_configuration.transition.doorway_in)
+						transition.width = scenario_configuration.transition.doorway_in
 					}
 					BimElementSign::DOOR_WAY_OUT => {
-						transition.width = f64::from(scenario_configuration.transition.doorway_out)
+						transition.width = scenario_configuration.transition.doorway_out
 					}
 					_ => {}
 				}
@@ -181,7 +181,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			for special in &scenario_configuration.transition.special {
 				for uuid in &special.uuid {
 					if transition.uuid.eq(uuid) {
-						transition.width = f64::from(special.width);
+						transition.width = special.width;
 					}
 				}
 			}
@@ -196,7 +196,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 			set_people_to_zone(
 				zone,
-				(zone.area * f64::from(scenario_configuration.distribution.density)) as f32,
+				(zone.area * scenario_configuration.distribution.density) as f32,
 			);
 		}
 
@@ -204,7 +204,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for special in &scenario_configuration.distribution.special {
 			for uuid in &special.uuid {
 				if zone.uuid.eq(uuid) {
-					set_people_to_zone(zone, (zone.area * f64::from(special.density)) as f32);
+					set_people_to_zone(zone, (zone.area * special.density) as f32);
 				}
 			}
 		}
@@ -220,7 +220,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 				set_people_to_zone(
 					zone,
-					(zone.area * f64::from(scenario_configuration.distribution.density)) as f32,
+					(zone.area * scenario_configuration.distribution.density) as f32,
 				);
 			}
 
@@ -228,21 +228,21 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			for special in &scenario_configuration.distribution.special {
 				for uuid in &special.uuid {
 					if zone.uuid.eq(uuid) {
-						set_people_to_zone(zone, (zone.area * f64::from(special.density)) as f32);
+						set_people_to_zone(zone, (zone.area * special.density) as f32);
 					}
 				}
 			}
 		}
 	}
 
-	set_modeling_step(f64::from(scenario_configuration.modeling.step));
-	evac_set_modeling_step_rust(f64::from(scenario_configuration.modeling.step));
-	set_speed_max(f64::from(scenario_configuration.modeling.max_speed));
-	evac_set_speed_max_rust(f64::from(scenario_configuration.modeling.max_speed));
-	set_density_max(f64::from(scenario_configuration.modeling.max_density));
-	evac_set_density_max_rust(f64::from(scenario_configuration.modeling.max_density));
-	set_density_min(f64::from(scenario_configuration.modeling.min_density));
-	evac_set_density_min_rust(f64::from(scenario_configuration.modeling.min_density));
+	set_modeling_step(scenario_configuration.modeling.step);
+	evac_set_modeling_step_rust(scenario_configuration.modeling.step);
+	set_speed_max(scenario_configuration.modeling.max_speed);
+	evac_set_speed_max_rust(scenario_configuration.modeling.max_speed);
+	set_density_max(scenario_configuration.modeling.max_density);
+	evac_set_density_max_rust(scenario_configuration.modeling.max_density);
+	set_density_min(scenario_configuration.modeling.min_density);
+	evac_set_density_min_rust(scenario_configuration.modeling.min_density);
 }
 
 // fn applying_scenario_bim_params_rust(bim: &mut bim_t_rust, cfg_scenario: &ScenarioCfg) {
