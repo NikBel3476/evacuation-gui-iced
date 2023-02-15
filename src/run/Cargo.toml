@@ -13,5 +13,5 @@ bim_tools = { path = "../../src-tauri/src/bim_tools" }
 bim_json_object = { path = "../../src-tauri/src/bim_json_object" }
 bim_evac = { path = "../../src-tauri/src/bim_evac" }
 bim_output = { path = "../../src-tauri/src/bim_output" }
-json_object = { path = "../json_object" }
+json_object = { path = "../../src-tauri/src/json_object" }
 bim_graph = { path = "../../src-tauri/src/bim_graph" }
