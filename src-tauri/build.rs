@@ -17,7 +17,7 @@ fn main() {
 
 	let headers_dirs = [
 		"../src",
-		"../src/bim_cli/src",
+		"src/bim_cli/src",
 		"../src/bim_configure/src",
 		"src/bim_evac/src",
 		"../src/bim_json_object/src",
