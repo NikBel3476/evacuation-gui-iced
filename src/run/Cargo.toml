@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 chrono = "0.4"
 cli = { path = "../../src-tauri/src/cli" }
-configuration = { path = "../configuration" }
+configuration = { path = "../../src-tauri/src/configuration" }
 bim_tools = { path = "../../src-tauri/src/bim_tools" }
 bim_json_object = { path = "../../src-tauri/src/bim_json_object" }
 bim_evac = { path = "../../src-tauri/src/bim_evac" }

@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 libc = "0.2"
-configuration = { path = "../../../src/configuration" }
+configuration = { path = "../configuration" }
 
 [lib]
 crate-type=["staticlib", "lib"]
