@@ -19,7 +19,7 @@ cc = { version = "1.0", features = ["parallel"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["api-all"] }
-cli = { path = "../src/cli" }
+cli = { path = "src/cli" }
 configuration = { path = "../src/configuration" }
 json_object = { path = "../src/json_object" }
 bim_cli = { path = "src/bim_cli" }
