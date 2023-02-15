@@ -17,7 +17,7 @@
 #include "bim_evac.h"
 #include "../src-tauri/src/bim_cli/src/bim_cli.h"
 #include "bim_configure.h"
-#include "bim_configure/src/bim_configure_rust.h"
+#include "../src-tauri/src/bim_configure/src/bim_configure_rust.h"
 #include "bim_output.h"
 #include "../src-tauri/src/bim_output/src/bim_output_rust.h"
 
