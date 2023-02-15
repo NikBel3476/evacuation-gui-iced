@@ -9,7 +9,7 @@ edition = "2021"
 chrono = "0.4"
 cli = { path = "../cli" }
 configuration = { path = "../configuration" }
-bim_tools = { path = "../bim_tools" }
+bim_tools = { path = "../../src-tauri/src/bim_tools" }
 bim_json_object = { path = "../../src-tauri/src/bim_json_object" }
 bim_evac = { path = "../../src-tauri/src/bim_evac" }
 bim_output = { path = "../../src-tauri/src/bim_output" }

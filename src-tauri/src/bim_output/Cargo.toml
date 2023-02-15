@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 libc = "0.2"
-bim_tools = { path = "../../../src/bim_tools" }
+bim_tools = { path = "../bim_tools" }
 
 [lib]
 crate-type=["staticlib", "lib"]
