@@ -11,7 +11,7 @@
 #include "../thirdparty/c-logger/src/loggerconf.h"
 
 #include "bim_json_object.h"
-#include "bim_json_object/src/bim_json_object_rust.h"
+#include "../src-tauri/src/bim_json_object/src/bim_json_object_rust.h"
 #include "bim_tools.h"
 #include "bim_graph.h"
 #include "bim_evac.h"

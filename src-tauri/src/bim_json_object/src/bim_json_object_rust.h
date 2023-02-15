@@ -1,4 +1,4 @@
-#include "../../bim_json_object.h"
+#include "../../../../src/bim_json_object.h"
 
 /*!
 Создает новый объект типа bim_object_t
