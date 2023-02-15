@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 fnv = "1.0"
 petgraph = "0.6"
-bim_tools = { path = "../../src-tauri/src/bim_tools" }
+bim_tools = { path = "../bim_tools" }
