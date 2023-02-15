@@ -14,7 +14,7 @@
  */
 
 #include "bim_graph.h"
-#include "bim_graph/src/bim_graph_rust.h"
+#include "../src-tauri/src/bim_graph/src/bim_graph_rust.h"
 
 void graph_create_edges(const ArrayList *list_doors, ArrayListEqualFunc callback,
                         bim_edge_t edges[], const ArrayList *zones);
