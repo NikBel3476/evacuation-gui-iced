@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 libc = "0.2"
 bim_json_object = { path = "../../src-tauri/src/bim_json_object" }
-bim_polygon_tools = { path = "../bim_polygon_tools" }
+bim_polygon_tools = { path = "../../src-tauri/src/bim_polygon_tools" }
 json_object = { path = "../json_object" }
 
 [lib]
