@@ -1,9 +1,9 @@
 fn main() {
 	println!("cargo:rerun-if-changed=../src/*");
 
-	let files = ["../thirdparty/triangle/triangle.c"];
+	let files = ["src/triangle/triangle.c"];
 
-	let headers_dirs = ["../thirdparty/triangle"];
+	let headers_dirs = ["src/triangle"];
 
 	cc::Build::new()
 		.files(files.iter())
