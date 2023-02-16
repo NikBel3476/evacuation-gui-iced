@@ -69,10 +69,10 @@ dependencies = [
  "bim_polygon_tools",
  "bim_tools",
  "cc",
+ "chrono",
  "cli",
  "configuration",
  "json_object",
- "run",
  "serde",
  "serde_json",
  "tauri",
@@ -2337,21 +2337,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "windows 0.37.0",
-]
-
-[[package]]
-name = "run"
-version = "0.1.0"
-dependencies = [
- "bim_evac",
- "bim_graph",
- "bim_json_object",
- "bim_output",
- "bim_tools",
- "chrono",
- "cli",
- "configuration",
- "json_object",
 ]
 
 [[package]]

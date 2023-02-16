@@ -3,8 +3,6 @@
 	windows_subsystem = "windows"
 )]
 
-use tauri::{AppHandle, WindowBuilder};
-
 use bim_cli;
 use bim_configure;
 use bim_evac;
@@ -17,6 +15,9 @@ use cli;
 use configuration;
 use json_object;
 use run::run_rust;
+use tauri::{AppHandle, WindowBuilder};
+
+mod run;
 
 fn main() {
 	tauri::Builder::default()

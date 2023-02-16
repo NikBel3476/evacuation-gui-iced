@@ -19,6 +19,7 @@ cc = { version = "1.0", features = ["parallel"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["api-all"] }
+chrono = "0.4"
 cli = { path = "src/cli" }
 configuration = { path = "src/configuration" }
 json_object = { path = "src/json_object" }
@@ -30,7 +31,6 @@ bim_output = { path = "src/bim_output" }
 bim_polygon_tools = { path = "src/bim_polygon_tools" }
 bim_graph = { path = "src/bim_graph" }
 bim_tools = { path = "src/bim_tools" }
-run = { path = "src/run" }
 
 [features]
 # by default Tauri runs in production mode
