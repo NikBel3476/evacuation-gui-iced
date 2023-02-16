@@ -196,7 +196,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 			set_people_to_zone(
 				zone,
-				(zone.area * scenario_configuration.distribution.density) as f32,
+				zone.area * scenario_configuration.distribution.density,
 			);
 		}
 
@@ -204,7 +204,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for special in &scenario_configuration.distribution.special {
 			for uuid in &special.uuid {
 				if zone.uuid.eq(uuid) {
-					set_people_to_zone(zone, (zone.area * special.density) as f32);
+					set_people_to_zone(zone, zone.area * special.density);
 				}
 			}
 		}
@@ -220,7 +220,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
 				set_people_to_zone(
 					zone,
-					(zone.area * scenario_configuration.distribution.density) as f32,
+					zone.area * scenario_configuration.distribution.density,
 				);
 			}
 
@@ -228,7 +228,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 			for special in &scenario_configuration.distribution.special {
 				for uuid in &special.uuid {
 					if zone.uuid.eq(uuid) {
-						set_people_to_zone(zone, (zone.area * special.density) as f32);
+						set_people_to_zone(zone, zone.area * special.density);
 					}
 				}
 			}
@@ -244,55 +244,3 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	set_density_min(scenario_configuration.modeling.min_density);
 	evac_set_density_min_rust(scenario_configuration.modeling.min_density);
 }
-
-// fn applying_scenario_bim_params_rust(bim: &mut bim_t_rust, cfg_scenario: &ScenarioCfg) {
-// 	for i in 0..bim.transits.len() {
-// 		if cfg_scenario.transition.transitions_type == TransitionType::Users {
-// 			if bim.transits[i].sign == BimElementSign::DOOR_WAY_IN {
-// 				bim.transits[i].width = cfg_scenario.transition.doorway_in;
-// 			}
-// 			if bim.transits[i].sign == BimElementSign::DOOR_WAY_OUT {
-// 				bim.transits[i].width = cfg_scenario.transition.doorway_out;
-// 			}
-// 		}
-//
-// 		// A special set up the transit width of item of bim
-// 		for s in 0..cfg_scenario.transition.special.len() {
-// 			let special = &cfg_scenario.transition.special[s];
-// 			for u in 0..special.uuid.len() {
-// 				if bim.transits[i].uuid.eq(&special.uuid[u]) {
-// 					bim.transits[i].width = special.width;
-// 				}
-// 			}
-// 		}
-// 	}
-//
-// 	for i in 0..bim.zones.len() {
-// 		if bim.zones[i].sign == BimElementSign::OUTSIDE {
-// 			continue;
-// 		}
-//
-// 		if cfg_scenario.distribution.distribution_type == DistributionType::Uniform {
-// 			bim.zones[i].number_of_people = bim.zones[i].area * cfg_scenario.distribution.density;
-// 		}
-//
-// 		// A special set up the density of item of bim
-// 		for s in 0..cfg_scenario.distribution.special.len() {
-// 			let special = &cfg_scenario.distribution.special[s];
-// 			for u in 0..special.uuid.len() {
-// 				if bim.zones[i].uuid.eq(&special.uuid[u]) {
-// 					bim.zones[i].number_of_people = bim.zones[i].area * special.density;
-// 				}
-// 			}
-// 		}
-// 	}
-//
-// 	set_modeling_step(cfg_scenario.modeling.step);
-// 	evac_set_modeling_step_rust(cfg_scenario.modeling.step);
-// 	set_speed_max(cfg_scenario.modeling.max_speed);
-// 	evac_set_speed_max_rust(cfg_scenario.modeling.max_speed);
-// 	set_density_max(cfg_scenario.modeling.max_density);
-// 	evac_set_density_max_rust(cfg_scenario.modeling.max_density);
-// 	set_density_min(cfg_scenario.modeling.min_density);
-// 	evac_set_density_min_rust(cfg_scenario.modeling.min_density);
-// }

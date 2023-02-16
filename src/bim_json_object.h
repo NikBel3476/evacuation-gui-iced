@@ -29,7 +29,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "bim_polygon_tools/src/bim_polygon_tools_rust.h"
+#include "../src-tauri/src/bim_polygon_tools/src/bim_polygon_tools_rust.h"
 #include "../thirdparty/c-logger/src/logger.h"
 #include "bim_uuid.h"
 

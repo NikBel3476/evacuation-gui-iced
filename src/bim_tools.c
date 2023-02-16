@@ -14,7 +14,7 @@
  */
 
 #include "bim_tools.h"
-#include "bim_tools/src/bim_tools_rust.h"
+#include "../src-tauri/src/bim_tools/src/bim_tools_rust.h"
 
 bim_t *bim_tools_new(const bim_json_object_t *const bim_json) {
     const bim_json_object_t *const jbim = bim_json;

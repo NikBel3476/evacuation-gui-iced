@@ -33,7 +33,7 @@ bim_level_element_t, и функции для работы с моделью з�
 #include <float.h>
 
 #include "../thirdparty/arraylist/arraylist.h"          ///< https://github.com/fragglet/c-algorithms
-#include "bim_json_object/src/bim_json_object_rust.h"
+#include "../src-tauri/src/bim_json_object/src/bim_json_object_rust.h"
 
 #define OUTSIDE_IDX(x) (x->zones->length - 1)
 
