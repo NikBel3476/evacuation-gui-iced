@@ -18,8 +18,6 @@ use configuration;
 use json_object;
 use run::run_rust;
 
-mod run_bindings;
-
 fn main() {
 	tauri::Builder::default()
 		.invoke_handler(tauri::generate_handler![
@@ -91,6 +89,5 @@ async fn open_building_view_window(handle: AppHandle) {
 
 #[tauri::command]
 async fn bim_start() {
-	unsafe { run_bindings::run() };
 	run_rust();
 }
