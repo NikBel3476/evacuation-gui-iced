@@ -1,4 +1,4 @@
-use bim_tools::bim_t_rust;
+use super::bim_tools::bim_t_rust;
 use libc::c_char;
 use std::ffi::{CStr, CString};
 use std::fs::File;

@@ -2,7 +2,9 @@
 
 extern crate core;
 
-use bim_tools::{bim_t_rust, bim_transit_t, bim_transit_t_rust, bim_zone_t, bim_zone_t_rust};
+use super::bim_tools::{
+	bim_t_rust, bim_transit_t, bim_transit_t_rust, bim_zone_t, bim_zone_t_rust,
+};
 use libc::size_t;
 
 /// https://www.techiedelight.com/implement-graph-data-structure-c

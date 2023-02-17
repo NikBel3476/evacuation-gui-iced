@@ -15,6 +15,15 @@ use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 use std::io::Write;
 
+mod bim_cli;
+mod bim_configure;
+mod bim_evac;
+mod bim_graph;
+mod bim_json_object;
+mod bim_output;
+mod bim_polygon_tools;
+mod bim_tools;
+
 pub fn run_rust() {
 	// TODO: remove mock file path
 	let cli_parameters = CliParameters {
