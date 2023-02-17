@@ -81,7 +81,7 @@ mod tests {
 	#[cfg(any(target_os = "linux", target_os = "macos"))]
 	fn test_bim_basename_linux_and_macos() {
 		let path_ptr = "../res/two_levels.json";
-		let out_file = bim_basename(path_ptr);
+		let out_file = bim_basename_rust(path_ptr);
 		let expected_path = "../result/two_levels";
 
 		assert_eq!(expected_path, out_file);
