@@ -1,6 +1,6 @@
-use super::bim_graph::bim_graph_t_rust;
+use super::bim_graph::BimGraph;
 use super::bim_json_object::BimElementSign;
-use super::bim_tools::{bim_t_rust, bim_tools_get_area_bim, bim_transit_t_rust, bim_zone_t_rust};
+use super::bim_tools::{bim_tools_get_area_bim, Bim, BimTransit, BimZone};
 use libc::{c_double, c_int};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
@@ -132,10 +132,7 @@ pub extern "C" fn evac_speed_on_stair_rust(
 ///
 /// # Returns
 /// Скорость людского потока в зоне
-pub fn speed_in_element(
-	receiving_zone: &bim_zone_t_rust,
-	transmitting_zone: &bim_zone_t_rust,
-) -> f64 {
+pub fn speed_in_element(receiving_zone: &BimZone, transmitting_zone: &BimZone) -> f64 {
 	let density_in_transmitting_zone = transmitting_zone.number_of_people / transmitting_zone.area;
 	// По умолчанию, используется скорость движения по горизонтальной поверхности
 	let mut v_zone =
@@ -145,7 +142,7 @@ pub fn speed_in_element(
 
 	// Если принимающее помещение является лестницей и находится на другом уровне,
 	// то скорость будет рассчитываться как по наклонной поверхности
-	if dh.abs() > 1e-3 && receiving_zone.sign == BimElementSign::STAIRCASE {
+	if dh.abs() > 1e-3 && receiving_zone.sign == BimElementSign::Staircase {
 		/* Иначе определяем направление движения по лестнице
 		 * -1 вниз, 1 вверх
 		 *         ______   aGiverItem
@@ -176,8 +173,8 @@ pub fn speed_in_element(
 /// # Returns
 /// Скорость на выходе из отдающего помещения
 pub fn speed_at_exit(
-	receiving_zone: &bim_zone_t_rust,
-	transmitting_zone: &bim_zone_t_rust,
+	receiving_zone: &BimZone,
+	transmitting_zone: &BimZone,
 	transit_width: f64,
 ) -> f64 {
 	let zone_speed = speed_in_element(receiving_zone, transmitting_zone);
@@ -205,7 +202,7 @@ pub fn speed_at_exit(
 /// # Returns
 ///
 pub fn change_num_of_people(
-	transmitting_zone: &bim_zone_t_rust,
+	transmitting_zone: &BimZone,
 	transit_width: f64,
 	speed_at_exit: f64,
 ) -> f64 {
@@ -230,9 +227,9 @@ pub fn change_num_of_people(
 /// # Returns
 /// Потенциал
 pub fn potential_element(
-	receiving_zone: &bim_zone_t_rust,
-	transmitting_zone: &bim_zone_t_rust,
-	transit: &bim_transit_t_rust,
+	receiving_zone: &BimZone,
+	transmitting_zone: &BimZone,
+	transit: &BimTransit,
 ) -> f64 {
 	let p = transmitting_zone.area.sqrt()
 		/ speed_at_exit(receiving_zone, transmitting_zone, transit.width);
@@ -253,9 +250,9 @@ pub fn potential_element(
 /// # Returns
 /// Количество людей
 pub fn part_people_flow(
-	receiving_zone: &bim_zone_t_rust,
-	transmitting_zone: &bim_zone_t_rust,
-	transit: &bim_transit_t_rust,
+	receiving_zone: &BimZone,
+	transmitting_zone: &BimZone,
+	transit: &BimTransit,
 ) -> f64 {
 	let area_transmitting_zone = transmitting_zone.area;
 	let people_in_transmitting_zone = transmitting_zone.number_of_people;
@@ -303,7 +300,7 @@ pub fn part_people_flow(
 	}
 }
 
-pub fn evac_def_modeling_step(bim: &bim_t_rust) {
+pub fn evac_def_modeling_step(bim: &Bim) {
 	let area = bim_tools_get_area_bim(bim);
 
 	let average_size = area / bim.zones.len() as f64;
@@ -317,15 +314,15 @@ pub fn evac_def_modeling_step(bim: &bim_t_rust) {
 }
 
 pub fn evac_moving_step_test_with_log_rust(
-	graph: &bim_graph_t_rust,
-	zones: &mut [bim_zone_t_rust],
-	transits: &mut [bim_transit_t_rust],
+	graph: &BimGraph,
+	zones: &mut [BimZone],
+	transits: &mut [BimTransit],
 ) {
 	reset_zones(zones);
 	reset_transits(transits);
 
 	let mut unprocessed_zones_count = zones.len();
-	let mut zones_to_process: Vec<bim_zone_t_rust> = vec![];
+	let mut zones_to_process: Vec<BimZone> = vec![];
 
 	let outside_id = graph.head.len() - 1;
 	let mut ptr = Some(graph.head[outside_id].clone());
@@ -388,17 +385,17 @@ pub fn evac_moving_step_test_with_log_rust(
 	}
 }
 
-pub fn reset_zones(zones: &mut [bim_zone_t_rust]) {
+pub fn reset_zones(zones: &mut [BimZone]) {
 	for zone in zones {
 		zone.is_visited = false;
 		zone.potential = match zone.sign {
-			BimElementSign::OUTSIDE => 0.0,
+			BimElementSign::Outside => 0.0,
 			_ => f64::from(f32::MAX),
 		};
 	}
 }
 
-pub fn reset_transits(transits: &mut [bim_transit_t_rust]) {
+pub fn reset_transits(transits: &mut [BimTransit]) {
 	for transit in transits {
 		transit.is_visited = false;
 		transit.no_proceeding = 0.0;
@@ -451,7 +448,7 @@ pub fn time_reset() {
 
 #[cfg(test)]
 mod tests {
-	use super::super::bim_polygon_tools::polygon_t_rust;
+	use super::super::bim_polygon_tools::Polygon;
 	use super::*;
 
 	#[test]
@@ -459,7 +456,7 @@ mod tests {
 		unsafe {
 			EVAC_SPEED_MAX_RUST = 100.0;
 		}
-		let receiving_zone = bim_zone_t_rust {
+		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
 			uuid: "".to_string(),
@@ -471,12 +468,12 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
-		let transmitting_zone = bim_zone_t_rust {
+		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
 			uuid: "".to_string(),
@@ -488,9 +485,9 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
 
@@ -505,7 +502,7 @@ mod tests {
 		unsafe {
 			EVAC_SPEED_MAX_RUST = 100.0;
 		}
-		let receiving_zone = bim_zone_t_rust {
+		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
 			uuid: "".to_string(),
@@ -517,12 +514,12 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
-		let transmitting_zone = bim_zone_t_rust {
+		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
 			uuid: "".to_string(),
@@ -534,9 +531,9 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
 		let transit_width = 1.0;
@@ -552,7 +549,7 @@ mod tests {
 		unsafe {
 			EVAC_MODELING_STEP_RUST = 0.01;
 		}
-		let transmitting_zone = bim_zone_t_rust {
+		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
 			uuid: "".to_string(),
@@ -564,9 +561,9 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
 		let transit_width = 1.0;
@@ -580,7 +577,7 @@ mod tests {
 
 	#[test]
 	fn potential_element_eq() {
-		let receiving_zone = bim_zone_t_rust {
+		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
 			uuid: "".to_string(),
@@ -592,12 +589,12 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
-		let transmitting_zone = bim_zone_t_rust {
+		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
 			uuid: "".to_string(),
@@ -609,22 +606,22 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
-		let transit = bim_transit_t_rust {
+		let transit = BimTransit {
 			uuid: "".to_string(),
 			id: 1,
 			name: "Transit".to_string(),
 			outputs: vec!["".to_string()],
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			size_z: 2.0,
 			z_level: 1.0,
 			width: 1.0,
 			no_proceeding: 0.0,
-			sign: BimElementSign::DOOR_WAY,
+			sign: BimElementSign::DoorWay,
 			is_visited: false,
 			is_blocked: false,
 		};
@@ -641,7 +638,7 @@ mod tests {
 			EVAC_DENSITY_MIN_RUST = 0.1;
 			EVAC_DENSITY_MAX_RUST = 5.0;
 		}
-		let receiving_zone = bim_zone_t_rust {
+		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
 			uuid: "".to_string(),
@@ -653,12 +650,12 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
-		let transmitting_zone = bim_zone_t_rust {
+		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
 			uuid: "".to_string(),
@@ -670,22 +667,22 @@ mod tests {
 			is_blocked: false,
 			is_visited: false,
 			is_safe: true,
-			sign: BimElementSign::ROOM,
+			sign: BimElementSign::Room,
 			size_z: 2.0,
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			potential: 1.0,
 		};
-		let transit = bim_transit_t_rust {
+		let transit = BimTransit {
 			uuid: "".to_string(),
 			id: 1,
 			name: "Transit".to_string(),
 			outputs: vec!["".to_string()],
-			polygon: polygon_t_rust::default(),
+			polygon: Polygon::default(),
 			size_z: 2.0,
 			z_level: 1.0,
 			width: 1.0,
 			no_proceeding: 0.0,
-			sign: BimElementSign::DOOR_WAY,
+			sign: BimElementSign::DoorWay,
 			is_visited: false,
 			is_blocked: false,
 		};

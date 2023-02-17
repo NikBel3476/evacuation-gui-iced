@@ -1,4 +1,4 @@
-use super::bim_tools::bim_t_rust;
+use super::bim_tools::Bim;
 use std::fs::File;
 use std::io::Write;
 use std::ops::Add;
@@ -38,7 +38,7 @@ pub fn bim_create_file_name_rust(base_file_name: &str, middle_name: &str, suffix
 	.to_owned()
 }
 
-pub fn bim_output_head(bim: &bim_t_rust, file: &mut File) {
+pub fn bim_output_head(bim: &Bim, file: &mut File) {
 	file.write_all(b"t,").expect("Failed to write to file");
 
 	for zone in &bim.zones {
@@ -55,7 +55,7 @@ pub fn bim_output_head(bim: &bim_t_rust, file: &mut File) {
 	file.flush().expect("Failed to flush file");
 }
 
-pub fn bim_output_body(bim: &bim_t_rust, time: f64, file: &mut File) {
+pub fn bim_output_body(bim: &Bim, time: f64, file: &mut File) {
 	file.write_all(format!("{time:.2},").as_bytes())
 		.expect("Failed to write to file");
 

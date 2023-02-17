@@ -1,46 +1,15 @@
-use super::bim_json_object::{uuid_t, BimElementSign, BimJsonObject};
+use super::bim_json_object::{BimElementSign, BimJsonObject};
 use super::bim_polygon_tools::{
-	geom_tools_area_polygon, is_intersect_line, is_point_in_polygon, nearest_point, polygon_t,
-	polygon_t_rust, side_length, Line,
+	geom_tools_area_polygon, is_intersect_line, is_point_in_polygon, nearest_point, side_length,
+	Line, Polygon,
 };
 use super::json_object::Point;
-use libc::{c_char, c_double, size_t};
+use libc::c_double;
 use std::cmp::Ordering;
 
 /// Структура, расширяющая элемент DOOR_*
-#[repr(C)]
-pub struct bim_transit_t {
-	/// UUID идентификатор элемента
-	pub uuid: uuid_t,
-	/// Внутренний номер элемента
-	pub id: usize,
-	/// Название элемента
-	pub name: *mut char,
-	/// Массив UUID элементов, которые являются соседними
-	pub outputs: *mut uuid_t,
-	/// Полигон элемента
-	pub polygon: *mut polygon_t,
-	/// Высота элемента
-	pub size_z: f64,
-	/// Уровень, на котором находится элемент
-	pub z_level: f64,
-	/// Ширина проема/двери
-	pub width: f64,
-	/// Количество людей, которые прошли через элемент
-	pub nop_proceeding: f64,
-	/// Тип элемента
-	pub sign: u8,
-	/// Количество связанных с текущим элементов
-	pub numofoutputs: u8,
-	/// Признак посещения элемента
-	pub is_visited: bool,
-	/// Признак недоступности элемента для движения
-	pub is_blocked: bool,
-}
-
-/// Структура, расширяющая элемент DOOR_*
 #[derive(Debug, Clone, Default)]
-pub struct bim_transit_t_rust {
+pub struct BimTransit {
 	/// UUID идентификатор элемента
 	pub uuid: String,
 	/// Внутренний номер элемента
@@ -50,7 +19,7 @@ pub struct bim_transit_t_rust {
 	/// Массив UUID элементов, которые являются соседними
 	pub outputs: Vec<String>,
 	/// Полигон элемента
-	pub polygon: polygon_t_rust,
+	pub polygon: Polygon,
 	/// Высота элемента
 	pub size_z: f64,
 	/// Уровень, на котором находится элемент
@@ -68,45 +37,8 @@ pub struct bim_transit_t_rust {
 }
 
 /// Структура, расширяющая элемент типа ROOM и STAIR
-#[repr(C)]
-pub struct bim_zone_t {
-	/// UUID идентификатор элемента
-	pub uuid: uuid_t,
-	/// Внутренний номер элемента
-	pub id: size_t,
-	/// Название элемента
-	pub name: *mut c_char,
-	/// Полигон элемента
-	pub polygon: *mut polygon_t,
-	/// Массив UUID элементов, которые являются соседними
-	pub outputs: *mut uuid_t,
-	/// Высота элемента
-	pub size_z: f64,
-	/// Уровень, на котором находится элемент
-	pub z_level: f64,
-	/// Количество людей в элементе
-	pub numofpeople: f64,
-	/// Время достижения безопасной зоны
-	pub potential: f64,
-	/// Площадь элемента
-	pub area: f64,
-	/// Уровень опасности, % (0, 10, 20, ..., 90, 100)
-	pub hazard_level: u8,
-	/// Тип элемента
-	pub sign: u8,
-	/// Количество связанных с текущим элементов
-	pub numofoutputs: u8,
-	/// Признак посещения элемента
-	pub is_visited: bool,
-	/// Признак недоступности элемента для движения
-	pub is_blocked: bool,
-	/// Признак безопасности зоны, т.е. в эту зону возможна эвакуация
-	pub is_safe: bool,
-}
-
-/// Структура, расширяющая элемент типа ROOM и STAIR
 #[derive(Debug, Clone, Default)]
-pub struct bim_zone_t_rust {
+pub struct BimZone {
 	/// UUID идентификатор элемента
 	pub uuid: String,
 	/// Внутренний номер элемента
@@ -114,7 +46,7 @@ pub struct bim_zone_t_rust {
 	/// Название элемента
 	pub name: String,
 	/// Полигон элемента
-	pub polygon: polygon_t_rust,
+	pub polygon: Polygon,
 	/// Массив UUID элементов, которые являются соседними
 	pub outputs: Vec<String>,
 	/// Высота элемента
@@ -140,28 +72,11 @@ pub struct bim_zone_t_rust {
 }
 
 /// Структура, описывающая этаж
-#[repr(C)]
-pub struct bim_level_t {
+pub struct BimLevel {
 	/// Массив зон, которые принадлежат этажу
-	pub zones: *mut bim_zone_t,
+	pub zones: Vec<BimZone>,
 	/// Массив переходов, которые принадлежат этажу
-	pub transits: *mut bim_transit_t,
-	/// Название этажа
-	pub name: *mut c_char,
-	/// Высота этажа над нулевой отметкой
-	pub z_level: f64,
-	/// Количство зон на этаже
-	pub numofzones: u16,
-	/// Количство переходов на этаже
-	pub numoftransits: u16,
-}
-
-/// Структура, описывающая этаж
-pub struct bim_level_t_rust {
-	/// Массив зон, которые принадлежат этажу
-	pub zones: Vec<bim_zone_t_rust>,
-	/// Массив переходов, которые принадлежат этажу
-	pub transits: Vec<bim_transit_t_rust>,
+	pub transits: Vec<BimTransit>,
 	/// Название этажа
 	pub name: String,
 	/// Высота этажа над нулевой отметкой
@@ -169,18 +84,18 @@ pub struct bim_level_t_rust {
 }
 
 /// Структура, описывающая здание
-pub struct bim_t_rust {
+pub struct Bim {
 	/// Массив уровней здания
-	pub levels: Vec<bim_level_t_rust>,
+	pub levels: Vec<BimLevel>,
 	/// Название здания
 	pub name: String,
 	/// Список зон объекта
-	pub zones: Vec<bim_zone_t_rust>,
+	pub zones: Vec<BimZone>,
 	/// Список переходов объекта
-	pub transits: Vec<bim_transit_t_rust>,
+	pub transits: Vec<BimTransit>,
 }
 
-pub fn intersected_edge(polygon_element: &polygon_t_rust, line: &Line) -> Line {
+pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 	let mut line_intersected = Line {
 		p1: Point { x: 0.0, y: 0.0 },
 		p2: Point { x: 0.0, y: 0.0 },
@@ -236,12 +151,7 @@ pub fn intersected_edge(polygon_element: &polygon_t_rust, line: &Line) -> Line {
 /// *************************************************************************
 /// 1. Определить грани помещения, которые пересекает короткая сторона проема
 /// 2. Вычислить среднее проекций граней друг на друга
-pub fn door_way_width(
-	zone1: &polygon_t_rust,
-	zone2: &polygon_t_rust,
-	edge1: &Line,
-	edge2: &Line,
-) -> c_double {
+pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Line) -> c_double {
 	// TODO: l1p1 == l2p1 and l1p2 == l2p2 ??? figure out why this is so
 	/* old c code
 	point_t *l1p1 = edge1->p1;
@@ -283,17 +193,17 @@ pub fn door_way_width(
 	(distance12 + distance34) * 0.5
 }
 
-pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
+pub fn outside_init_rust(bim_json: &BimJsonObject) -> BimZone {
 	let mut outputs: Vec<String> = vec![];
 	let mut id = 0u64;
 
 	for level in &bim_json.levels {
 		for element in &level.build_elements {
 			match element.sign {
-				BimElementSign::DOOR_WAY_OUT => {
+				BimElementSign::DoorWayOut => {
 					outputs.push(element.uuid.clone());
 				}
-				BimElementSign::ROOM | BimElementSign::STAIRCASE => {
+				BimElementSign::Room | BimElementSign::Staircase => {
 					id += 1;
 				}
 				_ => {}
@@ -305,11 +215,11 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 		panic!("Failed to find any output at outside_init_rust fn in bim_tools crate")
 	}
 
-	bim_zone_t_rust {
+	BimZone {
 		id,
 		name: String::from("Outside"),
-		sign: BimElementSign::OUTSIDE,
-		polygon: polygon_t_rust::default(),
+		sign: BimElementSign::Outside,
+		polygon: Polygon::default(),
 		uuid: String::from("outside0-safe-zone-0000-000000000000"),
 		z_level: 0.0,
 		size_z: f64::from(f32::MAX),
@@ -325,7 +235,7 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 }
 
 /// Устанавливает в помещение заданное количество людей
-pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f64) {
+pub fn set_people_to_zone(zone: &mut BimZone, num_of_people: f64) {
 	zone.number_of_people = num_of_people;
 }
 
@@ -337,10 +247,10 @@ pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f64) {
 ///
 /// # Returns
 /// Ширина проёма
-pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_transit_t_rust]) {
+pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) {
 	for transit in transits {
 		let mut stair_sign_counter = 0u8; // Если stair_sign_counter = 2, то проем межэтажный (между лестницами)
-		let mut related_zones = [bim_zone_t_rust::default(), bim_zone_t_rust::default()];
+		let mut related_zones = [BimZone::default(), BimZone::default()];
 
 		for (i, output) in transit.outputs.iter().enumerate() {
 			let zone = zones.iter().find(|zone| zone.uuid.eq(output)).unwrap_or_else(|| {
@@ -352,7 +262,7 @@ pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_t
 				);
 			});
 
-			if zone.sign == BimElementSign::STAIRCASE {
+			if zone.sign == BimElementSign::Staircase {
 				stair_sign_counter += 1;
 			}
 			related_zones[i] = zone.clone();
@@ -409,13 +319,13 @@ pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_t
 		}
 
 		match transit.sign {
-			BimElementSign::DOOR_WAY_IN | BimElementSign::DOOR_WAY_OUT => {
+			BimElementSign::DoorWayIn | BimElementSign::DoorWayOut => {
 				let width1 = side_length(&edge1.p1, &edge1.p2);
 				let width2 = side_length(&edge2.p1, &edge2.p2);
 
 				width = (width1 + width2) / 2.0;
 			}
-			BimElementSign::DOOR_WAY => {
+			BimElementSign::DoorWay => {
 				width = door_way_width(
 					&related_zones[0].polygon,
 					&related_zones[1].polygon,
@@ -448,14 +358,14 @@ pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_t
 	}
 }
 
-pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
-	let mut zones_list: Vec<bim_zone_t_rust> = vec![];
-	let mut transits_list: Vec<bim_transit_t_rust> = vec![];
-	let mut levels_list: Vec<bim_level_t_rust> = vec![];
+pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
+	let mut zones_list: Vec<BimZone> = vec![];
+	let mut transits_list: Vec<BimTransit> = vec![];
+	let mut levels_list: Vec<BimLevel> = vec![];
 
 	for level_json in &bim_json.levels {
-		let mut zones: Vec<bim_zone_t_rust> = vec![];
-		let mut transits: Vec<bim_transit_t_rust> = vec![];
+		let mut zones: Vec<BimZone> = vec![];
+		let mut transits: Vec<BimTransit> = vec![];
 
 		for build_element_json in &level_json.build_elements {
 			let id = build_element_json.id;
@@ -468,8 +378,8 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 			let polygon = build_element_json.polygon.clone();
 			// TODO: replace string on enum
 			match build_element_json.sign {
-				BimElementSign::ROOM | BimElementSign::STAIRCASE => {
-					let zone = bim_zone_t_rust {
+				BimElementSign::Room | BimElementSign::Staircase => {
+					let zone = BimZone {
 						id,
 						uuid,
 						name,
@@ -490,10 +400,10 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 					zones.push(zone.clone());
 					zones_list.push(zone);
 				}
-				BimElementSign::DOOR_WAY
-				| BimElementSign::DOOR_WAY_OUT
-				| BimElementSign::DOOR_WAY_IN => {
-					let transit = bim_transit_t_rust {
+				BimElementSign::DoorWay
+				| BimElementSign::DoorWayOut
+				| BimElementSign::DoorWayIn => {
+					let transit = BimTransit {
 						id,
 						name,
 						uuid,
@@ -514,7 +424,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 			}
 		}
 
-		let bim_level = bim_level_t_rust {
+		let bim_level = BimLevel {
 			name: level_json.name.clone(),
 			z_level: level_json.z_level,
 			zones,
@@ -543,7 +453,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 
 	calculate_transits_width(&zones_list, &mut transits_list);
 
-	bim_t_rust {
+	Bim {
 		transits: transits_list,
 		zones: zones_list,
 		levels: levels_list,
@@ -551,11 +461,11 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 	}
 }
 
-pub fn bim_tools_get_area_bim(bim: &bim_t_rust) -> f64 {
+pub fn bim_tools_get_area_bim(bim: &Bim) -> f64 {
 	let mut area = 0.0;
 	for level in &bim.levels {
 		for zone in &level.zones {
-			if zone.sign == BimElementSign::ROOM || zone.sign == BimElementSign::STAIRCASE {
+			if zone.sign == BimElementSign::Room || zone.sign == BimElementSign::Staircase {
 				area += zone.area;
 			}
 		}
@@ -565,9 +475,9 @@ pub fn bim_tools_get_area_bim(bim: &bim_t_rust) -> f64 {
 }
 
 /// Подсчитывает количество людей в здании по расширенной структуре
-pub fn bim_tools_get_num_of_people(bim: &bim_t_rust) -> f64 {
+pub fn bim_tools_get_num_of_people(bim: &Bim) -> f64 {
 	bim.zones.iter().fold(0.0, |acc, zone| match zone.sign {
-		BimElementSign::OUTSIDE => acc,
+		BimElementSign::Outside => acc,
 		_ => acc + zone.number_of_people,
 	})
 }

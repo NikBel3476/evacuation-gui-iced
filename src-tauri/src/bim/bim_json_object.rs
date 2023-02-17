@@ -1,48 +1,23 @@
 use super::bim_polygon_tools;
 use super::json_object::parse_building_from_json;
-use libc::{c_char, c_double, c_ulonglong};
-
-/// Количество символов в UUID + NUL символ
-#[derive(Clone)]
-#[repr(C)]
-pub struct uuid_t {
-	pub x: [c_char; 36 + 1],
-}
-
-impl Default for uuid_t {
-	fn default() -> Self {
-		Self { x: [0; 36 + 1] }
-	}
-}
-
-#[repr(C)]
-pub struct point_t_rust {
-	pub x: c_double,
-	pub y: c_double,
-}
-
-pub struct polygon_t_rust {
-	pub numofpoints: c_ulonglong,
-	pub points: *mut point_t_rust,
-}
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum BimElementSign {
 	/// Указывает, что элемент здания является помещением/комнатой
-	ROOM,
+	Room,
 	/// Указывает, что элемент здания является лестницей
-	STAIRCASE,
+	Staircase,
 	/// Указывает, что элемент здания является проемом (без дверного полотна)
-	DOOR_WAY,
+	DoorWay,
 	/// Указывает, что элемент здания является дверью, которая соединяет два элемента: ROOM и ROOM или ROOM и STAIR
-	DOOR_WAY_IN,
+	DoorWayIn,
 	/// Указывает, что элемент здания является эвакуационным выходом
-	DOOR_WAY_OUT,
+	DoorWayOut,
 	/// Указывает, что элемент является зоной вне здания
-	OUTSIDE,
+	Outside,
 	/// Указывает, что тип элемента не определен
 	#[default]
-	UNDEFINED,
+	Undefined,
 }
 
 /// Структура, описывающая элемент
@@ -52,7 +27,7 @@ pub struct BimJsonElement {
 	/// [JSON] Название элемента
 	pub name: String,
 	/// [JSON] Полигон элемента
-	pub polygon: bim_polygon_tools::polygon_t_rust,
+	pub polygon: bim_polygon_tools::Polygon,
 	/// [JSON] Массив UUID элементов, которые являются соседними к элементу
 	pub outputs: Vec<String>,
 	/// Внутренний номер элемента (генерируется)
@@ -141,15 +116,15 @@ pub fn bim_json_object_new(path_to_file: &str) -> BimJsonObject {
 						z_level: level.z_level,
 						number_of_people: element.number_of_people,
 						sign: match element.sign.as_str() {
-							"Room" => BimElementSign::ROOM,
-							"Staircase" => BimElementSign::STAIRCASE,
-							"DoorWay" => BimElementSign::DOOR_WAY,
-							"DoorWayInt" => BimElementSign::DOOR_WAY_IN,
-							"DoorWayOut" => BimElementSign::DOOR_WAY_OUT,
-							_ => BimElementSign::UNDEFINED,
+							"Room" => BimElementSign::Room,
+							"Staircase" => BimElementSign::Staircase,
+							"DoorWay" => BimElementSign::DoorWay,
+							"DoorWayInt" => BimElementSign::DoorWayIn,
+							"DoorWayOut" => BimElementSign::DoorWayOut,
+							_ => BimElementSign::Undefined,
 						},
 						outputs: element.outputs.clone(),
-						polygon: bim_polygon_tools::polygon_t_rust {
+						polygon: bim_polygon_tools::Polygon {
 							points: element.xy[0].points.clone(),
 						},
 					})

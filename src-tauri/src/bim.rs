@@ -8,13 +8,12 @@ use bim_output::{
 	bim_basename_rust, bim_create_file_name_rust, bim_output_body, bim_output_head,
 	OUTPUT_DETAIL_FILE_RUST, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX,
 };
-use bim_tools::{bim_t_rust, bim_tools_get_num_of_people, bim_tools_new_rust, set_people_to_zone};
+use bim_tools::{bim_tools_get_num_of_people, bim_tools_new_rust, set_people_to_zone, Bim};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 use std::io::Write;
 
 mod bim_cli;
-mod bim_configure;
 mod bim_evac;
 mod bim_graph;
 mod bim_json_object;
@@ -149,14 +148,14 @@ pub fn run_rust() {
 	}
 }
 
-pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration: &ScenarioCfg) {
+pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &ScenarioCfg) {
 	for transition in &mut bim.transits {
 		if scenario_configuration.transition.transitions_type == TransitionType::Users {
 			match transition.sign {
-				BimElementSign::DOOR_WAY_IN => {
+				BimElementSign::DoorWayIn => {
 					transition.width = scenario_configuration.transition.doorway_in
 				}
-				BimElementSign::DOOR_WAY_OUT => {
+				BimElementSign::DoorWayOut => {
 					transition.width = scenario_configuration.transition.doorway_out
 				}
 				_ => {}
@@ -178,10 +177,10 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for transition in &mut level.transits {
 			if scenario_configuration.transition.transitions_type == TransitionType::Users {
 				match transition.sign {
-					BimElementSign::DOOR_WAY_IN => {
+					BimElementSign::DoorWayIn => {
 						transition.width = scenario_configuration.transition.doorway_in
 					}
-					BimElementSign::DOOR_WAY_OUT => {
+					BimElementSign::DoorWayOut => {
 						transition.width = scenario_configuration.transition.doorway_out
 					}
 					_ => {}
@@ -200,7 +199,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	}
 
 	for zone in &mut bim.zones {
-		if zone.sign == BimElementSign::OUTSIDE {
+		if zone.sign == BimElementSign::Outside {
 			continue;
 		}
 
@@ -224,7 +223,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	// in c code bim->zones is a pointers to bim->levels[_]->zones so necessary to update bim->levels[_]->zones
 	for level in &mut bim.levels {
 		for zone in &mut level.zones {
-			if zone.sign == BimElementSign::OUTSIDE {
+			if zone.sign == BimElementSign::Outside {
 				continue;
 			}
 

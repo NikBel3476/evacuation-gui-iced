@@ -1,63 +1,36 @@
-use super::bim_tools::{bim_t_rust, bim_transit_t_rust, bim_zone_t_rust};
-use libc::size_t;
+use super::bim_tools::{Bim, BimTransit, BimZone};
 
 /// https://www.techiedelight.com/implement-graph-data-structure-c
 /// Data structure to store a graph object
-#[repr(C)]
-pub struct bim_graph_t {
-	/// An array of pointers to Node to represent an adjacency list
-	pub head: *mut *mut bim_node_t,
-	pub node_count: size_t,
-}
-
-pub struct bim_graph_t_rust {
-	pub head: Vec<Box<bim_node_t_rust>>,
+pub struct BimGraph {
+	pub head: Vec<Box<BimNode>>,
 }
 
 /// Data structure to store adjacency list nodes of the graph
-#[repr(C)]
-pub struct bim_node_t {
-	pub dest: size_t,
-	/// edge id
-	pub eid: size_t,
-	pub next: *mut bim_node_t,
-}
-
 #[derive(Default, Clone)]
-pub struct bim_node_t_rust {
+pub struct BimNode {
 	pub dest: usize,
 	pub eid: usize,
-	pub next: Option<Box<bim_node_t_rust>>,
+	pub next: Option<Box<BimNode>>,
 }
 
 /// Data structure to store a graph edge
-#[repr(C)]
-pub struct bim_edge_t {
-	pub src: size_t,
-	pub dest: size_t,
-	pub id: size_t,
-}
-
-pub struct bim_edge_t_rust {
+pub struct BimEdge {
 	pub src: usize,
 	pub dest: usize,
 	pub id: usize,
 }
 
-pub fn bim_graph_new(bim: &bim_t_rust) -> bim_graph_t_rust {
+pub fn bim_graph_new(bim: &Bim) -> BimGraph {
 	let edges = graph_create_edges(&bim.transits, &bim.zones);
 
 	graph_create(&edges, edges.len(), bim.zones.len())
 }
 
 /// Function to create an adjacency list from specified edges
-pub fn graph_create(
-	edges: &[bim_edge_t_rust],
-	edge_count: usize,
-	node_count: usize,
-) -> bim_graph_t_rust {
+pub fn graph_create(edges: &[BimEdge], edge_count: usize, node_count: usize) -> BimGraph {
 	// initialize head pointer for all vertices
-	let mut graph_head: Vec<Box<bim_node_t_rust>> = vec![Default::default(); node_count];
+	let mut graph_head: Vec<Box<BimNode>> = vec![Default::default(); node_count];
 
 	// add edges to the directed graph one by one
 	for i in 0..edge_count {
@@ -68,7 +41,7 @@ pub fn graph_create(
 		let eid = edge.id;
 
 		// 1. allocate a new node of adjacency list from `src` to `dest`
-		let mut new_node = bim_node_t_rust {
+		let mut new_node = BimNode {
 			dest,
 			eid,
 			next: None,
@@ -81,7 +54,7 @@ pub fn graph_create(
 		graph_head[src] = Box::new(new_node);
 
 		// 2. allocate a new node of adjacency list from `dest` to `src`
-		let new_node_dest_to_src = bim_node_t_rust {
+		let new_node_dest_to_src = BimNode {
 			dest: src,
 			eid,
 			// point new node to the current head
@@ -93,14 +66,11 @@ pub fn graph_create(
 	}
 
 	// allocate storage for the graph data structure
-	bim_graph_t_rust { head: graph_head }
+	BimGraph { head: graph_head }
 }
 
-pub fn graph_create_edges(
-	list_doors: &[bim_transit_t_rust],
-	zones: &[bim_zone_t_rust],
-) -> Vec<bim_edge_t_rust> {
-	let mut edges: Vec<bim_edge_t_rust> = vec![];
+pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<BimEdge> {
+	let mut edges: Vec<BimEdge> = vec![];
 
 	for (i, transition) in list_doors.iter().enumerate() {
 		let mut ids = [0, zones.len()];
@@ -112,7 +82,7 @@ pub fn graph_create_edges(
 			}
 		}
 
-		let edge = bim_edge_t_rust {
+		let edge = BimEdge {
 			id: i,
 			src: ids[0],
 			dest: ids[1],
@@ -123,7 +93,7 @@ pub fn graph_create_edges(
 	edges
 }
 
-pub fn equal_callback(zone: &bim_zone_t_rust, transit: &bim_transit_t_rust) -> bool {
+pub fn equal_callback(zone: &BimZone, transit: &BimTransit) -> bool {
 	for output in &zone.outputs {
 		if output.eq(&transit.uuid) {
 			return true;
