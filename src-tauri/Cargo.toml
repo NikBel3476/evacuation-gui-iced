@@ -30,7 +30,6 @@ bim_json_object = { path = "src/bim_json_object" }
 bim_output = { path = "src/bim_output" }
 bim_polygon_tools = { path = "src/bim_polygon_tools" }
 bim_graph = { path = "src/bim_graph" }
-bim_tools = { path = "src/bim_tools" }
 
 [features]
 # by default Tauri runs in production mode
