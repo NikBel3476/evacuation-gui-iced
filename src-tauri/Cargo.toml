@@ -28,7 +28,6 @@ bim_cli = { path = "src/bim_cli" }
 bim_evac = { path = "src/bim_evac" }
 bim_json_object = { path = "src/bim_json_object" }
 bim_polygon_tools = { path = "src/bim_polygon_tools" }
-bim_graph = { path = "src/bim_graph" }
 
 [features]
 # by default Tauri runs in production mode
