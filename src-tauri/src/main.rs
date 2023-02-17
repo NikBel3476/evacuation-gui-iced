@@ -4,7 +4,6 @@
 )]
 
 use bim::run_rust;
-use cli;
 use configuration;
 use json_object;
 use tauri::{AppHandle, WindowBuilder};
