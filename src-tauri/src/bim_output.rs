@@ -21,7 +21,7 @@ pub extern "C" fn bim_basename(path_to_file: *mut c_char) -> *mut c_char {
 		.to_str()
 		.unwrap()
 		.to_owned();
-	let out_file = Path::new("..")
+	let out_file = Path::new("../..")
 		.join(OUTPUT_DIR)
 		.join(basename)
 		.to_str()
@@ -40,7 +40,7 @@ pub fn bim_basename_rust(path_to_file: &str) -> String {
 		.unwrap()
 		.to_owned();
 
-	Path::new("..")
+	Path::new("../..")
 		.join(OUTPUT_DIR)
 		.join(basename)
 		.to_str()
