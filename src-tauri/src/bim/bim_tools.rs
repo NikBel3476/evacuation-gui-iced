@@ -1,7 +1,6 @@
 use super::bim_json_object::{BimElementSign, BimJsonObject};
 use super::bim_polygon_tools::{
-	geom_tools_area_polygon, is_intersect_line, is_point_in_polygon, nearest_point, side_length,
-	Line, Polygon,
+	is_intersect_line, is_point_in_polygon, nearest_point, Line, Polygon,
 };
 use super::json_object::Point;
 use libc::c_double;
@@ -164,11 +163,11 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 	 */
 	let l1p1 = edge1.p1;
 	let l1p2 = edge2.p2;
-	let length1 = side_length(&l1p1, &l1p2);
+	let length1 = l1p1.distance_to(&l1p2);
 
 	let l2p1 = edge1.p1;
 	let l2p2 = edge2.p2;
-	let length2 = side_length(&l2p1, &l2p2);
+	let length2 = l2p1.distance_to(&l2p2);
 
 	// Короткая линия проема, которая пересекает оба помещения
 	let d_line = match length1.total_cmp(&length2) {
@@ -184,11 +183,11 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 	// Расстояние между этими точками и является шириной проема
 	let point1 = nearest_point(&edge_element_a.p1, &edge_element_b);
 	let point2 = nearest_point(&edge_element_a.p2, &edge_element_b);
-	let distance12 = side_length(&point1, &point2);
+	let distance12 = point1.distance_to(&point2);
 
 	let point3 = nearest_point(&edge_element_b.p1, &edge_element_a);
 	let point4 = nearest_point(&edge_element_b.p2, &edge_element_a);
-	let distance34 = side_length(&point3, &point4);
+	let distance34 = point3.distance_to(&point4);
 
 	(distance12 + distance34) * 0.5
 }
@@ -320,8 +319,8 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 
 		match transit.sign {
 			BimElementSign::DoorWayIn | BimElementSign::DoorWayOut => {
-				let width1 = side_length(&edge1.p1, &edge1.p2);
-				let width2 = side_length(&edge2.p1, &edge2.p2);
+				let width1 = edge1.p1.distance_to(&edge1.p2);
+				let width2 = edge2.p1.distance_to(&edge2.p2);
 
 				width = (width1 + width2) / 2.0;
 			}
@@ -389,7 +388,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 						// FIXME: unsafe cast u64 to f64
 						number_of_people: build_element_json.number_of_people as f64,
 						outputs,
-						area: geom_tools_area_polygon(&polygon),
+						area: polygon.area(),
 						polygon,
 						is_blocked: false,
 						is_visited: false,

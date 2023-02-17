@@ -19,7 +19,7 @@ impl Polygon {
 
 		let mut triangle_list = vec![0; num_of_triangle_corner];
 
-		let number_of_triangles = self.triangulate(triangle_list.as_mut_ptr());
+		let number_of_triangles = self.triangulate(&mut triangle_list);
 
 		// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
 		// p=(ab+bc+ca)0.5
@@ -38,7 +38,11 @@ impl Polygon {
 		area_element
 	}
 
-	pub fn triangulate(&self, triangle_list: *mut i32) -> u64 {
+	/// #Returns
+	/// Массив номеров точек треугольников
+	///
+	/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
+	pub fn triangulate(&self, triangle_list: &mut [i32]) -> u64 {
 		let mut point_list = vec![0.0; 2 * self.points.len()];
 
 		for i in 0..self.points.len() {
@@ -51,7 +55,7 @@ impl Polygon {
 			pointattributelist: std::ptr::null_mut(),
 			pointmarkerlist: std::ptr::null_mut(),
 			numberofpoints: self.points.len() as i32,
-			trianglelist: triangle_list, // Индексы точек треугольников против часовой стрелки
+			trianglelist: triangle_list.as_mut_ptr(), // Индексы точек треугольников против часовой стрелки
 			numberofpointattributes: 0,
 			triangleattributelist: std::ptr::null_mut(),
 			trianglearealist: std::ptr::null_mut(),
@@ -146,7 +150,6 @@ pub struct triangulateio {
 	pub numberofedges: c_int,
 }
 
-/// cbindgen:ignore
 extern "C" {
 	fn triangulate(
 		triswitches: *mut c_char,
@@ -154,90 +157,6 @@ extern "C" {
 		_out: *mut triangulateio,
 		thevoro: *mut triangulateio,
 	);
-}
-
-/// #Returns
-/// Массив номеров точек треугольников
-///
-/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
-pub fn triangle_polygon(polygon: &Polygon, triangle_list: &mut [i32]) -> u64 {
-	let mut point_list = vec![0.0; 2 * polygon.points.len()];
-
-	for i in 0..polygon.points.len() {
-		point_list[i * 2] = polygon.points[i].x;
-		point_list[i * 2 + 1] = polygon.points[i].y;
-	}
-
-	let mut polygon_to_triangulate = triangulateio {
-		pointlist: point_list.as_mut_ptr(),
-		pointattributelist: std::ptr::null_mut(),
-		pointmarkerlist: std::ptr::null_mut(),
-		numberofpoints: polygon.points.len() as i32,
-		trianglelist: triangle_list.as_mut_ptr(), // Индексы точек треугольников против часовой стрелки
-		numberofpointattributes: 0,
-		triangleattributelist: std::ptr::null_mut(),
-		trianglearealist: std::ptr::null_mut(),
-		neighborlist: std::ptr::null_mut(),
-		numberoftriangles: 0,
-		numberofcorners: 0,
-		numberoftriangleattributes: 0,
-		segmentlist: std::ptr::null_mut(),
-		segmentmarkerlist: std::ptr::null_mut(),
-		numberofsegments: 0,
-		holelist: std::ptr::null_mut(),
-		numberofholes: 0,
-		regionlist: std::ptr::null_mut(),
-		numberofregions: 0,
-		edgelist: std::ptr::null_mut(),
-		edgemarkerlist: std::ptr::null_mut(),
-		normlist: std::ptr::null_mut(),
-		numberofedges: 0,
-	};
-
-	let triswitches = CString::new("zQ").unwrap_or_else(|_| {
-		panic!("Failed to create CString from \"zQ\" at triangle_polygon_rust fn in bim_polygon_tools crate")
-	});
-	unsafe {
-		triangulate(
-			triswitches.into_raw(),
-			&mut polygon_to_triangulate,
-			&mut polygon_to_triangulate,
-			std::ptr::null_mut(),
-		)
-	}
-
-	u64::try_from(polygon_to_triangulate.numberoftriangles).unwrap_or_else(|e| {
-		panic!("Failed to convert numberoftriangles to u64 at triangle_polygon_rust fn in bim_polygon_tools crate. {e}")
-	})
-}
-
-pub fn side_length(point1: &Point, point2: &Point) -> f64 {
-	((point1.x - point2.x).powi(2) + (point1.y - point2.y).powi(2)).sqrt()
-}
-
-pub fn geom_tools_area_polygon(polygon: &Polygon) -> f64 {
-	let num_of_triangle_corner = (polygon.points.len() - 2) * 3;
-
-	let mut triangle_list = vec![0; num_of_triangle_corner];
-
-	let number_of_triangles = triangle_polygon(polygon, &mut triangle_list);
-
-	// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
-	// p=(ab+bc+ca)0.5
-	let mut area_element = 0.0;
-
-	for i in 0..number_of_triangles {
-		let a = &polygon.points[triangle_list[(i * 3) as usize] as usize];
-		let b = &polygon.points[triangle_list[(i * 3 + 1) as usize] as usize];
-		let c = &polygon.points[triangle_list[(i * 3 + 2) as usize] as usize];
-		let ab = side_length(a, b);
-		let bc = side_length(b, c);
-		let ca = side_length(c, a);
-		let p = (ab + bc + ca) * 0.5;
-		area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
-	}
-
-	area_element
 }
 
 fn where_point_rust(a_ax: f64, a_ay: f64, a_bx: f64, a_by: f64, a_px: f64, a_py: f64) -> i32 {
@@ -276,7 +195,7 @@ pub fn is_point_in_polygon(point: &Point, polygon: &Polygon) -> bool {
 
 	let mut triangle_list = vec![0; num_of_triangle_corner];
 
-	let number_of_triangles = triangle_polygon(polygon, &mut triangle_list);
+	let number_of_triangles = polygon.triangulate(&mut triangle_list);
 
 	for i in 0..number_of_triangles {
 		let a = &polygon.points[triangle_list[(i * 3) as usize] as usize];
@@ -327,7 +246,11 @@ pub fn nearest_point(point_start: &Point, line: &Line) -> Point {
 
 	let p2 = &line.p2;
 
-	if side_length(p1, p2) < 1e-9 {
+	/*if side_length(p1, p2) < 1e-9 {
+		return line.p1;
+	}*/
+
+	if p1.distance_to(p2) < 1e-9 {
 		return line.p1;
 	}
 
