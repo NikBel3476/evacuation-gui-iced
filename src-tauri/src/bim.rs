@@ -1,10 +1,8 @@
 use bim_evac::{
-	evac_def_modeling_step, evac_moving_step_test_with_log, evac_moving_step_test_with_log_rust,
-	evac_set_density_max_rust, evac_set_density_min_rust, evac_set_modeling_step_rust,
-	evac_set_speed_max_rust, get_time_m, get_time_s, set_density_max, set_density_min,
-	set_modeling_step, set_speed_max, time_inc, time_reset,
+	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
+	set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
 };
-use bim_graph::{bim_graph_new, bim_graph_new_test};
+use bim_graph::bim_graph_new;
 use bim_json_object::{bim_json_object_new, BimElementSign};
 use bim_output::{
 	bim_basename_rust, bim_create_file_name_rust, bim_output_body, bim_output_head,
@@ -249,11 +247,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	}
 
 	set_modeling_step(scenario_configuration.modeling.step);
-	evac_set_modeling_step_rust(scenario_configuration.modeling.step);
 	set_speed_max(scenario_configuration.modeling.max_speed);
-	evac_set_speed_max_rust(scenario_configuration.modeling.max_speed);
 	set_density_max(scenario_configuration.modeling.max_density);
-	evac_set_density_max_rust(scenario_configuration.modeling.max_density);
 	set_density_min(scenario_configuration.modeling.min_density);
-	evac_set_density_min_rust(scenario_configuration.modeling.min_density);
 }
