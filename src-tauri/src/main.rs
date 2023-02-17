@@ -3,21 +3,13 @@
 	windows_subsystem = "windows"
 )]
 
-use bim_cli;
-use bim_evac;
-use bim_graph;
-use bim_json_object;
-use bim_output;
-use bim_polygon_tools;
-use bim_tools;
+use bim::run_rust;
 use cli;
 use configuration;
 use json_object;
-use run::run_rust;
 use tauri::{AppHandle, WindowBuilder};
 
-mod bim_configure;
-mod run;
+mod bim;
 
 fn main() {
 	tauri::Builder::default()

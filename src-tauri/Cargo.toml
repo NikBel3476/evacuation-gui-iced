@@ -1,13 +1,13 @@
 [package]
-name = "app"
+name = "evacuation"
 version = "0.1.0"
 description = "A Tauri App"
 authors = [""]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "evacuation"
 edition = "2021"
-rust-version = "1.66"
+rust-version = "1.67"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -24,8 +24,6 @@ libc = "0.2"
 cli = { path = "src/cli" }
 configuration = { path = "src/configuration" }
 json_object = { path = "src/json_object" }
-bim_cli = { path = "src/bim_cli" }
-bim_evac = { path = "src/bim_evac" }
 
 [features]
 # by default Tauri runs in production mode
@@ -34,9 +32,3 @@ default = [ "custom-protocol" ]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
-
-[workspace]
-members = [
-  "src/bim_output",
-  "src/bim_evac"
-]

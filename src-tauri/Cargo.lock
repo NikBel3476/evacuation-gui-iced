@@ -57,29 +57,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "98161a4e3e2184da77bb14f02184cdd111e83bbbcc9979dfee3c44b9a85f5602"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "bim_cli",
- "bim_evac",
- "bim_graph",
- "bim_json_object",
- "bim_output",
- "bim_polygon_tools",
- "bim_tools",
- "cc",
- "chrono",
- "cli",
- "configuration",
- "json_object",
- "libc",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
-]
-
-[[package]]
 name = "atk"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -130,65 +107,6 @@ name = "base64"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
-
-[[package]]
-name = "bim_cli"
-version = "0.1.0"
-
-[[package]]
-name = "bim_evac"
-version = "0.1.0"
-dependencies = [
- "bim_graph",
- "bim_json_object",
- "bim_polygon_tools",
- "bim_tools",
- "libc",
-]
-
-[[package]]
-name = "bim_graph"
-version = "0.1.0"
-dependencies = [
- "bim_tools",
- "libc",
-]
-
-[[package]]
-name = "bim_json_object"
-version = "0.1.0"
-dependencies = [
- "bim_polygon_tools",
- "json_object",
- "libc",
-]
-
-[[package]]
-name = "bim_output"
-version = "0.1.0"
-dependencies = [
- "bim_tools",
- "libc",
-]
-
-[[package]]
-name = "bim_polygon_tools"
-version = "0.1.0"
-dependencies = [
- "cc",
- "json_object",
- "libc",
-]
-
-[[package]]
-name = "bim_tools"
-version = "0.1.0"
-dependencies = [
- "bim_json_object",
- "bim_polygon_tools",
- "json_object",
- "libc",
-]
 
 [[package]]
 name = "bitflags"
@@ -744,6 +662,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9852635589dc9f9ea1b6fe9f05b50ef208c85c834a562f0c6abb1c475736ec2b"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "evacuation"
+version = "0.1.0"
+dependencies = [
+ "cc",
+ "chrono",
+ "cli",
+ "configuration",
+ "json_object",
+ "libc",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
 ]
 
 [[package]]

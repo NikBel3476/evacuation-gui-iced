@@ -1,6 +1,6 @@
-use bim_graph::{bim_graph_t, bim_graph_t_rust};
-use bim_json_object::{bim_element_sign_t_rust, BimElementSign};
-use bim_tools::{
+use super::bim_graph::{bim_graph_t, bim_graph_t_rust};
+use super::bim_json_object::{bim_element_sign_t_rust, BimElementSign};
+use super::bim_tools::{
 	bim_t_rust, bim_tools_get_area_bim, bim_transit_t, bim_transit_t_rust, bim_zone_t,
 	bim_zone_t_rust,
 };
@@ -1180,9 +1180,9 @@ pub fn time_reset() {
 
 #[cfg(test)]
 mod tests {
+	use super::super::bim_json_object::uuid_t;
+	use super::super::bim_polygon_tools::polygon_t_rust;
 	use super::*;
-	use bim_json_object::uuid_t;
-	use bim_polygon_tools::polygon_t_rust;
 	use std::ffi::CString;
 
 	#[test]

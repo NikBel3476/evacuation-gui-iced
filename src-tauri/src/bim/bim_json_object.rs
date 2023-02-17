@@ -1,4 +1,4 @@
-use bim_polygon_tools;
+use super::bim_polygon_tools;
 use json_object::{parse_building_from_json, Point};
 use libc::{c_char, c_double, c_ulonglong, size_t};
 use std::convert::TryInto;
