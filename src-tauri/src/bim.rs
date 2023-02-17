@@ -25,6 +25,7 @@ mod bim_polygon_tools;
 mod bim_tools;
 mod cli;
 pub mod configuration;
+mod graph;
 
 pub fn run_rust() {
 	// TODO: remove mock file path

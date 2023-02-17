@@ -1,4 +1,4 @@
-use bim_tools::{bim_t_rust, bim_transit_t_rust, bim_zone_t_rust};
+use super::bim_tools::{bim_t_rust, bim_transit_t_rust, bim_zone_t_rust};
 use fnv::FnvHashMap;
 use petgraph::Undirected;
 use std::hash::Hash;
