@@ -4,7 +4,6 @@
 )]
 
 use bim_cli;
-use bim_configure;
 use bim_evac;
 use bim_graph;
 use bim_json_object;
@@ -17,6 +16,7 @@ use json_object;
 use run::run_rust;
 use tauri::{AppHandle, WindowBuilder};
 
+mod bim_configure;
 mod run;
 
 fn main() {
