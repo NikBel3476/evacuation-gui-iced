@@ -26,6 +26,7 @@ mod bim_tools;
 mod cli;
 pub mod configuration;
 mod graph;
+mod json_object;
 
 pub fn run_rust() {
 	// TODO: remove mock file path

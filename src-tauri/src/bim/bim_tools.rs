@@ -6,7 +6,7 @@ use super::bim_polygon_tools::{
 	geom_tools_nearest_point_rust, is_intersect_line, is_point_in_polygon, line_t, nearest_point,
 	point_t, polygon_t, polygon_t_rust, side_length, Line,
 };
-use json_object::Point;
+use super::json_object::Point;
 use libc::{c_char, c_double, c_int, size_t};
 use std::cmp::Ordering;
 use std::ffi::CString;

@@ -5,7 +5,6 @@
 
 use bim::configuration;
 use bim::run_rust;
-use json_object;
 use tauri::{AppHandle, WindowBuilder};
 
 mod bim;

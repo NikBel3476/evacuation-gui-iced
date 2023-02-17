@@ -659,7 +659,6 @@ dependencies = [
  "cc",
  "chrono",
  "fnv",
- "json_object",
  "libc",
  "petgraph",
  "serde",
@@ -1356,14 +1355,6 @@ dependencies = [
  "serde",
  "serde_json",
  "treediff",
-]
-
-[[package]]
-name = "json_object"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
 ]
 
 [[package]]

@@ -23,7 +23,6 @@ chrono = "0.4"
 libc = "0.2"
 fnv = "1.0"
 petgraph = "0.6"
-json_object = { path = "src/json_object" }
 
 [features]
 # by default Tauri runs in production mode

@@ -1,4 +1,4 @@
-use json_object::Point;
+use super::json_object::Point;
 use libc::{c_char, c_double, c_int};
 use std::cmp::Ordering;
 use std::ffi::CString;
