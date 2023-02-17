@@ -1,15 +1,11 @@
-use super::bim_json_object::{
-	bim_element_sign_t_rust, bim_json_object_t_rust, uuid_t, BimElementSign, BimJsonObject,
-};
+use super::bim_json_object::{uuid_t, BimElementSign, BimJsonObject};
 use super::bim_polygon_tools::{
-	geom_tools_area_polygon, geom_tools_is_intersect_line_rust, geom_tools_length_side_rust,
-	geom_tools_nearest_point_rust, is_intersect_line, is_point_in_polygon, line_t, nearest_point,
-	point_t, polygon_t, polygon_t_rust, side_length, Line,
+	geom_tools_area_polygon, is_intersect_line, is_point_in_polygon, nearest_point, polygon_t,
+	polygon_t_rust, side_length, Line,
 };
 use super::json_object::Point;
-use libc::{c_char, c_double, c_int, size_t};
+use libc::{c_char, c_double, size_t};
 use std::cmp::Ordering;
-use std::ffi::CString;
 
 /// Структура, расширяющая элемент DOOR_*
 #[repr(C)]
@@ -184,76 +180,6 @@ pub struct bim_t_rust {
 	pub transits: Vec<bim_transit_t_rust>,
 }
 
-// #[no_mangle]
-// pub extern "C" fn bim_tools_new(building: *const bim_json_object_t_rust) -> *mut bim_t {
-// 	let bim = bim_json_object_t_rust {
-// 		numoflevels: building.levels.len(),
-// 		levels: bim_level_t {
-// 			z_level:
-// 		}
-// 	};
-//
-// 	std::memory::forget(bim);
-// 	bim.as_ptr()
-// }
-
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn intersected_edge_rust(
-	polygon_element: *const polygon_t,
-	line: *mut line_t,
-) -> *mut line_t {
-	let polygon_element = unsafe {
-		polygon_element.as_ref().unwrap_or_else(|| {
-			panic!("Failed to dereference pointer polygon_element at intersected_edge_rust fn in bim_tools crate")
-		})
-	};
-
-	let line =
-		unsafe {
-			line.as_mut().unwrap_or_else(|| {
-				panic!("Failed to dereference pointer line at intersected_edge_rust fn in bim_tools crate")
-			})
-		};
-
-	let points = unsafe {
-		std::slice::from_raw_parts_mut(polygon_element.points, polygon_element.numofpoints as usize)
-	};
-
-	let mut line_intersected = line_t {
-		p1: &mut point_t { x: 0.0, y: 0.0 },
-		p2: &mut point_t { x: 0.0, y: 0.0 },
-	};
-
-	let mut num_of_intersections = 0;
-	for i in 1..polygon_element.numofpoints {
-		// FIXME: bypass to get double mut ref
-		let (left, right) = points.split_at_mut(i as usize);
-		let point_element_a = left.last_mut().unwrap_or_else(|| {
-			panic!("Failed to get last element of left part at intersected_edge_rust fn in bim_tools crate");
-		});
-		let point_element_b = right.first_mut().unwrap_or_else(|| {
-			panic!("Failed to get first element of right part at intersected_edge_rust fn in bim_tools crate");
-		});
-		let line_tmp = line_t {
-			p1: point_element_a,
-			p2: point_element_b,
-		};
-		let is_intersected = geom_tools_is_intersect_line_rust(line, &line_tmp);
-		if is_intersected == 1 {
-			line_intersected.p1 = point_element_a;
-			line_intersected.p2 = point_element_b;
-			num_of_intersections += 1;
-		}
-	}
-
-	if num_of_intersections != 1 {
-		panic!("[func: intersected_edge_rust] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов.");
-	}
-
-	Box::into_raw(Box::new(line_intersected))
-}
-
 pub fn intersected_edge(polygon_element: &polygon_t_rust, line: &Line) -> Line {
 	let mut line_intersected = Line {
 		p1: Point { x: 0.0, y: 0.0 },
@@ -310,91 +236,6 @@ pub fn intersected_edge(polygon_element: &polygon_t_rust, line: &Line) -> Line {
 /// *************************************************************************
 /// 1. Определить грани помещения, которые пересекает короткая сторона проема
 /// 2. Вычислить среднее проекций граней друг на друга
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn width_door_way_rust(
-	zone1: *const polygon_t,
-	zone2: *const polygon_t,
-	edge1: *const line_t,
-	edge2: *const line_t,
-) -> c_double {
-	let zone1 = unsafe {
-		zone1.as_ref().unwrap_or_else(|| {
-			panic!("Failed to dereference pointer zone1 at width_door_way fn in bim_tools crate")
-		})
-	};
-
-	let zone2 = unsafe {
-		zone2.as_ref().unwrap_or_else(|| {
-			panic!("Failed to dereference pointer zone2 at width_door_way fn in bim_tools crate")
-		})
-	};
-
-	let edge1 = unsafe {
-		edge1.as_ref().unwrap_or_else(|| {
-			panic!("Failed to dereference pointer edge1 at width_door_way fn in bim_tools crate")
-		})
-	};
-
-	let edge2 = unsafe {
-		edge2.as_ref().unwrap_or_else(|| {
-			panic!("Failed to dereference pointer edge2 at width_door_way fn in bim_tools crate")
-		})
-	};
-
-	// TODO: l1p1 == l2p1 and l1p2 == l2p2 ??? figure out why this is so
-	/* old c code
-	point_t *l1p1 = edge1->p1;
-	point_t *l1p2 = edge2->p2;
-	double length1 = geom_tools_length_side_rust( l1p1, l1p2);
-
-	point_t *l2p1 = edge1->p1;
-	point_t *l2p2 = edge2->p2;
-	double length2 = geom_tools_length_side_rust(l2p1, l2p2);
-	 */
-	let l1p1 = edge1.p1;
-	let l1p2 = edge2.p2;
-	let length1 = geom_tools_length_side_rust(l1p1, l1p2);
-
-	let l2p1 = edge1.p1;
-	let l2p2 = edge2.p2;
-	let length2 = geom_tools_length_side_rust(l2p1, l2p2);
-
-	// Короткая линия проема, которая пересекает оба помещения
-	let mut d_line = match length1.total_cmp(&length2) {
-		Ordering::Greater | Ordering::Equal => line_t { p1: l2p1, p2: l2p2 },
-		Ordering::Less => line_t { p1: l1p1, p2: l1p2 },
-	};
-
-	// Линии, которые находятся друг напротив друга и связаны проемом
-	let edge_element_a = unsafe {
-		intersected_edge_rust(zone1, &mut d_line)
-			.as_ref()
-			.unwrap_or_else(|| {
-				panic!("Failed to dereference pointer edge_element_a at width_door_way fn in bim_tools crate")
-			})
-	};
-	let edge_element_b = unsafe {
-		intersected_edge_rust(zone2, &mut d_line)
-			.as_ref()
-			.unwrap_or_else(|| {
-				panic!("Failed to dereference pointer edge_element_b at width_door_way fn in bim_tools crate")
-			})
-	};
-
-	// Поиск точек, которые являются ближайшими к отрезку edgeElement
-	// Расстояние между этими точками и является шириной проема
-	let point1 = geom_tools_nearest_point_rust(edge_element_a.p1, edge_element_b);
-	let point2 = geom_tools_nearest_point_rust(edge_element_a.p2, edge_element_b);
-	let distance12 = geom_tools_length_side_rust(point1, point2);
-
-	let point3 = geom_tools_nearest_point_rust(edge_element_b.p1, edge_element_a);
-	let point4 = geom_tools_nearest_point_rust(edge_element_b.p2, edge_element_a);
-	let distance34 = geom_tools_length_side_rust(point3, point4);
-
-	(distance12 + distance34) * 0.5
-}
-
 pub fn door_way_width(
 	zone1: &polygon_t_rust,
 	zone2: &polygon_t_rust,
@@ -442,84 +283,6 @@ pub fn door_way_width(
 	(distance12 + distance34) * 0.5
 }
 
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn _outside_init_rust(bim_json: *const bim_json_object_t_rust) -> *mut bim_zone_t {
-	let bim_json =
-		unsafe {
-			bim_json.as_ref().unwrap_or_else(|| {
-				panic!("Failed to dereference pointer bim_json at outside_init_rust fn in bim_tools crate")
-			})
-		};
-
-	let uuid: Vec<c_char> = "outside0-safe-zone-0000-000000000000\n"
-		.chars()
-		.map(|c| c as c_char)
-		.collect();
-
-	let mut outside = bim_zone_t {
-		id: 0,
-		name: CString::new("Outside").unwrap().into_raw(),
-		sign: bim_element_sign_t_rust::OUTSIDE as u8,
-		polygon: std::ptr::null_mut(),
-		uuid: uuid_t {
-			x: uuid.try_into().unwrap_or_else(|v| {
-				panic!("Failed to convert vector to [char; 37]. Vector: {v:?}")
-			}),
-		},
-		z_level: 0.0,
-		size_z: f64::from(f32::MAX),
-		numofpeople: 0.0,
-		hazard_level: 0,
-		is_safe: true,
-		numofoutputs: 0,
-		potential: 0.0,
-		area: f64::from(f32::MAX),
-		outputs: std::ptr::null_mut(),
-		is_blocked: false,
-		is_visited: false,
-	};
-
-	let mut num_of_outputs = 0usize;
-	let mut outputs: Vec<uuid_t> = vec![];
-	let levels = unsafe { std::slice::from_raw_parts(bim_json.levels, bim_json.numoflevels) };
-
-	for i in 0..bim_json.numoflevels {
-		for j in 0..levels[i].numofelements {
-			let elements =
-				unsafe { std::slice::from_raw_parts(levels[i].elements, levels[i].numofelements) };
-
-			let element = &elements[j];
-
-			match element.sign {
-				bim_element_sign_t_rust::DOOR_WAY_OUT => {
-					outputs.push(element.uuid.clone());
-					num_of_outputs += 1;
-				}
-				bim_element_sign_t_rust::ROOM | bim_element_sign_t_rust::STAIRCASE => {
-					outside.id += 1;
-				}
-				_ => {}
-			}
-		}
-	}
-
-	if num_of_outputs == 0 {
-		panic!("Failed to find any output at outside_init fn in bim_tools crate")
-	}
-
-	let numofoutputs = num_of_outputs.try_into().unwrap_or_else(|e| {
-		panic!("Failed to convert usize to u32. usize: {num_of_outputs}. Error: {e:?}")
-	});
-
-	outside.numofoutputs = numofoutputs;
-	outside.outputs = outputs.as_mut_ptr();
-
-	std::mem::forget(outputs);
-
-	Box::into_raw(Box::new(outside))
-}
-
 pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 	let mut outputs: Vec<String> = vec![];
 	let mut id = 0u64;
@@ -561,70 +324,9 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> bim_zone_t_rust {
 	}
 }
 
-/*/// Подсчитывает количество людей в здании по расширенной структуре
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn bim_tools_get_num_of_people_rust(bim: *const bim_t) -> c_double {
-	let bim = unsafe {
-		bim.as_ref().unwrap_or_else(|| {
-			panic!("Failed to dereference pointer bim at bim_tools_get_num_of_people_rust fn in bim_tools crate")
-		})
-	};
-
-	let mut num_of_people = 0.0;
-	let levels = unsafe { std::slice::from_raw_parts(bim.levels, bim.numoflevels as usize) };
-
-	for level in levels {
-		let zones = unsafe { std::slice::from_raw_parts(level.zones, level.numofzones as usize) };
-
-		for zone in zones {
-			num_of_people += zone.numofpeople;
-		}
-	}
-
-	num_of_people
-}*/
-
-/// Устанавливает в помещение заданное количество людей
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn bim_tools_set_people_to_zone_rust(zone: *mut bim_zone_t, num_of_people: f32) {
-	let zone = unsafe {
-		zone.as_mut().expect("Failed to dereference pointer zone at bim_tools_set_people_to_zone fn in bim_tools crate")
-	};
-
-	zone.numofpeople = f64::try_from(num_of_people).unwrap_or_else(|e| {
-		panic!("Failed to convert f32 to f64. f32: {num_of_people}. Error: {e:?}")
-	});
-}
-
 /// Устанавливает в помещение заданное количество людей
 pub fn set_people_to_zone(zone: &mut bim_zone_t_rust, num_of_people: f64) {
 	zone.number_of_people = num_of_people;
-}
-
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn find_zone_callback_rust(value1: *mut bim_zone_t, value2: *mut uuid_t) -> c_int {
-	let zone = unsafe {
-		value1.as_mut().expect(
-			"Failed to dereference pointer value1 at find_zone_callback_rust fn in bim_tools crate",
-		)
-	};
-
-	let uuid = unsafe {
-		value2.as_mut().expect(
-			"Failed to dereference pointer value2 at find_zone_callback_rust fn in bim_tools crate",
-		)
-	};
-
-	for i in 0..uuid.x.len() {
-		if zone.uuid.x[i] != uuid.x[i] {
-			return 0;
-		}
-	}
-
-	1
 }
 
 /// Вычисление ширины проема по данным из модели здания
@@ -635,11 +337,7 @@ pub extern "C" fn find_zone_callback_rust(value1: *mut bim_zone_t, value2: *mut 
 ///
 /// # Returns
 /// Ширина проёма
-pub fn calculate_transits_width(
-	zones: &[bim_zone_t_rust],
-	transits: &mut [bim_transit_t_rust],
-	levels: &mut [bim_level_t_rust],
-) {
+pub fn calculate_transits_width(zones: &[bim_zone_t_rust], transits: &mut [bim_transit_t_rust]) {
 	for transit in transits {
 		let mut stair_sign_counter = 0u8; // Если stair_sign_counter = 2, то проем межэтажный (между лестницами)
 		let mut related_zones = [bim_zone_t_rust::default(), bim_zone_t_rust::default()];
@@ -843,7 +541,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> bim_t_rust {
 	zones_list.sort_by(|a, b| a.id.cmp(&b.id));
 	transits_list.sort_by(|a, b| a.id.cmp(&b.id));
 
-	calculate_transits_width(&zones_list, &mut transits_list, &mut levels_list);
+	calculate_transits_width(&zones_list, &mut transits_list);
 
 	bim_t_rust {
 		transits: transits_list,
@@ -866,73 +564,10 @@ pub fn bim_tools_get_area_bim(bim: &bim_t_rust) -> f64 {
 	area
 }
 
+/// Подсчитывает количество людей в здании по расширенной структуре
 pub fn bim_tools_get_num_of_people(bim: &bim_t_rust) -> f64 {
-	let mut num_of_people = 0.0;
-	for zone in &bim.zones {
-		if zone.sign == BimElementSign::OUTSIDE {
-			continue;
-		}
-		num_of_people += zone.number_of_people;
-	}
-	num_of_people
-	// let mut num_of_people = 0.0;
-	// for level in &bim.levels {
-	// 	for zone in &level.zones {
-	// 		num_of_people += zone.number_of_people;
-	// 	}
-	// }
-	//
-	// num_of_people
-
-	// bim.levels.iter().fold(0.0, |acc, level| {
-	// 	acc + level
-	// 		.zones
-	// 		.iter()
-	// 		.fold(0.0, |acc, zone| acc + zone.number_of_people)
-	// })
-}
-
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn zone_id_cmp_rust(value1: *const bim_zone_t, value2: *const bim_zone_t) -> i32 {
-	let e1 = unsafe {
-		value1
-			.as_ref()
-			.unwrap_or_else(|| panic!("Failed to dereference value1"))
-	};
-	let e2 = unsafe {
-		value2
-			.as_ref()
-			.unwrap_or_else(|| panic!("Failed to dereference value2"))
-	};
-
-	match e1.id.cmp(&e2.id) {
-		Ordering::Greater => 1,
-		Ordering::Less => -1,
-		Ordering::Equal => 0,
-	}
-}
-
-#[no_mangle]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn transit_id_cmp_rust(
-	value1: *const bim_transit_t,
-	value2: *const bim_transit_t,
-) -> i32 {
-	let e1 = unsafe {
-		value1
-			.as_ref()
-			.unwrap_or_else(|| panic!("Failed to dereference value1"))
-	};
-	let e2 = unsafe {
-		value2
-			.as_ref()
-			.unwrap_or_else(|| panic!("Failed to dereference value2"))
-	};
-
-	match e1.id.cmp(&e2.id) {
-		Ordering::Greater => 1,
-		Ordering::Less => -1,
-		Ordering::Equal => 0,
-	}
+	bim.zones.iter().fold(0.0, |acc, zone| match zone.sign {
+		BimElementSign::OUTSIDE => acc,
+		_ => acc + zone.number_of_people,
+	})
 }
