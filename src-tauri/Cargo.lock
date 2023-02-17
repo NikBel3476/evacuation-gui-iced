@@ -339,14 +339,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "configuration"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -666,7 +658,6 @@ version = "0.1.0"
 dependencies = [
  "cc",
  "chrono",
- "configuration",
  "json_object",
  "libc",
  "serde",

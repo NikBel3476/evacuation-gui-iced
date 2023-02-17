@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use configuration::{load_cfg, DistributionType, TransitionType};
+use super::configuration::{load_cfg, DistributionType, TransitionType};
 use libc::{c_char, c_float, c_uchar};
 use std::ffi::CStr;
 
