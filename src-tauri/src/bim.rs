@@ -1,28 +1,29 @@
 use bim_evac::{
-	evac_def_modeling_step, evac_moving_step_test_with_log, evac_moving_step_test_with_log_rust,
-	evac_set_density_max_rust, evac_set_density_min_rust, evac_set_modeling_step_rust,
-	evac_set_speed_max_rust, get_time_m, get_time_s, set_density_max, set_density_min,
-	set_modeling_step, set_speed_max, time_inc, time_reset,
+	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
+	set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
 };
-use bim_graph::{bim_graph_new, bim_graph_new_test};
+use bim_graph::bim_graph_new;
 use bim_json_object::{bim_json_object_new, BimElementSign};
 use bim_output::{
 	bim_basename_rust, bim_create_file_name_rust, bim_output_body, bim_output_head,
 	OUTPUT_DETAIL_FILE_RUST, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX,
 };
-use bim_tools::{bim_t_rust, bim_tools_get_num_of_people, bim_tools_new_rust, set_people_to_zone};
+use bim_tools::{bim_tools_new_rust, Bim};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 use std::io::Write;
 
 mod bim_cli;
-mod bim_configure;
 mod bim_evac;
 mod bim_graph;
 mod bim_json_object;
 mod bim_output;
 mod bim_polygon_tools;
 mod bim_tools;
+mod cli;
+pub mod configuration;
+mod graph;
+mod json_object;
 
 pub fn run_rust() {
 	// TODO: remove mock file path
@@ -105,7 +106,7 @@ pub fn run_rust() {
 			}
 		}
 
-		let num_of_evacuated_people = bim_tools_get_num_of_people(&bim);
+		let num_of_evacuated_people = bim.number_of_people();
 		let evacuation_time_m = get_time_m();
 		let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
 
@@ -147,14 +148,14 @@ pub fn run_rust() {
 	}
 }
 
-pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration: &ScenarioCfg) {
+pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &ScenarioCfg) {
 	for transition in &mut bim.transits {
 		if scenario_configuration.transition.transitions_type == TransitionType::Users {
 			match transition.sign {
-				BimElementSign::DOOR_WAY_IN => {
+				BimElementSign::DoorWayIn => {
 					transition.width = scenario_configuration.transition.doorway_in
 				}
-				BimElementSign::DOOR_WAY_OUT => {
+				BimElementSign::DoorWayOut => {
 					transition.width = scenario_configuration.transition.doorway_out
 				}
 				_ => {}
@@ -176,10 +177,10 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 		for transition in &mut level.transits {
 			if scenario_configuration.transition.transitions_type == TransitionType::Users {
 				match transition.sign {
-					BimElementSign::DOOR_WAY_IN => {
+					BimElementSign::DoorWayIn => {
 						transition.width = scenario_configuration.transition.doorway_in
 					}
-					BimElementSign::DOOR_WAY_OUT => {
+					BimElementSign::DoorWayOut => {
 						transition.width = scenario_configuration.transition.doorway_out
 					}
 					_ => {}
@@ -198,22 +199,19 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	}
 
 	for zone in &mut bim.zones {
-		if zone.sign == BimElementSign::OUTSIDE {
+		if zone.sign == BimElementSign::Outside {
 			continue;
 		}
 
 		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
-			set_people_to_zone(
-				zone,
-				zone.area * scenario_configuration.distribution.density,
-			);
+			zone.number_of_people = zone.area * scenario_configuration.distribution.density;
 		}
 
 		// A special set up the density of item of bim
 		for special in &scenario_configuration.distribution.special {
 			for uuid in &special.uuid {
 				if zone.uuid.eq(uuid) {
-					set_people_to_zone(zone, zone.area * special.density);
+					zone.number_of_people = zone.area * special.density;
 				}
 			}
 		}
@@ -222,22 +220,19 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	// in c code bim->zones is a pointers to bim->levels[_]->zones so necessary to update bim->levels[_]->zones
 	for level in &mut bim.levels {
 		for zone in &mut level.zones {
-			if zone.sign == BimElementSign::OUTSIDE {
+			if zone.sign == BimElementSign::Outside {
 				continue;
 			}
 
 			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
-				set_people_to_zone(
-					zone,
-					zone.area * scenario_configuration.distribution.density,
-				);
+				zone.number_of_people = zone.area * scenario_configuration.distribution.density;
 			}
 
 			// A special set up the density of item of bim
 			for special in &scenario_configuration.distribution.special {
 				for uuid in &special.uuid {
 					if zone.uuid.eq(uuid) {
-						set_people_to_zone(zone, zone.area * special.density);
+						zone.number_of_people = zone.area * special.density;
 					}
 				}
 			}
@@ -245,11 +240,7 @@ pub fn applying_scenario_bim_params(bim: &mut bim_t_rust, scenario_configuration
 	}
 
 	set_modeling_step(scenario_configuration.modeling.step);
-	evac_set_modeling_step_rust(scenario_configuration.modeling.step);
 	set_speed_max(scenario_configuration.modeling.max_speed);
-	evac_set_speed_max_rust(scenario_configuration.modeling.max_speed);
 	set_density_max(scenario_configuration.modeling.max_density);
-	evac_set_density_max_rust(scenario_configuration.modeling.max_density);
 	set_density_min(scenario_configuration.modeling.min_density);
-	evac_set_density_min_rust(scenario_configuration.modeling.min_density);
 }

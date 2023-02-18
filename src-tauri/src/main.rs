@@ -3,10 +3,8 @@
 	windows_subsystem = "windows"
 )]
 
+use bim::configuration;
 use bim::run_rust;
-use cli;
-use configuration;
-use json_object;
 use tauri::{AppHandle, WindowBuilder};
 
 mod bim;
