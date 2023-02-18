@@ -8,7 +8,7 @@ use bim_output::{
 	bim_basename_rust, bim_create_file_name_rust, bim_output_body, bim_output_head,
 	OUTPUT_DETAIL_FILE_RUST, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX,
 };
-use bim_tools::{bim_tools_get_num_of_people, bim_tools_new_rust, set_people_to_zone, Bim};
+use bim_tools::{bim_tools_new_rust, Bim};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 use std::io::Write;
@@ -106,7 +106,7 @@ pub fn run_rust() {
 			}
 		}
 
-		let num_of_evacuated_people = bim_tools_get_num_of_people(&bim);
+		let num_of_evacuated_people = bim.number_of_people();
 		let evacuation_time_m = get_time_m();
 		let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
 
@@ -204,17 +204,14 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 		}
 
 		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
-			set_people_to_zone(
-				zone,
-				zone.area * scenario_configuration.distribution.density,
-			);
+			zone.number_of_people = zone.area * scenario_configuration.distribution.density;
 		}
 
 		// A special set up the density of item of bim
 		for special in &scenario_configuration.distribution.special {
 			for uuid in &special.uuid {
 				if zone.uuid.eq(uuid) {
-					set_people_to_zone(zone, zone.area * special.density);
+					zone.number_of_people = zone.area * special.density;
 				}
 			}
 		}
@@ -228,17 +225,14 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 			}
 
 			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
-				set_people_to_zone(
-					zone,
-					zone.area * scenario_configuration.distribution.density,
-				);
+				zone.number_of_people = zone.area * scenario_configuration.distribution.density;
 			}
 
 			// A special set up the density of item of bim
 			for special in &scenario_configuration.distribution.special {
 				for uuid in &special.uuid {
 					if zone.uuid.eq(uuid) {
-						set_people_to_zone(zone, zone.area * special.density);
+						zone.number_of_people = zone.area * special.density;
 					}
 				}
 			}

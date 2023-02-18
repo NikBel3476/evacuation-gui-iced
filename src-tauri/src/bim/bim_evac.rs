@@ -1,8 +1,6 @@
 use super::bim_graph::BimGraph;
 use super::bim_json_object::BimElementSign;
-use super::bim_tools::{bim_tools_get_area_bim, Bim, BimTransit, BimZone};
-use libc::{c_double, c_int};
-use std::borrow::Borrow;
+use super::bim_tools::{Bim, BimTransit, BimZone};
 use std::cmp::Ordering;
 
 /// м/мин
@@ -27,8 +25,7 @@ static mut EVAC_TIME_RUST: f64 = 0.0;
 ///
 /// # Returns
 /// скорость, м/мин.
-#[no_mangle]
-fn velocity_rust(v0: c_double, a: c_double, d: c_double, d0: c_double) -> c_double {
+fn velocity_rust(v0: f64, a: f64, d: f64, d0: f64) -> f64 {
 	v0 * (1.0 - a * (d / d0).ln())
 }
 
@@ -41,12 +38,7 @@ fn velocity_rust(v0: c_double, a: c_double, d: c_double, d0: c_double) -> c_doub
 ///
 /// # Returns
 /// скорость потока в проеме в зависимости от плотности, м/мин
-#[no_mangle]
-pub extern "C" fn speed_through_transit_rust(
-	transit_width: c_double,
-	density_in_zone: c_double,
-	v_max: c_double,
-) -> c_double {
+pub fn speed_through_transit_rust(transit_width: f64, density_in_zone: f64, v_max: f64) -> f64 {
 	let v0 = v_max;
 	let d0 = 0.65;
 	let a = 0.295;
@@ -77,8 +69,7 @@ pub extern "C" fn speed_through_transit_rust(
 ///
 /// # Returns
 /// Скорость потока по горизонтальному пути, м/мин
-#[no_mangle]
-pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double) -> c_double {
+pub fn speed_in_room_rust(density_in_zone: f64, v_max: f64) -> f64 {
 	let d0 = 0.51;
 
 	match density_in_zone > d0 {
@@ -95,16 +86,12 @@ pub extern "C" fn speed_in_room_rust(density_in_zone: c_double, v_max: c_double)
 ///
 /// # Returns
 /// Скорость потока при движении по лестнице в зависимости от плотности, м/мин
-#[no_mangle]
-pub extern "C" fn evac_speed_on_stair_rust(
-	density_in_zone: c_double,
-	direction: c_int,
-) -> c_double {
-	let mut d0: c_double = 0.0;
-	let mut v0: c_double = 0.0;
-	let mut a: c_double = 0.0;
+pub fn evac_speed_on_stair_rust(density_in_zone: f64, direction: i32) -> f64 {
+	let mut d0: f64 = 0.0;
+	let mut v0: f64 = 0.0;
+	let mut a: f64 = 0.0;
 
-	match direction.cmp(0.borrow()) {
+	match direction.cmp(&0) {
 		Ordering::Greater => {
 			d0 = 0.67;
 			v0 = 50.0;
@@ -301,7 +288,7 @@ pub fn part_people_flow(
 }
 
 pub fn evac_def_modeling_step(bim: &Bim) {
-	let area = bim_tools_get_area_bim(bim);
+	let area = bim.area();
 
 	let average_size = area / bim.zones.len() as f64;
 	let hxy = average_size.sqrt(); // характерный размер области, м

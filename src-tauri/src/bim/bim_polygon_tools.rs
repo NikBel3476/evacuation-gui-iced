@@ -94,7 +94,6 @@ impl Polygon {
 	}
 }
 
-/// cbindgen:ignore
 #[repr(C)]
 pub struct triangulateio {
 	/// In / out
@@ -215,8 +214,7 @@ pub fn area(p1: &Point, p2: &Point, p3: &Point) -> f64 {
 }
 
 /// https://e-maxx.ru/algo/segments_intersection_checking
-#[no_mangle]
-pub extern "C" fn intersect_1_rust(mut a: f64, mut b: f64, mut c: f64, mut d: f64) -> bool {
+pub fn intersect_1_rust(mut a: f64, mut b: f64, mut c: f64, mut d: f64) -> bool {
 	if a > b {
 		std::mem::swap(&mut a, &mut b);
 	}
@@ -238,48 +236,4 @@ pub fn is_intersect_line(l1: &Line, l2: &Line) -> bool {
 		&& intersect_1_rust(p1.y, p2.y, p3.y, p4.y)
 		&& area(p1, p2, p3) * area(p1, p2, p4) <= 0.0
 		&& area(p3, p4, p1) * area(p3, p4, p2) <= 0.0
-}
-
-/// Определение точки на линии, расстояние до которой от заданной точки является минимальным из существующих
-pub fn nearest_point(point_start: &Point, line: &Line) -> Point {
-	let p1 = &line.p1;
-
-	let p2 = &line.p2;
-
-	/*if side_length(p1, p2) < 1e-9 {
-		return line.p1;
-	}*/
-
-	if p1.distance_to(p2) < 1e-9 {
-		return line.p1;
-	}
-
-	let a = point_start.x - p1.x;
-	let b = point_start.y - p1.y;
-	let c = p2.x - p1.x;
-	let d = p2.y - p1.y;
-
-	let dot = a * c + b * d;
-	let len_sq = c * c + d * d;
-	let mut param = -1.0;
-
-	if len_sq != 0.0 {
-		param = dot / len_sq;
-	}
-
-	let xx;
-	let yy;
-
-	if param < 0.0 {
-		xx = p1.x;
-		yy = p1.y;
-	} else if param > 1.0 {
-		xx = p2.x;
-		yy = p2.y;
-	} else {
-		xx = p1.x + param * c;
-		yy = p1.y + param * d;
-	}
-
-	Point { x: xx, y: yy }
 }

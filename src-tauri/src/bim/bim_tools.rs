@@ -1,9 +1,6 @@
 use super::bim_json_object::{BimElementSign, BimJsonObject};
-use super::bim_polygon_tools::{
-	is_intersect_line, is_point_in_polygon, nearest_point, Line, Polygon,
-};
+use super::bim_polygon_tools::{is_intersect_line, is_point_in_polygon, Line, Polygon};
 use super::json_object::Point;
-use libc::c_double;
 use std::cmp::Ordering;
 
 /// Структура, расширяющая элемент DOOR_*
@@ -94,6 +91,25 @@ pub struct Bim {
 	pub transits: Vec<BimTransit>,
 }
 
+impl Bim {
+	pub fn area(&self) -> f64 {
+		self.levels.iter().fold(0.0, |acc, level| {
+			acc + level.zones.iter().fold(0.0, |acc, zone| match zone.sign {
+				BimElementSign::Room | BimElementSign::Staircase => acc + zone.area,
+				_ => acc,
+			})
+		})
+	}
+
+	/// Подсчитывает количество людей в здании по расширенной структуре
+	pub fn number_of_people(&self) -> f64 {
+		self.zones.iter().fold(0.0, |acc, zone| match zone.sign {
+			BimElementSign::Outside => acc,
+			_ => acc + zone.number_of_people,
+		})
+	}
+}
+
 pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 	let mut line_intersected = Line {
 		p1: Point { x: 0.0, y: 0.0 },
@@ -123,7 +139,7 @@ pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 	}
 
 	if num_of_intersections != 1 {
-		panic!("[func: intersected_edge_rust] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов.");
+		panic!("[func: intersected_edge] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов.");
 	}
 
 	line_intersected
@@ -150,7 +166,7 @@ pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 /// *************************************************************************
 /// 1. Определить грани помещения, которые пересекает короткая сторона проема
 /// 2. Вычислить среднее проекций граней друг на друга
-pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Line) -> c_double {
+pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Line) -> f64 {
 	// TODO: l1p1 == l2p1 and l1p2 == l2p2 ??? figure out why this is so
 	/* old c code
 	point_t *l1p1 = edge1->p1;
@@ -181,12 +197,12 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 
 	// Поиск точек, которые являются ближайшими к отрезку edgeElement
 	// Расстояние между этими точками и является шириной проема
-	let point1 = nearest_point(&edge_element_a.p1, &edge_element_b);
-	let point2 = nearest_point(&edge_element_a.p2, &edge_element_b);
+	let point1 = edge_element_a.p1.nearest_point_on_line(&edge_element_b);
+	let point2 = edge_element_a.p2.nearest_point_on_line(&edge_element_b);
 	let distance12 = point1.distance_to(&point2);
 
-	let point3 = nearest_point(&edge_element_b.p1, &edge_element_a);
-	let point4 = nearest_point(&edge_element_b.p2, &edge_element_a);
+	let point3 = edge_element_b.p1.nearest_point_on_line(&edge_element_a);
+	let point4 = edge_element_b.p2.nearest_point_on_line(&edge_element_a);
 	let distance34 = point3.distance_to(&point4);
 
 	(distance12 + distance34) * 0.5
@@ -231,11 +247,6 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> BimZone {
 		is_safe: true,
 		number_of_people: 0.0,
 	}
-}
-
-/// Устанавливает в помещение заданное количество людей
-pub fn set_people_to_zone(zone: &mut BimZone, num_of_people: f64) {
-	zone.number_of_people = num_of_people;
 }
 
 /// Вычисление ширины проема по данным из модели здания
@@ -458,25 +469,4 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 		levels: levels_list,
 		name: bim_json.building_name.clone(),
 	}
-}
-
-pub fn bim_tools_get_area_bim(bim: &Bim) -> f64 {
-	let mut area = 0.0;
-	for level in &bim.levels {
-		for zone in &level.zones {
-			if zone.sign == BimElementSign::Room || zone.sign == BimElementSign::Staircase {
-				area += zone.area;
-			}
-		}
-	}
-
-	area
-}
-
-/// Подсчитывает количество людей в здании по расширенной структуре
-pub fn bim_tools_get_num_of_people(bim: &Bim) -> f64 {
-	bim.zones.iter().fold(0.0, |acc, zone| match zone.sign {
-		BimElementSign::Outside => acc,
-		_ => acc + zone.number_of_people,
-	})
 }

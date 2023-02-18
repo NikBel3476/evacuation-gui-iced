@@ -24,17 +24,16 @@ pub struct BimEdge {
 pub fn bim_graph_new(bim: &Bim) -> BimGraph {
 	let edges = graph_create_edges(&bim.transits, &bim.zones);
 
-	graph_create(&edges, edges.len(), bim.zones.len())
+	graph_create(&edges, bim.zones.len())
 }
 
 /// Function to create an adjacency list from specified edges
-pub fn graph_create(edges: &[BimEdge], edge_count: usize, node_count: usize) -> BimGraph {
+pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 	// initialize head pointer for all vertices
 	let mut graph_head: Vec<Box<BimNode>> = vec![Default::default(); node_count];
 
 	// add edges to the directed graph one by one
-	for i in 0..edge_count {
-		let edge = &edges[i];
+	for edge in edges {
 		// get the source and destination vertex
 		let src = edge.src;
 		let dest = edge.dest;
@@ -76,7 +75,12 @@ pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<B
 		let mut ids = [0, zones.len()];
 		let mut j = 0usize;
 		for (k, zone) in zones.iter().enumerate() {
-			if equal_callback(zone, transition) && j != 2 {
+			if zone
+				.outputs
+				.iter()
+				.any(|output| output.eq(&transition.uuid))
+				&& j != 2
+			{
 				ids[j] = k;
 				j += 1;
 			}
@@ -91,14 +95,4 @@ pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<B
 	}
 
 	edges
-}
-
-pub fn equal_callback(zone: &BimZone, transit: &BimTransit) -> bool {
-	for output in &zone.outputs {
-		if output.eq(&transit.uuid) {
-			return true;
-		}
-	}
-
-	false
 }
