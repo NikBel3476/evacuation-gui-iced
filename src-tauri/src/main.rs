@@ -3,22 +3,11 @@
 	windows_subsystem = "windows"
 )]
 
+use bim::configuration;
+use bim::run_rust;
 use tauri::{AppHandle, WindowBuilder};
 
-use bim_cli;
-use bim_configure;
-use bim_evac;
-use bim_graph;
-use bim_json_object;
-use bim_output;
-use bim_polygon_tools;
-use bim_tools;
-use cli;
-use configuration;
-use json_object;
-use run::run_rust;
-
-mod run_bindings;
+mod bim;
 
 fn main() {
 	tauri::Builder::default()
@@ -91,6 +80,5 @@ async fn open_building_view_window(handle: AppHandle) {
 
 #[tauri::command]
 async fn bim_start() {
-	unsafe { run_bindings::run() };
 	run_rust();
 }
