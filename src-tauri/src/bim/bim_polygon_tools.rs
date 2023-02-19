@@ -1,7 +1,7 @@
 use super::json_object::Point;
-use libc::{c_char, c_double, c_int};
 use std::cmp::Ordering;
 use std::ffi::CString;
+use triangle_rs::{triangulate, triangulateio};
 
 pub struct Line {
 	pub p1: Point,
@@ -92,70 +92,6 @@ impl Polygon {
 			panic!("Failed to convert numberoftriangles to u64 at triangle_polygon_rust fn in bim_polygon_tools crate. {e}")
 		})
 	}
-}
-
-#[repr(C)]
-pub struct triangulateio {
-	/// In / out
-	pub pointlist: *mut c_double,
-	/// In / out
-	pub pointattributelist: *mut c_double,
-	/// In / out
-	pub pointmarkerlist: *mut c_int,
-	/// In / out
-	pub numberofpoints: c_int,
-	/// In / out
-	pub numberofpointattributes: c_int,
-
-	/// In / out
-	pub trianglelist: *mut c_int,
-	/// In / out
-	pub triangleattributelist: *mut c_double,
-	/// In only
-	pub trianglearealist: *mut c_double,
-	/// Out only
-	pub neighborlist: *mut c_int,
-	/// In / out
-	pub numberoftriangles: c_int,
-	/// In / out
-	pub numberofcorners: c_int,
-	/// In / out
-	pub numberoftriangleattributes: c_int,
-
-	/// In / out
-	pub segmentlist: *mut c_int,
-	/// In / out
-	pub segmentmarkerlist: *mut c_int,
-	/// In / out
-	pub numberofsegments: c_int,
-
-	/// In / pointer to array copied out
-	pub holelist: *mut c_double,
-	/// In / copied out
-	pub numberofholes: c_int,
-
-	/// In / pointer to array copied out
-	pub regionlist: *mut c_double,
-	/// In / copied out
-	pub numberofregions: c_int,
-
-	/// Out only
-	pub edgelist: *mut c_int,
-	/// Not used with Voronoi diagram; out only
-	pub edgemarkerlist: *mut c_int,
-	/// Used only with Voronoi diagram; out only
-	pub normlist: *mut c_double,
-	/// Out only
-	pub numberofedges: c_int,
-}
-
-extern "C" {
-	fn triangulate(
-		triswitches: *mut c_char,
-		_in: *mut triangulateio,
-		_out: *mut triangulateio,
-		thevoro: *mut triangulateio,
-	);
 }
 
 fn where_point_rust(a_ax: f64, a_ay: f64, a_bx: f64, a_by: f64, a_px: f64, a_py: f64) -> i32 {
