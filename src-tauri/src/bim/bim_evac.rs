@@ -310,7 +310,7 @@ pub fn evac_moving_step_test_with_log_rust(
 	let mut zones_to_process: Vec<BimZone> = vec![];
 
 	let outside_id = graph.head.len() - 1;
-	let mut ptr = Some(graph.head[outside_id].clone());
+	let mut ptr = Some(Box::new(graph.head[outside_id].clone()));
 	let mut receiving_zone_id = outside_id;
 
 	for _ in 0..zones.len() {
@@ -360,7 +360,7 @@ pub fn evac_moving_step_test_with_log_rust(
 				.iter()
 				.position(|zone| deleted_zone.uuid.eq(&zone.uuid))
 				.unwrap_or_else(|| panic!("Zone not found!"));
-			ptr = Some(graph.head[deleted_zone.id as usize].clone());
+			ptr = Some(Box::new(graph.head[deleted_zone.id as usize].clone()));
 		}
 	}
 }
