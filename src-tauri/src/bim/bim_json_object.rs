@@ -1,5 +1,6 @@
 use super::bim_polygon_tools;
 use super::json_object::parse_building_from_json;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum BimElementSign {
@@ -23,13 +24,13 @@ pub enum BimElementSign {
 /// Структура, описывающая элемент
 pub struct BimJsonElement {
 	/// [JSON] UUID идентификатор элемента
-	pub uuid: String,
+	pub uuid: Uuid,
 	/// [JSON] Название элемента
 	pub name: String,
 	/// [JSON] Полигон элемента
 	pub polygon: bim_polygon_tools::Polygon,
 	/// [JSON] Массив UUID элементов, которые являются соседними к элементу
-	pub outputs: Vec<String>,
+	pub outputs: Vec<Uuid>,
 	/// Внутренний номер элемента (генерируется)
 	pub id: u64,
 	/// [JSON] Количество людей в элементе

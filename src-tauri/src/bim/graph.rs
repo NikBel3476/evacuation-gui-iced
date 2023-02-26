@@ -1,6 +1,4 @@
-use super::bim_tools::{Bim, BimTransit, BimZone};
 use fnv::FnvHashMap;
-use petgraph::Undirected;
 use std::hash::Hash;
 
 struct Graph<VId, E = (), V = ()> {

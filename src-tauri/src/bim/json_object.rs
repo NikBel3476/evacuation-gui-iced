@@ -2,6 +2,7 @@ use super::bim_polygon_tools::Line;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Address {
@@ -75,9 +76,9 @@ pub struct Coordinates {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BuildElement {
 	#[serde(rename = "Id")]
-	pub id: String,
+	pub id: Uuid,
 	#[serde(rename = "@")]
-	pub uuid: String,
+	pub uuid: Uuid,
 	#[serde(rename = "Name")]
 	pub name: String,
 	#[serde(rename = "SizeZ")]
@@ -87,7 +88,7 @@ pub struct BuildElement {
 	#[serde(rename = "XY")]
 	pub xy: Vec<Coordinates>,
 	#[serde(rename = "Output")]
-	pub outputs: Vec<String>,
+	pub outputs: Vec<Uuid>,
 	#[serde(rename = "NumPeople", default)]
 	pub number_of_people: u64,
 }

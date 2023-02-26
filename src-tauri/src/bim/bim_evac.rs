@@ -280,7 +280,6 @@ pub fn part_people_flow(
 		return 0.0;
 	}
 
-	// println!("capacity: {capacity_receiving_zone:.5} part: {part_of_people_flow:.5}");
 	match capacity_receiving_zone > part_of_people_flow {
 		true => part_of_people_flow,
 		false => capacity_receiving_zone,
@@ -308,14 +307,13 @@ pub fn evac_moving_step_test_with_log_rust(
 	reset_zones(zones);
 	reset_transits(transits);
 
-	let mut unprocessed_zones_count = zones.len();
 	let mut zones_to_process: Vec<BimZone> = vec![];
 
 	let outside_id = graph.head.len() - 1;
-	let mut ptr = Some(graph.head[outside_id].clone());
+	let mut ptr = Some(Box::new(graph.head[outside_id].clone()));
 	let mut receiving_zone_id = outside_id;
 
-	loop {
+	for _ in 0..zones.len() {
 		for _ in 0..zones[receiving_zone_id].outputs.len() {
 			if let Some(ptr_box) = ptr {
 				let mut transit = &mut transits[ptr_box.eid];
@@ -362,13 +360,8 @@ pub fn evac_moving_step_test_with_log_rust(
 				.iter()
 				.position(|zone| deleted_zone.uuid.eq(&zone.uuid))
 				.unwrap_or_else(|| panic!("Zone not found!"));
-			ptr = Some(graph.head[deleted_zone.id as usize].clone());
+			ptr = Some(Box::new(graph.head[deleted_zone.id as usize].clone()));
 		}
-
-		if unprocessed_zones_count == 0 {
-			break;
-		}
-		unprocessed_zones_count -= 1;
 	}
 }
 
@@ -437,6 +430,7 @@ pub fn time_reset() {
 mod tests {
 	use super::super::bim_polygon_tools::Polygon;
 	use super::*;
+	use uuid::uuid;
 
 	#[test]
 	fn speed_in_element_eq() {
@@ -446,8 +440,8 @@ mod tests {
 		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -463,8 +457,8 @@ mod tests {
 		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -492,8 +486,8 @@ mod tests {
 		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -509,8 +503,8 @@ mod tests {
 		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -539,8 +533,8 @@ mod tests {
 		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -567,8 +561,8 @@ mod tests {
 		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -584,8 +578,8 @@ mod tests {
 		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -599,10 +593,10 @@ mod tests {
 			potential: 1.0,
 		};
 		let transit = BimTransit {
-			uuid: "".to_string(),
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
 			id: 1,
 			name: "Transit".to_string(),
-			outputs: vec!["".to_string()],
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			polygon: Polygon::default(),
 			size_z: 2.0,
 			z_level: 1.0,
@@ -628,8 +622,8 @@ mod tests {
 		let receiving_zone = BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -645,8 +639,8 @@ mod tests {
 		let transmitting_zone = BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
-			uuid: "".to_string(),
-			outputs: vec!["".to_string()],
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			area: 10.0,
 			z_level: 1.0,
 			number_of_people: 10.0,
@@ -660,10 +654,10 @@ mod tests {
 			potential: 1.0,
 		};
 		let transit = BimTransit {
-			uuid: "".to_string(),
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
 			id: 1,
 			name: "Transit".to_string(),
-			outputs: vec!["".to_string()],
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
 			polygon: Polygon::default(),
 			size_z: 2.0,
 			z_level: 1.0,

@@ -3,7 +3,7 @@ use super::bim_tools::{Bim, BimTransit, BimZone};
 /// https://www.techiedelight.com/implement-graph-data-structure-c
 /// Data structure to store a graph object
 pub struct BimGraph {
-	pub head: Vec<Box<BimNode>>,
+	pub head: Vec<BimNode>,
 }
 
 /// Data structure to store adjacency list nodes of the graph
@@ -30,7 +30,7 @@ pub fn bim_graph_new(bim: &Bim) -> BimGraph {
 /// Function to create an adjacency list from specified edges
 pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 	// initialize head pointer for all vertices
-	let mut graph_head: Vec<Box<BimNode>> = vec![Default::default(); node_count];
+	let mut graph_head: Vec<BimNode> = vec![Default::default(); node_count];
 
 	// add edges to the directed graph one by one
 	for edge in edges {
@@ -47,31 +47,31 @@ pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 		};
 
 		// point new node to the current head
-		new_node.next = Some(graph_head[src].clone());
+		new_node.next = Some(Box::new(graph_head[src].clone()));
 
 		// point head pointer to the new node
-		graph_head[src] = Box::new(new_node);
+		graph_head[src] = new_node;
 
 		// 2. allocate a new node of adjacency list from `dest` to `src`
 		let new_node_dest_to_src = BimNode {
 			dest: src,
 			eid,
 			// point new node to the current head
-			next: Some(graph_head[dest].clone()),
+			next: Some(Box::new(graph_head[dest].clone())),
 		};
 
 		// change head pointer to point to the new node
-		graph_head[dest] = Box::new(new_node_dest_to_src);
+		graph_head[dest] = new_node_dest_to_src;
 	}
 
 	// allocate storage for the graph data structure
 	BimGraph { head: graph_head }
 }
 
-pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<BimEdge> {
+pub fn graph_create_edges(transits: &[BimTransit], zones: &[BimZone]) -> Vec<BimEdge> {
 	let mut edges: Vec<BimEdge> = vec![];
 
-	for (i, transition) in list_doors.iter().enumerate() {
+	for (i, transition) in transits.iter().enumerate() {
 		let mut ids = [0, zones.len()];
 		let mut j = 0usize;
 		for (k, zone) in zones.iter().enumerate() {
@@ -86,12 +86,11 @@ pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<B
 			}
 		}
 
-		let edge = BimEdge {
+		edges.push(BimEdge {
 			id: i,
 			src: ids[0],
 			dest: ids[1],
-		};
-		edges.push(edge);
+		});
 	}
 
 	edges
