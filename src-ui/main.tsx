@@ -1,12 +1,15 @@
-import * as ReactDOM from 'react-dom/client';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import App from './App';
 
 import './main.css';
+import { Provider } from 'react-redux';
+import { store } from './store';
 
-/* (document.getElementById('file_input') as HTMLInputElement).addEventListener('change', e => {
-	console.log((e.target as HTMLInputElement).value);
-}); */
-
-const rootElement = document.querySelector('#root') as HTMLElement;
-const root = ReactDOM.createRoot(rootElement);
-root.render(<App />);
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+	<React.StrictMode>
+		<Provider store={store}>
+			<App />
+		</Provider>
+	</React.StrictMode>
+);

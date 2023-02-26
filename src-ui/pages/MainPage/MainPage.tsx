@@ -2,29 +2,27 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import * as styles from './MainPage.module.css';
+import styles from './MainPage.module.css';
 
-type mainPageProps = {};
-
-const MainPage: FC<mainPageProps> = () => {
+const MainPage: FC = () => {
 	const handleOpenConfigurationButtonClick = () => {
-		invoke('open_configuration_window');
+		void invoke('open_configuration_window');
 	};
 
 	const handleOpenConfigurationRescriptButtonClick = () => {
-		invoke('open_configuration_rescript_window');
+		void invoke('open_configuration_rescript_window');
 	};
 
 	const handleOpenPeopleTrafficButtonClick = () => {
-		invoke('open_people_traffic_window');
+		void invoke('open_people_traffic_window');
 	};
 
 	const handleOpenBuildingViewButtonClick = () => {
-		invoke('open_building_view_window');
+		void invoke('open_building_view_window');
 	};
 
 	const handleBimStartButtonClick = () => {
-		invoke('bim_start');
+		void invoke('bim_start');
 	};
 
 	return (
@@ -40,7 +38,7 @@ const MainPage: FC<mainPageProps> = () => {
 								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 								to="configuration"
 							>
-								Configuration page
+								Страница конфигурации
 							</Link>
 						</li>
 						<li>
