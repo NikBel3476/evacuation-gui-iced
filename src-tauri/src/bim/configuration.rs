@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all(deserialize = "snake_case"))]
@@ -18,7 +19,7 @@ pub enum TransitionType {
 
 #[derive(Serialize, Deserialize)]
 pub struct DistributionSpecial {
-	pub uuid: Vec<String>,
+	pub uuid: Vec<Uuid>,
 	pub density: f64,
 	#[serde(rename(deserialize = "_comment"))]
 	pub comment: String,
@@ -26,7 +27,7 @@ pub struct DistributionSpecial {
 
 #[derive(Serialize, Deserialize)]
 pub struct TransitionSpecial {
-	pub uuid: Vec<String>,
+	pub uuid: Vec<Uuid>,
 	pub width: f64,
 	#[serde(rename(deserialize = "_comment"))]
 	pub comment: String,

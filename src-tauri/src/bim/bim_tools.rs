@@ -2,18 +2,19 @@ use super::bim_json_object::{BimElementSign, BimJsonObject};
 use super::bim_polygon_tools::{is_intersect_line, is_point_in_polygon, Line, Polygon};
 use super::json_object::Point;
 use std::cmp::Ordering;
+use uuid::{uuid, Uuid};
 
 /// Структура, расширяющая элемент DOOR_*
 #[derive(Debug, Clone, Default)]
 pub struct BimTransit {
 	/// UUID идентификатор элемента
-	pub uuid: String,
+	pub uuid: Uuid,
 	/// Внутренний номер элемента
 	pub id: u64,
 	/// Название элемента
 	pub name: String,
 	/// Массив UUID элементов, которые являются соседними
-	pub outputs: Vec<String>,
+	pub outputs: Vec<Uuid>,
 	/// Полигон элемента
 	pub polygon: Polygon,
 	/// Высота элемента
@@ -36,7 +37,7 @@ pub struct BimTransit {
 #[derive(Debug, Clone, Default)]
 pub struct BimZone {
 	/// UUID идентификатор элемента
-	pub uuid: String,
+	pub uuid: Uuid,
 	/// Внутренний номер элемента
 	pub id: u64,
 	/// Название элемента
@@ -44,7 +45,7 @@ pub struct BimZone {
 	/// Полигон элемента
 	pub polygon: Polygon,
 	/// Массив UUID элементов, которые являются соседними
-	pub outputs: Vec<String>,
+	pub outputs: Vec<Uuid>,
 	/// Высота элемента
 	pub size_z: f64,
 	/// Уровень, на котором находится элемент
@@ -209,7 +210,7 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 }
 
 pub fn outside_init_rust(bim_json: &BimJsonObject) -> BimZone {
-	let mut outputs: Vec<String> = vec![];
+	let mut outputs: Vec<Uuid> = vec![];
 	let mut id = 0u64;
 
 	for level in &bim_json.levels {
@@ -235,7 +236,7 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> BimZone {
 		name: String::from("Outside"),
 		sign: BimElementSign::Outside,
 		polygon: Polygon::default(),
-		uuid: String::from("outside0-safe-zone-0000-000000000000"),
+		uuid: uuid!("00000000-0000-0000-0000-000000000000"),
 		z_level: 0.0,
 		size_z: f64::from(f32::MAX),
 		hazard_level: 0,

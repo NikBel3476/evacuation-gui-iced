@@ -68,10 +68,10 @@ pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 	BimGraph { head: graph_head }
 }
 
-pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<BimEdge> {
+pub fn graph_create_edges(transits: &[BimTransit], zones: &[BimZone]) -> Vec<BimEdge> {
 	let mut edges: Vec<BimEdge> = vec![];
 
-	for (i, transition) in list_doors.iter().enumerate() {
+	for (i, transition) in transits.iter().enumerate() {
 		let mut ids = [0, zones.len()];
 		let mut j = 0usize;
 		for (k, zone) in zones.iter().enumerate() {
@@ -86,12 +86,11 @@ pub fn graph_create_edges(list_doors: &[BimTransit], zones: &[BimZone]) -> Vec<B
 			}
 		}
 
-		let edge = BimEdge {
+		edges.push(BimEdge {
 			id: i,
 			src: ids[0],
 			dest: ids[1],
-		};
-		edges.push(edge);
+		});
 	}
 
 	edges
