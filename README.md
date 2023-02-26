@@ -9,14 +9,9 @@
 ```
 .
 ├── res             -- Ресурсы. Файлы зданий
-├── src             -- Исходный код программы
-├── src-tauri       -- Исходный код управления графическим интерфейсом(язык Rust)
-├── src-ui          -- Исходный код управления графическим интерфейсом(язык TypeScript)
-├── test            -- Тесты
-└── thirdparty      -- Библиотеки, используемые в программе
-    ├── arraylist   -- Библиотека для работы с динамическим списком
-    ├── c-logger    -- Библиотека для логгирования
-    └── triangle    -- Библиотека для триангуляции поверхности
+├── src-tauri       -- Исходный код программы
+├── cypress         -- UI тесты
+└── src-ui          -- Исходный код управления графическим интерфейсом
 ```
 
 #### Используемые библиотеки Rust:
@@ -25,14 +20,12 @@
 - cc - библиотека для компиляции исходного кода языка Си и объединение его с основным исполянемым файлом
 - tauri - библиотека для создания графического интерфейса, основанная на webview
 
-# Сборка
-
-## Интсрументарий
+## Необходимый интсрументарий
 - Rust последней версии(rustup, rustc и cargo). [Ссылка для скачивания rust](https://www.rust-lang.org/tools/install)
-- Node.js версии 16.* или выше [Ссылка для скачивания Node.js](https://nodejs.org/en)
-  (для этого также можно воспользоваться [nvm](https://github.com/nvm-sh/nvm))
+- Node.js версии 16.* или выше [Ссылка для скачивания Node.js](https://nodejs.org/en)  
+  (для этого можно воспользоваться [nvm](https://github.com/nvm-sh/nvm)(Linux и macOS) или [nvm-windows](https://github.com/coreybutler/nvm-windows)(Windows))
 
-# Запуск
+## Сборка и запуск
 
 Перед запуском необходимо установить нужные для работы пакеты и зависимости, которые указаны на этой странице:  
 https://tauri.app/v1/guides/getting-started/prerequisites
@@ -63,20 +56,22 @@ from_bim  -- распеделение, которое задано в прост
 В блоке `special` можно указать специальные настройки для одного или группы областей здания.
 Этот блок обрабатывается всегда.
 
-```
-"distribution": {
-    "type":"uniform",
-    "density": 0.1,
-    "special": [
-        {
-            "uuid": [
-            "87c49613-44a7-4f3f-82e0-fb4a9ca2f46d"
-            ],
-            "density": 1.0,
-            "_comment": "The uuid is Room_1 by three_zone_three_transit"
-        }
-    ]
-  }
+```json
+{
+    "distribution": {
+        "type":"uniform",
+        "density": 0.1,
+        "special": [
+            {
+                "uuid": [
+                    "87c49613-44a7-4f3f-82e0-fb4a9ca2f46d"
+                ],
+                "density": 1.0,
+                "_comment": "The uuid is Room_1 by three_zone_three_transit"
+            }
+        ]
+    }   
+}
 ```
 
 ### transits
