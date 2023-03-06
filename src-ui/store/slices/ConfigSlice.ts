@@ -17,7 +17,13 @@ const initialState: ConfigState = {
 export const configSlice = createSlice({
 	name: 'config',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeLoggerFile: (state, action: PayloadAction<string>) => {
+			if (state.config) {
+				state.config.logger_config = action.payload;
+			}
+		}
+	},
 	extraReducers: builder => {
 		builder
 			.addCase(getConfig.pending.type, (state, action) => {
@@ -37,5 +43,7 @@ export const configSlice = createSlice({
 			});
 	}
 });
+
+export const { changeLoggerFile } = configSlice.actions;
 
 export default configSlice.reducer;
