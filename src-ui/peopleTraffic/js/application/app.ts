@@ -9,12 +9,14 @@ import { Canvas } from './canvas/Canvas.js';
 import { BASE_SETTINGS } from '../BASE_SETTINGS';
 import { Building, BuildingElement, Point } from './Interfaces/Building';
 import { GIFEncoder } from '../vendor/toGif/GIFEncoder';
+import { VideoRecorder } from '../VideoRecorder/VideoRecorder';
 
 export class App {
 	BASE_SETTINGS: BASE_SETTINGS;
 	server: Server;
 	canvas: Canvas;
 	mathem: Mathem;
+	videoRecorder: VideoRecorder;
 	data: {
 		struct: Building;
 		timerTimeDataUpdatePause: boolean;
@@ -37,14 +39,15 @@ export class App {
 		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];
 
-		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
+		activePeople: Array<{ uuid: string; XY: Point[] }>;
+		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 		maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
 		label: number;
 		exitedLabel: number;
 	};
+
 	view: View;
 	ui: UI;
 	logic: Logic;
@@ -56,6 +59,7 @@ export class App {
 		this.server = new Server();
 		this.canvas = new Canvas(this.BASE_SETTINGS.CANVAS);
 		this.mathem = new Mathem();
+		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
 		this.data = {
 			struct: this.server.data,
 			timerTimeDataUpdatePause: true,
@@ -91,14 +95,18 @@ export class App {
 			data: this.data,
 			mathem: this.mathem
 		});
-		this.ui = new UI({ data: this.data, mathem: this.mathem });
+		this.ui = new UI({
+			data: this.data,
+			mathem: this.mathem,
+			videoRecorder: this.videoRecorder
+		});
 		this.logic = new Logic({
 			view: this.view,
 			ui: this.ui,
 			data: this.data,
 			mathem: this.mathem
 		});
-		// @ts-ignore
+		// @ts-expect-error
 		this.encoder = new GIFEncoder();
 
 		// Инициализация первичных настроек
@@ -124,15 +132,14 @@ export class App {
 					break;
 				// Увеличить zoom
 				case 107:
+					break;
 				case 187:
 					this.data.scale++;
-					console.log(this.data.scale);
 					break;
 				// Уменьшить zoom
 				case 189:
 				case 109:
 					this.data.scale--;
-					console.log(this.data.scale);
 					break;
 			}
 			this.logic.updateBuildsInCamera();

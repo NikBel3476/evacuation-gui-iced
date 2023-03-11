@@ -1,6 +1,7 @@
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
+import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
@@ -34,12 +35,14 @@ interface UIConstructorParams {
 		exitedLabel: number;
 	};
 	mathem: Mathem;
+	videoRecorder: VideoRecorder;
 }
 
 export class UI {
 	private readonly data: UIConstructorParams['data'];
 	private readonly struct: Building;
 	private readonly mathem: Mathem;
+	private readonly videoRecorder: VideoRecorder;
 	private readonly levelHTML: HTMLElement;
 	private readonly buildingTypeHTML: HTMLElement;
 	private readonly buildingIdHTML: HTMLElement;
@@ -52,10 +55,11 @@ export class UI {
 	private readonly pauseButton: HTMLElement;
 	private readonly playButton: HTMLElement;
 
-	constructor({ data, mathem }: UIConstructorParams) {
+	constructor({ data, mathem, videoRecorder }: UIConstructorParams) {
 		this.data = data;
 		this.struct = this.data.struct;
 		this.mathem = mathem;
+		this.videoRecorder = videoRecorder;
 
 		this.levelHTML = document.getElementById('level')!;
 		this.buildingTypeHTML = document.getElementById('sign')!;
@@ -114,10 +118,25 @@ export class UI {
 				this.data.timerTimeDataUpdatePause = true;
 				this.data.isGifStop = true;
 			}
+			if (this.videoRecorder.recordingState === 'recording') {
+				this.videoRecorder.pause();
+			}
 		});
 		this.playButton.addEventListener('click', _ => {
 			if (this.data.timerTimeDataUpdatePause) {
 				this.data.timerTimeDataUpdatePause = false;
+			}
+			switch (this.videoRecorder.recordingState) {
+				case 'inactive':
+					this.videoRecorder.startRecording();
+					break;
+				case 'paused':
+					this.videoRecorder.resume();
+					break;
+				case 'recording':
+					this.videoRecorder.stopRecording();
+					this.videoRecorder.download();
+					break;
 			}
 		});
 	}
