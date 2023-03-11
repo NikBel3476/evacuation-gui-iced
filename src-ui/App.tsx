@@ -1,26 +1,9 @@
 import React, { FC } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ConfigurationPage from './pages/ConfigurationPage';
-import MainPage from './pages/MainPage';
-
-// TODO: move routes to separate file
-const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <MainPage />
-	},
-	{
-		path: '/configuration',
-		element: <ConfigurationPage />
-	}
-]);
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
 
 const App: FC = () => {
-	return (
-		<React.StrictMode>
-			<RouterProvider router={router} />
-		</React.StrictMode>
-	);
+	return <RouterProvider router={router} />;
 };
 
 export default App;

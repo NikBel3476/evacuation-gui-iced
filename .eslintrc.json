@@ -4,10 +4,10 @@
         "es2021": true
     },
     "extends": [
-        "eslint:recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
-        "standard-with-typescript"
+        "standard-with-typescript",
+        "plugin:prettier/recommended"
     ],
     "overrides": [
     ],
@@ -26,10 +26,20 @@
     },
     "rules": {
         "no-tabs": ["error", { "allowIndentationTabs": true }],
+        "no-console": "error",
+        "react/jsx-uses-react": "error",
+        "prettier/prettier": ["error", {
+            "endOfLine": "auto"
+        }],
         "@typescript-eslint/semi": ["error", "always"],
-        "@typescript-eslint/indent": "off",
         "@typescript-eslint/member-delimiter-style": ["error", {}],
-        "@typescript-eslint/space-before-function-paren": ["error", "never"],
-        "@typescript-eslint/strict-boolean-expressions": ["error", { "allowNullableObject": true }]
+        "@typescript-eslint/space-before-function-paren": "off",
+        "@typescript-eslint/strict-boolean-expressions": ["error", { "allowNullableObject": true }],
+        "@typescript-eslint/consistent-type-imports": ["error", {
+            "prefer": "no-type-imports"
+        }],
+        "@typescript-eslint/explicit-function-return-type": ["error", {
+            "allowFunctionsWithoutTypeParameters": true
+        }]
     }
 }

@@ -4,7 +4,6 @@ dist/
 lib/
 **/target/
 
-thirdparty/
 src-ui/peopleTraffic/js/vendor/toGif/Actionscript
 
 .idea/

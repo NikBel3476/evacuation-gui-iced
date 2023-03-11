@@ -1,52 +1,14 @@
 import { invoke } from '@tauri-apps/api';
-
-enum DistributionType {
-	FromBim,
-	Users
-}
-
-enum TransitionType {
-	FromBim,
-	Users
-}
-
-type ScenarioCfg = {
-	files: string[];
-	logger_config: string;
-	distribution: {
-		distribution_type: DistributionType;
-		density: number;
-		special: {
-			uuid: string[];
-			density: number;
-			comment: string;
-		}[];
-	};
-	transition: {
-		transitions_type: TransitionType;
-		doorway_in: number;
-		doorway_out: number;
-		special: {
-			uuid: string[];
-			width: number;
-			comment: string;
-		}[];
-	};
-	modeling: {
-		step: number;
-		max_speed: number;
-		max_density: number;
-		min_density: number;
-	};
-};
+import { ScenarioConfiguration } from '../types/ScenarioConfiguration';
 
 document.getElementById('start-btn')!.addEventListener('click', async _ => {
 	try {
-		let config = await invoke<ScenarioCfg>('read_config');
+		const config = await invoke<ScenarioConfiguration>('read_config');
 
 		document.querySelector<HTMLOListElement>('.config__bim-files')!.innerHTML =
 			config.files.reduce(
-				(filenameElements, pathToFile) => filenameElements.concat(`<li>${pathToFile}</li>`),
+				(filenameElements, pathToFile) =>
+					filenameElements.concat(`<li>${pathToFile}</li>`),
 				''
 			);
 
@@ -67,7 +29,10 @@ document.getElementById('start-btn')!.addEventListener('click', async _ => {
 					specialElements.concat(
 						`<li>
 							<ol>
-								${special.uuid.reduce((uuidElements, uuid) => uuidElements.concat(`<li>${uuid}</li>`), '')}
+								${special.uuid.reduce(
+									(uuidElements, uuid) => uuidElements.concat(`<li>${uuid}</li>`),
+									''
+								)}
 							</ol>
 							<p>Плотность: ${special.density}</p>
 							<p>Комментарий: ${special.comment}</p>
@@ -94,7 +59,10 @@ document.getElementById('start-btn')!.addEventListener('click', async _ => {
 					specialElements.concat(`
 					<li>
 						<ol>
-							${special.uuid.reduce((uuidElements, uuid) => uuidElements.concat(`<li>${uuid}</li>`), '')}
+							${special.uuid.reduce(
+								(uuidElements, uuid) => uuidElements.concat(`<li>${uuid}</li>`),
+								''
+							)}
 						</ol>
 						<p>Ширина: ${special.width}</p>
 						<p>Комментарий: ${special.comment}</p>
