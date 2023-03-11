@@ -1,10 +1,10 @@
 import { View } from '../view/View';
 import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
-import { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
+import { Building, BuildingElement, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
 
-type LogicConstructorParams = {
+interface LogicConstructorParams {
 	view: View;
 	ui: UI;
 	data: {
@@ -29,8 +29,8 @@ type LogicConstructorParams = {
 		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];
 
-		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
+		activePeople: Array<{ uuid: string; XY: Point[] }>;
+		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 		maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
@@ -38,7 +38,7 @@ type LogicConstructorParams = {
 		exitedLabel: number;
 	};
 	mathem: Mathem;
-};
+}
 
 export class Logic {
 	view: View;
@@ -63,14 +63,15 @@ export class Logic {
 		this.mathem = mathem;
 	}
 
-	/**** ЛОГИКА VIEW ****/
+	/** ЛОГИКА VIEW **/
 
 	// Проверка объектов находятся ли они в камере
-	isInCamera(XY: Array<Point>): boolean {
+	isInCamera(XY: Point[]): boolean {
 		return XY.some(point => {
 			return (
 				point.x * this.data.scale >= this.data.cameraXY.x &&
-				point.x * this.data.scale <= this.data.cameraXY.x + this.view.canvas.canvas.width &&
+				point.x * this.data.scale <=
+					this.data.cameraXY.x + this.view.canvas.canvas.width &&
 				point.y * this.data.scale >= this.data.cameraXY.y &&
 				point.y * this.data.scale <= this.data.cameraXY.y + this.view.canvas.canvas.height
 			);
@@ -79,13 +80,13 @@ export class Logic {
 
 	// Обновить список объектов в поле камеры
 	updateBuildsInCamera(): void {
-		this.data.activeBuilds = this.struct.Level[this.data.level].BuildElement.filter(building =>
-			this.isInCamera(building.XY[0].points)
+		this.data.activeBuilds = this.struct.Level[this.data.level].BuildElement.filter(
+			building => this.isInCamera(building.XY[0].points)
 		);
 	}
 
 	updateLabel(): void {
-		let rooms = this.data.timeData.items.find(
+		const rooms = this.data.timeData.items.find(
 			dateTime => this.data.time === Math.floor(dateTime.time)
 		)?.rooms;
 
@@ -138,10 +139,10 @@ export class Logic {
 		}
 	}
 
-	genPeopleCoordinate(build: BuildingElement, density: number): Array<Point> {
+	genPeopleCoordinate(build: BuildingElement, density: number): Point[] {
 		const XY = build.XY[0].points;
-		let arrayX = Array(XY.length - 1);
-		let arrayY = Array(XY.length - 1);
+		const arrayX = Array(XY.length - 1);
+		const arrayY = Array(XY.length - 1);
 		// TODO: understand why length - 1 is needed
 		XY.slice(0, -1).forEach((point, i) => {
 			arrayX[i] = point.x;
@@ -154,7 +155,7 @@ export class Logic {
 		const centerXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
 
 		const peopleCount = Math.floor(density);
-		let peopleXY = Array<Point>(peopleCount + 1);
+		const peopleXY = Array<Point>(peopleCount + 1);
 		for (let i = 0; i <= peopleCount; i++) {
 			let randX = this.mathem.getRandomArbitrary(
 				centerXY.x - centerXY.x / 2 + minXY.x,
@@ -166,7 +167,7 @@ export class Logic {
 			);
 
 			let intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
-			while (!Boolean(intersection & 1)) {
+			while (!(intersection & 1)) {
 				randX = this.mathem.getRandomArbitrary(
 					centerXY.x - centerXY.x / 2 + minXY.x,
 					centerXY.x + centerXY.x / 2 + minXY.x
@@ -188,16 +189,10 @@ export class Logic {
 		this.updatePeopleInCamera();
 		switch (key) {
 			case 'x':
-				this.data.cameraXY.x =
-					value > 0
-						? this.data.cameraXY.x - 0.2 * this.data.scale
-						: this.data.cameraXY.x + 0.2 * this.data.scale;
+				this.data.cameraXY.x = this.data.cameraXY.x - value;
 				break;
 			case 'y':
-				this.data.cameraXY.y =
-					value > 0
-						? this.data.cameraXY.y - 0.2 * this.data.scale
-						: this.data.cameraXY.y + 0.2 * this.data.scale;
+				this.data.cameraXY.y = this.data.cameraXY.y - value;
 				break;
 		}
 	}
@@ -219,8 +214,8 @@ export class Logic {
 
 		this.data.choiceBuild =
 			this.data.activeBuilds.find(building => {
-				let arrayX = Array(building.XY[0].points.length - 1);
-				let arrayY = Array(building.XY[0].points.length - 1);
+				const arrayX = Array(building.XY[0].points.length - 1);
+				const arrayY = Array(building.XY[0].points.length - 1);
 				building.XY[0].points.slice(0, -1).forEach((point, i) => {
 					arrayX[i] = point.x * this.data.scale;
 					arrayY[i] = point.y * this.data.scale;
