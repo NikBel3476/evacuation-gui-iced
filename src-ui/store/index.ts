@@ -1,9 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import configReducer from './slices/ConfigSlice';
+import floorReducer from './slices/FloorSlice';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 const rootReducer = combineReducers({
-	configReducer
+	configReducer,
+	floorReducer
 });
 
 export const store = configureStore({

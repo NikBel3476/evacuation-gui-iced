@@ -69,6 +69,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="distribution_type">Тип:</label>
 							<input
 								value={config.distribution.distribution_type}
+								onChange={() => {}}
 								placeholder="distribution_type"
 								type="text"
 								name="distribution_type"
@@ -81,6 +82,7 @@ const ConfigurationPage: FC = () => {
 							<label>Плотность:</label>
 							<input
 								value={config.distribution.density}
+								onChange={() => {}}
 								placeholder="distribution_density"
 								type="text"
 								name="distribution_density"
@@ -103,6 +105,7 @@ const ConfigurationPage: FC = () => {
 											</label>
 											<input
 												value={special.density}
+												onChange={() => {}}
 												placeholder="distribution_special_density"
 												type="text"
 												name="distribution_special_density"
@@ -128,6 +131,7 @@ const ConfigurationPage: FC = () => {
 											<label htmlFor="distribution_special_comment">Комментарий:</label>
 											<input
 												value={special.comment}
+												onChange={() => {}}
 												placeholder="distribution_special_comment"
 												type="text"
 												name="distribution_special_comment"
@@ -147,6 +151,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="transition_type">Тип:</label>
 							<input
 								value={config.transition.transitions_type}
+								onChange={() => {}}
 								placeholder="transition_type"
 								type="text"
 								name="transition_type"
@@ -159,6 +164,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="transition_doorway_in">Doorway in:</label>
 							<input
 								value={config.transition.doorway_in}
+								onChange={() => {}}
 								placeholder="transition_doorway_in"
 								type="text"
 								name="transition_doorway_in"
@@ -171,6 +177,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="transition_doorway_out">Doorway out:</label>
 							<input
 								value={config.transition.doorway_out}
+								onChange={() => {}}
 								placeholder="transition_doorway_out"
 								type="text"
 								name="transition_doorway_out"
@@ -192,6 +199,7 @@ const ConfigurationPage: FC = () => {
 											</label>
 											<input
 												value={special.width}
+												onChange={() => {}}
 												placeholder="distribution_special_width"
 												type="text"
 												name="distribution_special_width"
@@ -217,6 +225,7 @@ const ConfigurationPage: FC = () => {
 											<label htmlFor="transition_special_comment">Комментарий:</label>
 											<input
 												value={special.comment}
+												onChange={() => {}}
 												placeholder="transition_special_comment"
 												type="text"
 												name="transition_special_comment"
@@ -236,6 +245,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="modeling_step">Шаг:</label>
 							<input
 								value={config.modeling.step}
+								onChange={() => {}}
 								placeholder="modeling_step"
 								type="text"
 								name="modeling_step"
@@ -248,6 +258,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="max_speed">Максимальная скорость:</label>
 							<input
 								value={config.modeling.max_speed}
+								onChange={() => {}}
 								placeholder="max_speed"
 								type="text"
 								name="max_speed"
@@ -260,6 +271,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="max_density">Максимальная плотность:</label>
 							<input
 								value={config.modeling.max_density}
+								onChange={() => {}}
 								placeholder="max_density"
 								type="text"
 								name="max_density"
@@ -272,6 +284,7 @@ const ConfigurationPage: FC = () => {
 							<label htmlFor="min_density">Минимальная плотность:</label>
 							<input
 								value={config.modeling.min_density}
+								onChange={() => {}}
 								placeholder="min_density"
 								type="text"
 								name="min_density"
