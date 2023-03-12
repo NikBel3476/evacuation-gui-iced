@@ -53,6 +53,7 @@ export class App {
 	logic: Logic;
 	encoder;
 	private renderLoopId: number | null = null;
+	private timerTimeDataUpdateId: number | null = null;
 
 	constructor() {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
@@ -65,7 +66,7 @@ export class App {
 			struct: this.server.data,
 			timerTimeDataUpdatePause: true,
 			timerSpeedUp: 1,
-			timeData: timeData,
+			timeData,
 			time: 0,
 			timeStep: 1,
 
@@ -123,7 +124,6 @@ export class App {
 
 		this.gifInit(1000); // Инициализация настроек
 
-		let timerTimeDataUpdateId = setInterval(() => this.updateTimeData(), 500);
 		// this.startRendering();
 		// Закончить GIF и создать её
 		// let timerGifFinish = setTimeout(() => {
@@ -135,13 +135,30 @@ export class App {
 
 	startRendering() {
 		this.logic.updateField();
-		this.renderLoopId = window.requestAnimationFrame(() => this.startRendering());
+		this.renderLoopId = window.requestAnimationFrame(() => {
+			this.startRendering();
+		});
 	}
 
 	stopRendering() {
 		if (this.renderLoopId !== null) {
 			window.cancelAnimationFrame(this.renderLoopId);
 			this.renderLoopId = null;
+		}
+	}
+
+	startModeling() {
+		if (this.timerTimeDataUpdateId === null) {
+			this.timerTimeDataUpdateId = window.setInterval(() => {
+				this.updateTimeData();
+			}, 500);
+		}
+	}
+
+	stopModeling() {
+		if (this.timerTimeDataUpdateId !== null) {
+			window.clearInterval(this.timerTimeDataUpdateId);
+			this.timerTimeDataUpdateId = null;
 		}
 	}
 

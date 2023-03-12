@@ -8,22 +8,44 @@ import {
 	PlayIcon
 } from '@heroicons/react/24/solid';
 
-const ControlPanel: FC = () => {
-	const handlePlayButton: MouseEventHandler<HTMLDivElement> = e => {};
+interface ControlPanelProps {
+	onPlayButtonClick: MouseEventHandler;
+	onPauseButtonClick: MouseEventHandler;
+	onSpeedUpButtonClick: MouseEventHandler;
+	onSpeedDownButtonClick: MouseEventHandler;
+}
 
+const ControlPanel: FC<ControlPanelProps> = ({
+	onPlayButtonClick,
+	onPauseButtonClick,
+	onSpeedUpButtonClick,
+	onSpeedDownButtonClick
+}) => {
 	return (
 		<aside className={cn(styles.footer, 'bg-sky-400')}>
 			<div className="grid grid-cols-4 grid-rows-1 gap-x-4 justify-items-center">
-				<div className="p-1 rounded-full bg-indigo-600 cursor-pointer">
+				<div
+					className="p-1 rounded-full bg-indigo-600 cursor-pointer"
+					onClick={onPlayButtonClick}
+				>
 					<PlayIcon className="h-6 w-6 fill-amber-50" />
 				</div>
-				<div className="p-1 rounded-full bg-indigo-600 cursor-pointer">
+				<div
+					className="p-1 rounded-full bg-indigo-600 cursor-pointer"
+					onClick={onPauseButtonClick}
+				>
 					<PauseIcon className="h-6 w-6 fill-amber-50" />
 				</div>
-				<div className="p-1 rounded-full bg-indigo-600 cursor-pointer">
+				<div
+					className="p-1 rounded-full bg-indigo-600 cursor-pointer"
+					onClick={onSpeedDownButtonClick}
+				>
 					<ArrowDownIcon className="h-6 w-6 fill-amber-50" />
 				</div>
-				<div className="p-1 rounded-full bg-indigo-600 cursor-pointer">
+				<div
+					className="p-1 rounded-full bg-indigo-600 cursor-pointer"
+					onClick={onSpeedUpButtonClick}
+				>
 					<ArrowUpIcon className="h-6 w-6 fill-amber-50" />
 				</div>
 			</div>
