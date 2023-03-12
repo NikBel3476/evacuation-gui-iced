@@ -151,8 +151,7 @@ function App() {
 			y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
 		};
 
-		const newScale =
-			e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+		const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
 		stage.scale({ x: newScale, y: newScale });
 
@@ -162,12 +161,8 @@ function App() {
 		};
 		setState({
 			stageScale: newScale,
-			stageX:
-				-(mousePointTo.x - stage.getPointerPosition().x / newScale) *
-				newScale,
-			stageY:
-				-(mousePointTo.y - stage.getPointerPosition().y / newScale) *
-				newScale
+			stageX: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+			stageY: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
 		});
 	};
 
@@ -247,8 +242,8 @@ function App() {
 					))}
 				</Layer>
 				<Layer>
-					{rs.map(room =>
-						console.log()
+					{rs.map(
+						room => console.log()
 						//   for (;;) {
 						//     <Circle
 						//   x={200}

@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import configReducer from './slices/ConfigSlice';
-import floorReducer from './slices/FloorSlice';
+import floorReducer from './slices/BuildingViewSlice';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 const rootReducer = combineReducers({
