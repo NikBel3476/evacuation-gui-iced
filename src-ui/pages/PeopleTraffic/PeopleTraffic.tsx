@@ -25,24 +25,23 @@ const PeopleTraffic: FC = () => {
 
 	const handleDocumentKeydown = (event: KeyboardEvent) => {
 		if (app) {
-			switch (event.keyCode) {
+			switch (event.key) {
 				// Повысить этаж
-				case 38:
+				case 'ArrowUp':
 					app.data.level += app.data.level + 1 < app.data.struct.Level.length ? 1 : 0;
 					break;
 				// Понизить этаж
-				case 40:
+				case 'ArrowDown':
 					app.data.level -= app.data.level - 1 >= 0 ? 1 : 0;
 					break;
 				// Увеличить zoom
-				case 107:
-					break;
-				case 187:
+				case '=':
+				case '+':
 					app.data.scale++;
 					break;
 				// Уменьшить zoom
-				case 189:
-				case 109:
+				case '-':
+				case '_':
 					app.data.scale--;
 					break;
 			}

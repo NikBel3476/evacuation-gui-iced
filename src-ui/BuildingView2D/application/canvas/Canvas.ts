@@ -1,50 +1,60 @@
-type CanvasConstructorParams = {
+interface CanvasConstructorParams {
 	ID: string;
-};
+}
 
 export class Canvas {
-	canvasContainer: HTMLElement;
 	canvas: HTMLCanvasElement;
+	canvasContainer: HTMLElement;
 	context: CanvasRenderingContext2D;
-	x0: number;
-	y0: number;
-	memCanvas: HTMLCanvasElement;
-	memContext: CanvasRenderingContext2D;
+	private readonly bindedHandleWindowResize: () => void;
 
 	constructor({ ID }: CanvasConstructorParams) {
-		this.canvasContainer = document.getElementById('canvas_container') as HTMLElement; //я на время добавил если что
+		this.canvasContainer = document.getElementById('canvas_container') as HTMLElement;
 		this.canvas = document.getElementById(ID) as HTMLCanvasElement;
-		this.canvas.width = this.canvasContainer.offsetWidth;
-		this.canvas.height = this.canvasContainer.clientHeight;
-		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-		this.x0 = 0;
-		this.y0 = 0;
+		this.resizeCanvas();
+		this.context = this.canvas.getContext('2d', {
+			willReadFrequently: true
+		}) as CanvasRenderingContext2D;
+		this.bindedHandleWindowResize = this.handleWindowResize.bind(this);
+		this.setupListeners();
+	}
 
-		this.memCanvas = document.createElement('canvas');
-		this.memCanvas.width = this.canvasContainer.clientWidth;
-		this.memCanvas.height = this.canvasContainer.clientHeight;
-		this.memContext = this.memCanvas.getContext('2d') as CanvasRenderingContext2D;
+	setupListeners() {
+		window.addEventListener('resize', this.bindedHandleWindowResize);
+	}
+
+	removeListeners() {
+		window.removeEventListener('resize', this.bindedHandleWindowResize);
+	}
+
+	handleWindowResize() {
+		this.resizeCanvas();
+	}
+
+	resizeCanvas() {
+		this.canvas.width = this.canvasContainer.clientWidth;
+		this.canvas.height = this.canvasContainer.clientHeight;
 	}
 
 	fill(color: CanvasFillStrokeStyles['fillStyle']) {
-		this.memContext.fillStyle = color;
-		this.memContext.fill();
+		this.context.fillStyle = color;
+		this.context.fill();
 	}
 
 	beginPath() {
-		this.memContext.beginPath();
+		this.context.beginPath();
 	}
 
 	closePath() {
-		this.memContext.closePath();
+		this.context.closePath();
 	}
 
 	moveTo(x: number, y: number) {
-		this.memContext.moveTo(x, y);
+		this.context.moveTo(x, y);
 	}
 
-	fillRect(color: CanvasFillStrokeStyles['fillStyle']) {
-		this.context.fillStyle = color || 'white';
+	fillRect(color: CanvasFillStrokeStyles['fillStyle'] = 'white') {
+		this.context.fillStyle = color;
 		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
@@ -53,25 +63,30 @@ export class Canvas {
 		y1: number,
 		x2: number,
 		y2: number,
-		color: CanvasFillStrokeStyles['strokeStyle']
+		color: CanvasFillStrokeStyles['strokeStyle'] = 'black'
 	) {
-		this.memContext.strokeStyle = color || 'black';
-		this.memContext.moveTo(x1 + this.x0, y1 + this.y0);
-		this.memContext.lineTo(x2 + this.x0, y2 + this.y0);
-		this.memContext.stroke();
+		this.context.strokeStyle = color;
+		this.context.moveTo(x1, y1);
+		this.context.lineTo(x2, y2);
+		this.context.stroke();
 	}
 
 	line_(x: number, y: number, color: CanvasFillStrokeStyles['strokeStyle'] = 'black') {
-		this.memContext.strokeStyle = color;
-		this.memContext.lineTo(x, y);
-		this.memContext.stroke();
+		this.context.strokeStyle = color;
+		this.context.lineTo(x, y);
+		this.context.stroke();
 	}
 
-	circle(x: number, y: number, r: number, color: CanvasFillStrokeStyles['strokeStyle']) {
-		this.memContext.beginPath();
-		this.memContext.strokeStyle = color || 'black';
-		this.memContext.arc(x, y, r, 0, 2 * Math.PI);
-		this.memContext.stroke();
+	circle(
+		x: number,
+		y: number,
+		r: number,
+		color: CanvasFillStrokeStyles['strokeStyle'] = 'black'
+	) {
+		this.context.beginPath();
+		this.context.strokeStyle = color;
+		this.context.arc(x, y, r, 0, 2 * Math.PI);
+		this.context.stroke();
 		this.fill(color);
 	}
 
@@ -80,10 +95,10 @@ export class Canvas {
 		y: number,
 		width: number,
 		height: number,
-		color: CanvasFillStrokeStyles['strokeStyle']
+		color: CanvasFillStrokeStyles['strokeStyle'] = 'black'
 	) {
 		this.context.beginPath();
-		this.context.strokeStyle = color || 'black';
+		this.context.strokeStyle = color;
 		this.context.rect(x, y, width, height);
 		this.context.stroke();
 	}
@@ -93,11 +108,13 @@ export class Canvas {
 		y: number,
 		width: number,
 		height: number,
-		color: CanvasFillStrokeStyles['fillStyle'] | CanvasFillStrokeStyles['strokeStyle']
+		color:
+			| CanvasFillStrokeStyles['fillStyle']
+			| CanvasFillStrokeStyles['strokeStyle'] = 'black'
 	) {
 		this.context.beginPath();
-		this.context.strokeStyle = color || 'black';
-		this.context.fillStyle = color || 'black';
+		this.context.strokeStyle = color;
+		this.context.fillStyle = color;
 		this.context.fillRect(x, y, width, height);
 		this.context.stroke();
 	}
@@ -106,11 +123,11 @@ export class Canvas {
 		text: string,
 		x: number,
 		y: number,
-		color: CanvasFillStrokeStyles['fillStyle'],
-		size: number
+		color: CanvasFillStrokeStyles['fillStyle'] = 'black',
+		size: number = 50
 	) {
-		this.context.fillStyle = color || 'black';
-		this.context.font = (size || 50) + 'px Georgia';
+		this.context.fillStyle = color;
+		this.context.font = `${size}px Georgia`;
 		this.context.fillText(text, x, y);
 	}
 
@@ -129,12 +146,12 @@ export class Canvas {
 	}
 
 	print() {
-		this.context.drawImage(this.memCanvas, 0, 0);
+		this.context.drawImage(this.canvas, 0, 0);
 	}
 
 	clear(color: CanvasFillStrokeStyles['fillStyle'] = '#EAF0F1') {
-		this.memContext.fillStyle = color;
-		this.memContext.fillRect(0, 0, this.memCanvas.width, this.memCanvas.height);
+		this.context.fillStyle = color;
+		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
 	rotate(angle: number) {

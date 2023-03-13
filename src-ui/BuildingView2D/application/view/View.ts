@@ -3,7 +3,7 @@ import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
 
-type ViewConstructorParams = {
+interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
 		struct: Building;
@@ -27,8 +27,8 @@ type ViewConstructorParams = {
 		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];
 
-		activePeople: Array<{ uuid: string; XY: Array<Point> }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Array<Point> }>;
+		activePeople: Array<{ uuid: string; XY: Point[] }>;
+		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 		maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
@@ -36,7 +36,7 @@ type ViewConstructorParams = {
 		exitedLabel: number;
 	};
 	mathem: Mathem;
-};
+}
 
 export class View {
 	canvas: Canvas;
@@ -76,7 +76,7 @@ export class View {
 		this.canvas.closePath();
 	}
 
-	drawPeople(people: { uuid: string; XY: Array<Point> }, buildings: BuildingElement[]) {
+	drawPeople(people: { uuid: string; XY: Point[] }, buildings: BuildingElement[]) {
 		this.canvas.beginPath();
 		const building = buildings.find(building => building.Id === people.uuid);
 		if (building) {

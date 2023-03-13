@@ -54,6 +54,9 @@ export class App {
 	encoder;
 	private renderLoopId: number | null = null;
 	private timerTimeDataUpdateId: number | null = null;
+	private fps: number = 0;
+	private fpsOut: number = 0;
+	private timestamp: number = performance.now();
 
 	constructor() {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
@@ -123,18 +126,18 @@ export class App {
 		this.logic.updateLabel();
 
 		this.gifInit(1000); // Инициализация настроек
-
-		// this.startRendering();
-		// Закончить GIF и создать её
-		// let timerGifFinish = setTimeout(() => {
-		//     this.data.gifFinish = true;
-		//     this.encoder.finish();
-		//     this.encoder.download("newGif.gif");
-		// }, 5500);
 	}
 
 	startRendering() {
+		this.fps++;
+		const currentTimestamp = performance.now();
+		if (currentTimestamp - this.timestamp >= 1000) {
+			this.timestamp = currentTimestamp;
+			this.fpsOut = this.fps;
+			this.fps = 0;
+		}
 		this.logic.updateField();
+		this.canvas.text(String(this.fpsOut), 0, 30, 'black', 30);
 		this.renderLoopId = window.requestAnimationFrame(() => {
 			this.startRendering();
 		});
@@ -189,6 +192,6 @@ export class App {
 
 	// Добавить новый кадр
 	gifNewFrame() {
-		this.encoder.addFrame(this.canvas.memContext);
+		this.encoder.addFrame(this.canvas.context);
 	}
 }

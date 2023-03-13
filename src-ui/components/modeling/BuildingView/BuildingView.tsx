@@ -24,21 +24,19 @@ const BuildingView: FC<BuildingViewProps> = ({
 	useEffect(() => {
 		onMount();
 		return onUnmount;
-	}, []);
+	});
 
 	return (
-		<section>
-			<div className="w-full h-full" id="canvas_container">
-				<canvas
-					id="field"
-					onDoubleClick={onCanvasDoubleClick}
-					onWheel={onCanvasWheel}
-					onMouseDown={onCanvasMouseDown}
-					onMouseUp={onCanvasMouseUp}
-					onMouseOut={onCanvasMouseOut}
-					onMouseMove={onCanvasMouseMove}
-				></canvas>
-			</div>
+		<section className="overflow-hidden" id="canvas_container">
+			<canvas
+				id="field"
+				onDoubleClick={onCanvasDoubleClick}
+				onWheel={onCanvasWheel}
+				onMouseDown={onCanvasMouseDown}
+				onMouseUp={onCanvasMouseUp}
+				onMouseOut={onCanvasMouseOut}
+				onMouseMove={onCanvasMouseMove}
+			></canvas>
 		</section>
 	);
 };
