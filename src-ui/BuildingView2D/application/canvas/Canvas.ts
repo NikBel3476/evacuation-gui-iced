@@ -1,5 +1,5 @@
 interface CanvasConstructorParams {
-	ID: string;
+	canvasId: string;
 }
 
 export class Canvas {
@@ -8,9 +8,9 @@ export class Canvas {
 	context: CanvasRenderingContext2D;
 	private readonly bindedHandleWindowResize: () => void;
 
-	constructor({ ID }: CanvasConstructorParams) {
+	constructor({ canvasId }: CanvasConstructorParams) {
 		this.canvasContainer = document.getElementById('canvas_container') as HTMLElement;
-		this.canvas = document.getElementById(ID) as HTMLCanvasElement;
+		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.resizeCanvas();
 		this.context = this.canvas.getContext('2d', {
 			willReadFrequently: true
