@@ -61,7 +61,7 @@ export class App {
 			mathem: this.mathem,
 			server: this.server
 		});
-		// @ts-expect-error
+		// @ts-expect-error written in js
 		this.encoder = new GIFEncoder();
 
 		// Инициализация первичных настроек

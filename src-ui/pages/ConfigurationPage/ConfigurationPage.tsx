@@ -10,7 +10,7 @@ const ConfigurationPage: FC = () => {
 
 	useEffect(() => {
 		void dispatch(getConfig());
-	}, []);
+	});
 
 	const handleLoggerFilenameInputChange: ChangeEventHandler<HTMLInputElement> = e => {
 		dispatch(changeLoggerFile(e.target.value));
