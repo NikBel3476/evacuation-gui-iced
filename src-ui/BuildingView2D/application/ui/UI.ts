@@ -4,12 +4,6 @@ import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
-		cameraXY: { x: number; y: number };
-		canMove: boolean;
-		scale: number;
-		fieldWidth: number;
-		fieldHeight: number;
-
 		level: number;
 		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];

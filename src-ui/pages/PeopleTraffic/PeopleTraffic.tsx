@@ -89,24 +89,24 @@ const PeopleTraffic: FC = () => {
 
 	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = _ => {
 		if (app) {
-			app.data.canMove = true;
+			app.canMove = true;
 		}
 	};
 
 	const handleCanvasMouseUp: MouseEventHandler<HTMLCanvasElement> = _ => {
 		if (app) {
-			app.data.canMove = false;
+			app.canMove = false;
 		}
 	};
 
 	const handleCanvasMouseOut: MouseEventHandler<HTMLCanvasElement> = _ => {
 		if (app) {
-			app.data.canMove = false;
+			app.canMove = false;
 		}
 	};
 
 	const handleCanvasMouseMove: MouseEventHandler<HTMLCanvasElement> = event => {
-		if (app?.data.canMove === true) {
+		if (app?.canMove === true) {
 			app.logic.mouseMove(event);
 		}
 	};

@@ -6,10 +6,7 @@ interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
 		cameraXY: { x: number; y: number };
-		canMove: boolean;
 		scale: number;
-		fieldWidth: number;
-		fieldHeight: number;
 
 		level: number;
 		choiceBuild: BuildingElement | null;

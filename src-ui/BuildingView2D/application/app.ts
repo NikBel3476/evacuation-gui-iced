@@ -17,10 +17,7 @@ export class App {
 	videoRecorder: VideoRecorder;
 	data: {
 		cameraXY: { x: number; y: number };
-		canMove: boolean;
 		scale: number;
-		fieldWidth: number;
-		fieldHeight: number;
 
 		level: number;
 		choiceBuild: BuildingElement | null;
@@ -36,6 +33,7 @@ export class App {
 	encoder;
 	timerTimeDataUpdatePause: boolean = true;
 	isGifStop: boolean = false;
+	canMove: boolean = false;
 	private renderLoopId: number | null = null;
 	private timerTimeDataUpdateId: number | null = null;
 	private fps: number = 0;
@@ -51,10 +49,7 @@ export class App {
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
 		this.data = {
 			cameraXY: { x: 0, y: 0 },
-			canMove: false,
 			scale: 20,
-			fieldWidth: this.canvas.canvas.width,
-			fieldHeight: this.canvas.canvas.height,
 
 			level: 0,
 			choiceBuild: null,

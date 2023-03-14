@@ -14,10 +14,7 @@ interface LogicConstructorParams {
 	server: Server;
 	data: {
 		cameraXY: { x: number; y: number };
-		canMove: boolean;
 		scale: number;
-		fieldWidth: number;
-		fieldHeight: number;
 
 		level: number;
 		choiceBuild: BuildingElement | null;
@@ -238,9 +235,9 @@ export class Logic {
 		const xLength = Math.abs(rightX - leftX);
 		const yLength = Math.abs(botY - topY);
 		const diagonal = Math.sqrt(Math.pow(xLength, 2) + Math.pow(yLength, 2));
-		const fieldDiagonal = Math.sqrt(
-			Math.pow(this.data.fieldWidth, 2) + Math.pow(this.data.fieldHeight, 2)
-		);
+		const canvasWidth = this.view.canvas.canvas.width;
+		const canvasHeight = this.view.canvas.canvas.height;
+		const fieldDiagonal = Math.sqrt(Math.pow(canvasWidth, 2) + Math.pow(canvasHeight, 2));
 
 		this.data.scale = fieldDiagonal / diagonal;
 		this.data.cameraXY.x = leftX * this.data.scale;
