@@ -13,8 +13,8 @@ interface LogicConstructorParams {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		time: number;
-		timeStep: number;
+		// time: number;
+		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -86,21 +86,21 @@ export class Logic {
 		);
 	}
 
-	updateLabel(): void {
+	updateNumberOfPeopleInsideBuildingLabel(): void {
 		const rooms = this.data.timeData.items.find(
-			dateTime => this.data.time === Math.floor(dateTime.time)
+			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 
 		if (rooms) {
-			const label = Math.floor(
+			const numberOfPeopleInsideBuilding = Math.floor(
 				rooms.reduce((totalDensity, room) => totalDensity + room.density, 0)
 			);
 
 			if (this.data.label !== 0) {
-				this.data.exitedLabel += this.data.label - label;
+				this.data.exitedLabel += this.data.label - numberOfPeopleInsideBuilding;
 			}
 
-			this.data.label = label;
+			this.data.label = numberOfPeopleInsideBuilding;
 		} else {
 			this.data.label = 0;
 		}
@@ -120,7 +120,7 @@ export class Logic {
 
 	updatePeopleInBuilds(): void {
 		const rooms = this.data.timeData.items.find(
-			dateTime => this.data.time === Math.floor(dateTime.time)
+			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 
 		this.data.peopleCoordinate = [];

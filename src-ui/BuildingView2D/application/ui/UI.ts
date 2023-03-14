@@ -9,8 +9,8 @@ interface UIConstructorParams {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		time: number;
-		timeStep: number;
+		// time: number;
+		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -46,6 +46,19 @@ export class UI {
 	private readonly movingTimeHTML: HTMLElement;
 	private readonly numberOfPeopleInsideHTML: HTMLElement;
 	private readonly numberOfPeopleOutsideHTML: HTMLElement;
+	private _evacuationTimeInSec: number = 0;
+
+	get evacuationTimeInSec(): typeof this._evacuationTimeInSec {
+		return this._evacuationTimeInSec;
+	}
+
+	set evacuationTimeInSec(time: typeof this._evacuationTimeInSec) {
+		this._evacuationTimeInSec = time;
+		this.movingTimeHTML.textContent = String(this._evacuationTimeInSec);
+	}
+
+	private numberOfPeopleInsideBuilding: number = 0;
+	private numberOfPeopleOutsideBuilding: number = 0;
 
 	constructor({ data, mathem, videoRecorder }: UIConstructorParams) {
 		this.data = data;
@@ -61,10 +74,15 @@ export class UI {
 		this.numberOfPeopleOutsideHTML = document.getElementById(
 			'people_outside_building'
 		) as HTMLSpanElement;
+		this.initLabels();
+	}
+
+	initLabels() {
+		this.movingTimeHTML.textContent = String(this._evacuationTimeInSec);
 	}
 
 	updateUI() {
-		this.movingTimeHTML.textContent = String(this.data.time);
+		// this.movingTimeHTML.textContent = String(this.data.time);
 		this.numberOfPeopleInsideHTML.textContent = String(this.data.label);
 		this.numberOfPeopleOutsideHTML.textContent = String(this.data.exitedLabel);
 	}

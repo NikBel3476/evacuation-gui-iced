@@ -22,8 +22,8 @@ export class App {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		time: number;
-		timeStep: number;
+		// time: number;
+		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -69,10 +69,9 @@ export class App {
 			struct: this.server.data,
 			timerTimeDataUpdatePause: true,
 			timerSpeedUp: 1,
-			// @ts-expect-error
 			timeData,
-			time: 0,
-			timeStep: 1,
+			// time: 0,
+			// timeStep: 1,
 
 			gifFinish: false,
 			isGifStop: false,
@@ -124,7 +123,7 @@ export class App {
 		this.logic.toScreenAdjustment();
 		this.logic.updatePeopleInBuilds();
 		this.logic.updatePeopleInCamera();
-		this.logic.updateLabel();
+		this.logic.updateNumberOfPeopleInsideBuildingLabel();
 
 		this.gifInit(1000); // Инициализация настроек
 	}
@@ -168,10 +167,10 @@ export class App {
 
 	updateTimeData() {
 		if (!this.data.timerTimeDataUpdatePause) {
-			this.data.time += this.data.timeStep;
+			this.ui.evacuationTimeInSec++;
 			this.logic.updatePeopleInBuilds();
 			this.logic.updatePeopleInCamera();
-			this.logic.updateLabel();
+			this.logic.updateNumberOfPeopleInsideBuildingLabel();
 			this.ui.updateUI();
 			this.gifNewFrame();
 		}

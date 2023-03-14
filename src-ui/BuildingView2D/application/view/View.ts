@@ -10,8 +10,8 @@ interface ViewConstructorParams {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		time: number;
-		timeStep: number;
+		// time: number;
+		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
