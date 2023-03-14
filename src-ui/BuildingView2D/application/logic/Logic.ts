@@ -16,8 +16,6 @@ interface LogicConstructorParams {
 		cameraXY: { x: number; y: number };
 		scale: number;
 
-		level: number;
-		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
@@ -30,8 +28,8 @@ export class Logic {
 	ui: UI;
 	data: LogicConstructorParams['data'];
 	struct: Building;
-	level: number;
-	choiceBuild: BuildingElement | null;
+	level: number = 0;
+	choiceBuild: BuildingElement | null = null;
 	scale: number;
 	mathem: Mathem;
 	private readonly server: Server;
@@ -45,8 +43,6 @@ export class Logic {
 		this.server = server;
 
 		this.struct = this.server.data;
-		this.level = this.data.level;
-		this.choiceBuild = this.data.choiceBuild;
 		this.scale = this.data.scale;
 
 		this.mathem = mathem;
@@ -69,8 +65,8 @@ export class Logic {
 
 	// Обновить список объектов в поле камеры
 	updateBuildsInCamera(): void {
-		this.data.activeBuilds = this.struct.Level[this.data.level].BuildElement.filter(
-			building => this.isInCamera(building.XY[0].points)
+		this.data.activeBuilds = this.struct.Level[this.level].BuildElement.filter(building =>
+			this.isInCamera(building.XY[0].points)
 		);
 	}
 
@@ -127,6 +123,14 @@ export class Logic {
 				});
 			});
 		}
+	}
+
+	getPeopleCountInChoiceRoom(): number {
+		const coordinates = this.data.peopleCoordinate.find(
+			coordinate => this.choiceBuild?.Id === coordinate.uuid
+		);
+
+		return coordinates?.XY.length ?? 0;
 	}
 
 	genPeopleCoordinate(build: BuildingElement, density: number): Point[] {
@@ -202,7 +206,7 @@ export class Logic {
 		const mouseX = event.nativeEvent.offsetX + this.data.cameraXY.x;
 		const mouseY = event.nativeEvent.offsetY + this.data.cameraXY.y;
 
-		this.data.choiceBuild =
+		this.choiceBuild =
 			this.data.activeBuilds.find(building => {
 				const arrayX = Array(building.XY[0].points.length - 1);
 				const arrayY = Array(building.XY[0].points.length - 1);
@@ -217,7 +221,7 @@ export class Logic {
 	}
 
 	toInitialCoordination(): void {
-		const rooms = this.struct.Level[this.data.level].BuildElement;
+		const rooms = this.struct.Level[this.level].BuildElement;
 		let leftX = rooms[0].XY[0].points[0].x;
 		let topY = rooms[0].XY[0].points[0].y;
 		let rightX = rooms[0].XY[0].points[0].x;
@@ -249,7 +253,7 @@ export class Logic {
 		while (true) {
 			if (
 				this.data.activeBuilds.length !==
-				this.struct.Level[this.data.level].BuildElement.length
+				this.struct.Level[this.level].BuildElement.length
 			) {
 				this.data.scale -= 1;
 				this.updateBuildsInCamera();

@@ -4,10 +4,6 @@ import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
-		level: number;
-		choiceBuild: BuildingElement | null;
-		activeBuilds: BuildingElement[];
-
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 	};
@@ -79,7 +75,7 @@ export class UI {
 		this.initLabels();
 	}
 
-	initLabels() {
+	private initLabels() {
 		this.movingTimeHTML.textContent = String(this._evacuationTimeInSec);
 		this.numberOfPeopleInsideHTML.textContent = String(
 			this._numberOfPeopleInsideBuilding
@@ -87,13 +83,5 @@ export class UI {
 		this.numberOfPeopleOutsideHTML.textContent = String(
 			this._numberOfPeopleOutsideBuilding
 		);
-	}
-
-	getPeopleCountInChoiceRoom(): number {
-		const coordinates = this.data.peopleCoordinate.find(
-			coordinate => this.data.choiceBuild?.Id === coordinate.uuid
-		);
-
-		return coordinates?.XY.length ?? 0;
 	}
 }

@@ -19,8 +19,6 @@ export class App {
 		cameraXY: { x: number; y: number };
 		scale: number;
 
-		level: number;
-		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
@@ -51,8 +49,6 @@ export class App {
 			cameraXY: { x: 0, y: 0 },
 			scale: 20,
 
-			level: 0,
-			choiceBuild: null,
 			activeBuilds: [],
 
 			activePeople: [],

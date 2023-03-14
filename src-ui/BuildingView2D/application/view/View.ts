@@ -8,8 +8,6 @@ interface ViewConstructorParams {
 		cameraXY: { x: number; y: number };
 		scale: number;
 
-		level: number;
-		choiceBuild: BuildingElement | null;
 		activeBuilds: BuildingElement[];
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;

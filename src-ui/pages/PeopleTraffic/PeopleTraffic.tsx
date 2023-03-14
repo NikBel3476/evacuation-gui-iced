@@ -31,14 +31,14 @@ const PeopleTraffic: FC = () => {
 		if (app) {
 			switch (event.key) {
 				case 'ArrowUp':
-					if (app.data.level < app.logic.struct.Level.length - 1) {
-						app.data.level++;
+					if (app.logic.level < app.logic.struct.Level.length - 1) {
+						app.logic.level++;
 						dispatch(incrementCurrentLevel());
 					}
 					break;
 				case 'ArrowDown':
-					if (app.data.level > 0) {
-						app.data.level--;
+					if (app.logic.level > 0) {
+						app.logic.level--;
 						dispatch(decrementCurrentLevel());
 					}
 					break;
@@ -58,15 +58,15 @@ const PeopleTraffic: FC = () => {
 
 	const handleCanvasDoubleClick: MouseEventHandler<HTMLCanvasElement> = event => {
 		app?.logic.toChoiceBuild(event);
-		if (app?.data.choiceBuild) {
+		if (app?.logic.choiceBuild) {
 			dispatch(
 				setBuildingElement({
-					id: app.data.choiceBuild.Id,
-					area: Math.floor(app.mathem.calculateBuildArea(app.data.choiceBuild)),
-					name: app.data.choiceBuild.Name,
-					type: app.data.choiceBuild.Sign,
-					level: app.logic.struct.Level[app.data.level].ZLevel,
-					numberOfPeople: app.ui.getPeopleCountInChoiceRoom()
+					id: app.logic.choiceBuild.Id,
+					area: Math.floor(app.mathem.calculateBuildArea(app.logic.choiceBuild)),
+					name: app.logic.choiceBuild.Name,
+					type: app.logic.choiceBuild.Sign,
+					level: app.logic.struct.Level[app.logic.level].ZLevel,
+					numberOfPeople: app.logic.getPeopleCountInChoiceRoom()
 				})
 			);
 		}
