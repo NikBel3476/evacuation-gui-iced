@@ -1,11 +1,10 @@
 import { Canvas } from '../canvas/Canvas';
 import { Mathem } from '../mathem/Mathem';
-import { Building, BuildingElement, Point } from '../Interfaces/Building';
+import { BuildingElement, Point } from '../Interfaces/Building';
 
 interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
-		struct: Building;
 		timerTimeDataUpdatePause: boolean;
 
 		gifFinish: boolean;
@@ -32,13 +31,11 @@ interface ViewConstructorParams {
 export class View {
 	canvas: Canvas;
 	data: ViewConstructorParams['data'];
-	struct: Building;
 	mathem: Mathem;
 
 	constructor({ canvas, data, mathem }: ViewConstructorParams) {
 		this.canvas = canvas;
 		this.data = data;
-		this.struct = this.data.struct;
 		this.mathem = mathem;
 	}
 

@@ -31,7 +31,7 @@ const PeopleTraffic: FC = () => {
 		if (app) {
 			switch (event.key) {
 				case 'ArrowUp':
-					if (app.data.level < app.data.struct.Level.length - 1) {
+					if (app.data.level < app.logic.struct.Level.length - 1) {
 						app.data.level++;
 						dispatch(incrementCurrentLevel());
 					}
@@ -65,7 +65,7 @@ const PeopleTraffic: FC = () => {
 					area: Math.floor(app.mathem.calculateBuildArea(app.data.choiceBuild)),
 					name: app.data.choiceBuild.Name,
 					type: app.data.choiceBuild.Sign,
-					level: app.data.struct.Level[app.data.level].ZLevel,
+					level: app.logic.struct.Level[app.data.level].ZLevel,
 					numberOfPeople: app.ui.getPeopleCountInChoiceRoom()
 				})
 			);

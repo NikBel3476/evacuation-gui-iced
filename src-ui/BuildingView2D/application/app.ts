@@ -5,7 +5,7 @@ import { Mathem } from './mathem/Mathem.js';
 import { Logic } from './logic/Logic.js';
 import { Canvas } from './canvas/Canvas.js';
 import { BASE_SETTINGS } from '../BASE_SETTINGS';
-import { Building, BuildingElement, Point } from './Interfaces/Building';
+import { BuildingElement, Point } from './Interfaces/Building';
 import { GIFEncoder } from '../../peopleTraffic/js/vendor/toGif/GIFEncoder';
 import { VideoRecorder } from '../VideoRecorder/VideoRecorder';
 
@@ -16,7 +16,6 @@ export class App {
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;
 	data: {
-		struct: Building;
 		timerTimeDataUpdatePause: boolean;
 
 		gifFinish: boolean;
@@ -56,7 +55,6 @@ export class App {
 		this.mathem = new Mathem();
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
 		this.data = {
-			struct: this.server.data,
 			timerTimeDataUpdatePause: true,
 
 			gifFinish: false,
@@ -91,7 +89,8 @@ export class App {
 			view: this.view,
 			ui: this.ui,
 			data: this.data,
-			mathem: this.mathem
+			mathem: this.mathem,
+			server: this.server
 		});
 		// @ts-expect-error
 		this.encoder = new GIFEncoder();

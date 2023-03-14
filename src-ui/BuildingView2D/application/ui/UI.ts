@@ -1,10 +1,9 @@
 import { Mathem } from '../mathem/Mathem';
-import { Building, BuildingElement, Point } from '../Interfaces/Building';
+import { BuildingElement, Point } from '../Interfaces/Building';
 import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
-		struct: Building;
 		timerTimeDataUpdatePause: boolean;
 
 		gifFinish: boolean;
@@ -31,7 +30,6 @@ interface UIConstructorParams {
 
 export class UI {
 	readonly data: UIConstructorParams['data'];
-	private readonly struct: Building;
 	private readonly mathem: Mathem;
 	readonly videoRecorder: VideoRecorder;
 	private readonly movingTimeHTML: HTMLElement;
@@ -80,7 +78,6 @@ export class UI {
 
 	constructor({ data, mathem, videoRecorder }: UIConstructorParams) {
 		this.data = data;
-		this.struct = this.data.struct;
 		this.mathem = mathem;
 		this.videoRecorder = videoRecorder;
 		this.movingTimeHTML = document.getElementById(

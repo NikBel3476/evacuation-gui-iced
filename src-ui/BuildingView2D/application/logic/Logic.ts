@@ -5,12 +5,14 @@ import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
 import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
+import { Server } from '../server/Server';
 
 interface LogicConstructorParams {
 	view: View;
 	ui: UI;
+	mathem: Mathem;
+	server: Server;
 	data: {
-		struct: Building;
 		timerTimeDataUpdatePause: boolean;
 
 		gifFinish: boolean;
@@ -31,7 +33,6 @@ interface LogicConstructorParams {
 		peopleDen: number;
 		peopleR: number;
 	};
-	mathem: Mathem;
 }
 
 export class Logic {
@@ -43,14 +44,16 @@ export class Logic {
 	choiceBuild: BuildingElement | null;
 	scale: number;
 	mathem: Mathem;
+	private readonly server: Server;
 	private readonly timeData: TimeData = timeData;
 
-	constructor({ view, ui, data, mathem }: LogicConstructorParams) {
+	constructor({ view, ui, data, mathem, server }: LogicConstructorParams) {
 		this.view = view;
 		this.ui = ui;
 		this.data = data;
+		this.server = server;
 
-		this.struct = this.data.struct;
+		this.struct = this.server.data;
 		this.level = this.data.level;
 		this.choiceBuild = this.data.choiceBuild;
 		this.scale = this.data.scale;
