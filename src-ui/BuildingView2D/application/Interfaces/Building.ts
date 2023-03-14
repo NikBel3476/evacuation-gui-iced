@@ -1,6 +1,6 @@
 export interface Building {
 	NameBuilding: string;
-	Level: Array<Level>;
+	Level: Level[];
 	Address: Address;
 }
 
@@ -13,7 +13,7 @@ export interface Address {
 export interface Level {
 	NameLevel: string;
 	ZLevel: number;
-	BuildElement: Array<BuildingElement>;
+	BuildElement: BuildingElement[];
 }
 
 export interface BuildingElement {
@@ -23,13 +23,13 @@ export interface BuildingElement {
 	Sign: string;
 	Up?: string;
 	Down?: string;
-	XY: Array<BuildingElementPoints>;
-	Output: Array<string>;
+	XY: BuildingElementPoints[];
+	Output: string[];
 	Id: string;
 }
 
 export interface BuildingElementPoints {
-	points: Array<Point>;
+	points: Point[];
 }
 
 export interface Point {

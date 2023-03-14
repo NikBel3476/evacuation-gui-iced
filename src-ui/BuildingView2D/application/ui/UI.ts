@@ -1,18 +1,12 @@
 import { Mathem } from '../mathem/Mathem';
-import { BuildingElement, Point } from '../Interfaces/Building';
 import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
-	data: {
-		activePeople: Array<{ uuid: string; XY: Point[] }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-	};
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;
 }
 
 export class UI {
-	readonly data: UIConstructorParams['data'];
 	private readonly mathem: Mathem;
 	readonly videoRecorder: VideoRecorder;
 	private readonly movingTimeHTML: HTMLElement;
@@ -59,8 +53,7 @@ export class UI {
 		);
 	}
 
-	constructor({ data, mathem, videoRecorder }: UIConstructorParams) {
-		this.data = data;
+	constructor({ mathem, videoRecorder }: UIConstructorParams) {
 		this.mathem = mathem;
 		this.videoRecorder = videoRecorder;
 		this.movingTimeHTML = document.getElementById(

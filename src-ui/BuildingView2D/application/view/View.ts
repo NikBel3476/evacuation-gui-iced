@@ -5,13 +5,10 @@ import { BuildingElement, Point } from '../Interfaces/Building';
 interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
-		cameraXY: { x: number; y: number };
+		cameraXY: Point;
 		scale: number;
 
 		activeBuilds: BuildingElement[];
-
-		activePeople: Array<{ uuid: string; XY: Point[] }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 	};
 	mathem: Mathem;
 }
@@ -20,6 +17,7 @@ export class View {
 	canvas: Canvas;
 	data: ViewConstructorParams['data'];
 	mathem: Mathem;
+	activePeople: Array<{ uuid: string; XY: Point[] }> = [];
 	private readonly peopleR: number = 0.25;
 
 	constructor({ canvas, data, mathem }: ViewConstructorParams) {
@@ -29,7 +27,7 @@ export class View {
 	}
 
 	// Отрисовка "коробочек" элементов
-	drawBox(coordinates: Array<{ x: number; y: number }>) {
+	drawBox(coordinates: Point[]) {
 		this.canvas.moveTo(
 			coordinates[0].x * this.data.scale - this.data.cameraXY.x,
 			coordinates[0].y * this.data.scale - this.data.cameraXY.y
@@ -73,9 +71,7 @@ export class View {
 	render() {
 		this.canvas.clear();
 		this.data.activeBuilds.forEach(build => this.drawBuild(build));
-		this.data.activePeople.forEach(people =>
-			this.drawPeople(people, this.data.activeBuilds)
-		);
+		this.activePeople.forEach(people => this.drawPeople(people, this.data.activeBuilds));
 		this.canvas.print();
 	}
 }

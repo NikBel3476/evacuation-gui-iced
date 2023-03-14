@@ -13,13 +13,10 @@ interface LogicConstructorParams {
 	mathem: Mathem;
 	server: Server;
 	data: {
-		cameraXY: { x: number; y: number };
+		cameraXY: Point;
 		scale: number;
 
 		activeBuilds: BuildingElement[];
-
-		activePeople: Array<{ uuid: string; XY: Point[] }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 	};
 }
 
@@ -32,6 +29,7 @@ export class Logic {
 	choiceBuild: BuildingElement | null = null;
 	scale: number;
 	mathem: Mathem;
+	private peopleCoordinate: Array<{ uuid: string; XY: Point[] }> = [];
 	private readonly server: Server;
 	// @ts-expect-error
 	private readonly timeData: TimeData = timeData;
@@ -92,13 +90,13 @@ export class Logic {
 	}
 
 	updatePeopleInCamera(): void {
-		this.data.activePeople = [];
+		this.view.activePeople = [];
 		this.data.activeBuilds.forEach(building => {
-			const coordinates = this.data.peopleCoordinate.find(
+			const coordinates = this.peopleCoordinate.find(
 				coordinate => building.Id === coordinate.uuid
 			);
 			if (coordinates) {
-				this.data.activePeople.push(coordinates);
+				this.view.activePeople.push(coordinates);
 			}
 		});
 	}
@@ -108,13 +106,13 @@ export class Logic {
 			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 
-		this.data.peopleCoordinate = [];
+		this.peopleCoordinate = [];
 		if (rooms) {
 			rooms.forEach(room => {
 				this.struct.Level.forEach(level => {
 					level.BuildElement.forEach(building => {
 						if (room.uuid === building.Id) {
-							this.data.peopleCoordinate.push({
+							this.peopleCoordinate.push({
 								uuid: room.uuid,
 								XY: this.genPeopleCoordinate(building, room.density)
 							});
@@ -126,7 +124,7 @@ export class Logic {
 	}
 
 	getPeopleCountInChoiceRoom(): number {
-		const coordinates = this.data.peopleCoordinate.find(
+		const coordinates = this.peopleCoordinate.find(
 			coordinate => this.choiceBuild?.Id === coordinate.uuid
 		);
 

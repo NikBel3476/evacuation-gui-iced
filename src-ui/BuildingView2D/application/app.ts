@@ -16,13 +16,10 @@ export class App {
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;
 	data: {
-		cameraXY: { x: number; y: number };
+		cameraXY: Point;
 		scale: number;
 
 		activeBuilds: BuildingElement[];
-
-		activePeople: Array<{ uuid: string; XY: Point[] }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
 	};
 
 	view: View;
@@ -49,10 +46,7 @@ export class App {
 			cameraXY: { x: 0, y: 0 },
 			scale: 20,
 
-			activeBuilds: [],
-
-			activePeople: [],
-			peopleCoordinate: []
+			activeBuilds: []
 		};
 		this.view = new View({
 			canvas: this.canvas,
@@ -60,7 +54,6 @@ export class App {
 			mathem: this.mathem
 		});
 		this.ui = new UI({
-			data: this.data,
 			mathem: this.mathem,
 			videoRecorder: this.videoRecorder
 		});
