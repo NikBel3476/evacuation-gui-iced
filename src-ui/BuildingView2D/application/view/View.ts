@@ -1,19 +1,15 @@
 import { Canvas } from '../canvas/Canvas';
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
-import { TimeData } from '../Interfaces/TimeData';
 
 interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
 		struct: Building;
 		timerTimeDataUpdatePause: boolean;
-		timerSpeedUp: number;
-		timeData: TimeData;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
-		passFrame: number;
 
 		cameraXY: { x: number; y: number };
 		canMove: boolean;

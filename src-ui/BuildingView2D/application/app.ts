@@ -1,6 +1,4 @@
 import { Server } from './server/Server.js';
-import { TimeData } from './Interfaces/TimeData';
-import * as timeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from './view/View.js';
 import { UI } from './ui/UI.js';
 import { Mathem } from './mathem/Mathem.js';
@@ -20,12 +18,9 @@ export class App {
 	data: {
 		struct: Building;
 		timerTimeDataUpdatePause: boolean;
-		timerSpeedUp: number;
-		timeData: TimeData;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
-		passFrame: number;
 
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
@@ -63,12 +58,9 @@ export class App {
 		this.data = {
 			struct: this.server.data,
 			timerTimeDataUpdatePause: true,
-			timerSpeedUp: 1,
-			timeData,
 
 			gifFinish: false,
 			isGifStop: false,
-			passFrame: 0,
 
 			cameraXY: { x: 0, y: 0 },
 			canMove: false,

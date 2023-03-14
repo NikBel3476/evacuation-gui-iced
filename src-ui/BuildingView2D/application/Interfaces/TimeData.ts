@@ -1,10 +1,10 @@
 export interface TimeData {
-	items: Array<TimeState>;
+	items: TimeState[];
 }
 
 export interface TimeState {
-	doors: Array<DoorTimeState>;
-	rooms: Array<RoomTimeState>;
+	doors: DoorTimeState[];
+	rooms: RoomTimeState[];
 	time: number;
 }
 

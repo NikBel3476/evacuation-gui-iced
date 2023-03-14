@@ -4,6 +4,7 @@ import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
+import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 
 interface LogicConstructorParams {
 	view: View;
@@ -11,12 +12,9 @@ interface LogicConstructorParams {
 	data: {
 		struct: Building;
 		timerTimeDataUpdatePause: boolean;
-		timerSpeedUp: number;
-		timeData: TimeData;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
-		passFrame: number;
 
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
@@ -45,6 +43,7 @@ export class Logic {
 	choiceBuild: BuildingElement | null;
 	scale: number;
 	mathem: Mathem;
+	private readonly timeData: TimeData = timeData;
 
 	constructor({ view, ui, data, mathem }: LogicConstructorParams) {
 		this.view = view;
@@ -82,7 +81,7 @@ export class Logic {
 	}
 
 	updateNumberOfPeopleInsideBuildingLabel(): void {
-		const rooms = this.data.timeData.items.find(
+		const rooms = this.timeData.items.find(
 			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 
@@ -115,7 +114,7 @@ export class Logic {
 	}
 
 	updatePeopleInBuilds(): void {
-		const rooms = this.data.timeData.items.find(
+		const rooms = this.timeData.items.find(
 			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 

@@ -1,18 +1,14 @@
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
-import { TimeData } from '../Interfaces/TimeData';
 import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
 		struct: Building;
 		timerTimeDataUpdatePause: boolean;
-		timerSpeedUp: number;
-		timeData: TimeData;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
-		passFrame: number;
 
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
