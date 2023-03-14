@@ -41,6 +41,9 @@
         }],
         "@typescript-eslint/explicit-function-return-type": ["error", {
             "allowFunctionsWithoutTypeParameters": true
+        }],
+        "@typescript-eslint/no-confusing-void-expression": ["error", {
+            "ignoreArrowShorthand": true
         }]
     }
 }

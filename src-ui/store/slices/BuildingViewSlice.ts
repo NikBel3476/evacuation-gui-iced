@@ -4,11 +4,17 @@ import { BuildingElement } from '../../interfaces/BuildingElement';
 interface BuildingViewState {
 	buildingElement: BuildingElement | null;
 	currentLevel: number;
+	evacuationTime: number;
+	numberOfPeopleInsideBuilding: number;
+	numberOfPeopleOutsideBuilding: number;
 }
 
 const initialState: BuildingViewState = {
 	buildingElement: null,
-	currentLevel: 0
+	currentLevel: 0,
+	evacuationTime: 0,
+	numberOfPeopleInsideBuilding: 0,
+	numberOfPeopleOutsideBuilding: 0
 };
 
 export const buildingViewSlice = createSlice({
@@ -49,6 +55,21 @@ export const buildingViewSlice = createSlice({
 			if (state.buildingElement) {
 				state.buildingElement.area = action.payload;
 			}
+		},
+		incrementCurrentLevel: state => {
+			state.currentLevel++;
+		},
+		decrementCurrentLevel: state => {
+			state.currentLevel--;
+		},
+		incrementEvacuationTime: state => {
+			state.evacuationTime++;
+		},
+		setPeopleInsideBuilding: (state, action: PayloadAction<number>) => {
+			state.numberOfPeopleInsideBuilding = action.payload;
+		},
+		setPeopleOutsideBuilding: (state, action: PayloadAction<number>) => {
+			state.numberOfPeopleOutsideBuilding = action.payload;
 		}
 	}
 });
@@ -60,7 +81,12 @@ export const {
 	setElementName,
 	setElementId,
 	setElementNumberOfPeople,
-	setElementArea
+	setElementArea,
+	incrementCurrentLevel,
+	decrementCurrentLevel,
+	incrementEvacuationTime,
+	setPeopleInsideBuilding,
+	setPeopleOutsideBuilding
 } = buildingViewSlice.actions;
 
 export default buildingViewSlice.reducer;

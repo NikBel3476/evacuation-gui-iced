@@ -29,7 +29,7 @@ interface ViewConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		maxNumPeople: number;
+		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
 		label: number;

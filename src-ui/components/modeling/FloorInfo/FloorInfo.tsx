@@ -4,16 +4,18 @@ import { Link } from 'react-router-dom';
 
 const FloorInfo: FC = () => {
 	const { buildingElement } = useAppSelector(state => state.floorReducer);
+	const { currentLevel } = useAppSelector(state => state.floorReducer);
 
 	return (
-		<aside className="p-4 bg-sky-400 grid grid-cols-1 gap-y-4 content-start">
+		<aside className="p-4 bg-sky-400 grid grid-cols-1 gap-y-2 content-start">
 			<Link
 				className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 				to="/"
 			>
 				Main page
 			</Link>
-			<h1 className="text-4xl">Данные</h1>
+			<p className="text-lg">Этаж: {currentLevel}</p>
+			<h2 className="text-xl">Данные о помещении</h2>
 			<p>
 				<span className="block">Уровень этажа:</span>
 				<span>{buildingElement?.level}</span>

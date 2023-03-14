@@ -28,7 +28,7 @@ interface UIConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		maxNumPeople: number;
+		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
 		label: number;
@@ -52,12 +52,21 @@ export class UI {
 		this.struct = this.data.struct;
 		this.mathem = mathem;
 		this.videoRecorder = videoRecorder;
+		this.movingTimeHTML = document.getElementById(
+			'evacuation_time_label'
+		) as HTMLSpanElement;
+		this.numberOfPeopleInsideHTML = document.getElementById(
+			'people_inside_building'
+		) as HTMLSpanElement;
+		this.numberOfPeopleOutsideHTML = document.getElementById(
+			'people_outside_building'
+		) as HTMLSpanElement;
 	}
 
 	updateUI() {
-		/* this.movingTimeHTML.textContent = `Длительность движения, сек: ${this.data.time}`;
-		this.numberOfPeopleInsideHTML.textContent = `Количество людей в здании, чел: ${this.data.label}`;
-		this.numberOfPeopleOutsideHTML.textContent = `Человек вышло: ${this.data.exitedLabel}`; */
+		this.movingTimeHTML.textContent = String(this.data.time);
+		this.numberOfPeopleInsideHTML.textContent = String(this.data.label);
+		this.numberOfPeopleOutsideHTML.textContent = String(this.data.exitedLabel);
 	}
 
 	getPeopleCountInChoiceRoom(): number {

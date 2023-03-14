@@ -50,13 +50,19 @@ const ControlPanel: FC<ControlPanelProps> = ({
 				</div>
 			</div>
 			<div>
-				<span className="block">Длительность движения:</span>
+				<p>
+					Длительность движения, сек: <span id="evacuation_time_label"></span>
+				</p>
 			</div>
 			<div>
-				<span className="block">Человек в здании:</span>
+				<p>
+					Человек в здании: <span id="people_inside_building"></span>
+				</p>
 			</div>
 			<div>
-				<span className="block">Человек вышло:</span>
+				<p>
+					Человек вышло: <span id="people_outside_building"></span>
+				</p>
 			</div>
 		</aside>
 	);

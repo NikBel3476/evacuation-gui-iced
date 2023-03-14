@@ -5,7 +5,11 @@ import FloorInfo from '../../components/modeling/FloorInfo';
 import BuildingView from '../../components/modeling/BuildingView';
 import ControlPanel from '../../components/modeling/ControlPanel';
 import { App } from '../../BuildingView2D/application/app';
-import { setBuildingElement } from '../../store/slices/BuildingViewSlice';
+import {
+	decrementCurrentLevel,
+	incrementCurrentLevel,
+	setBuildingElement
+} from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
 
 const PeopleTraffic: FC = () => {
@@ -26,20 +30,22 @@ const PeopleTraffic: FC = () => {
 	const handleDocumentKeydown = (event: KeyboardEvent) => {
 		if (app) {
 			switch (event.key) {
-				// Повысить этаж
 				case 'ArrowUp':
-					app.data.level += app.data.level + 1 < app.data.struct.Level.length ? 1 : 0;
+					if (app.data.level < app.data.struct.Level.length - 1) {
+						app.data.level++;
+						dispatch(incrementCurrentLevel());
+					}
 					break;
-				// Понизить этаж
 				case 'ArrowDown':
-					app.data.level -= app.data.level - 1 >= 0 ? 1 : 0;
+					if (app.data.level > 0) {
+						app.data.level--;
+						dispatch(decrementCurrentLevel());
+					}
 					break;
-				// Увеличить zoom
 				case '=':
 				case '+':
 					app.data.scale++;
 					break;
-				// Уменьшить zoom
 				case '-':
 				case '_':
 					app.data.scale--;

@@ -41,7 +41,7 @@ export class App {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		maxNumPeople: number;
+		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
 		label: number;
@@ -69,6 +69,7 @@ export class App {
 			struct: this.server.data,
 			timerTimeDataUpdatePause: true,
 			timerSpeedUp: 1,
+			// @ts-expect-error
 			timeData,
 			time: 0,
 			timeStep: 1,
@@ -89,7 +90,7 @@ export class App {
 
 			activePeople: [],
 			peopleCoordinate: [],
-			maxNumPeople: 5,
+			// maxNumPeople: 5,
 			peopleDen: 1,
 			peopleR: 0.25,
 			label: 0,
