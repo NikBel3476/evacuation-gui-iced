@@ -13,9 +13,6 @@ interface LogicConstructorParams {
 	mathem: Mathem;
 	server: Server;
 	data: {
-		gifFinish: boolean;
-		isGifStop: boolean;
-
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
 		scale: number;
@@ -43,6 +40,7 @@ export class Logic {
 	scale: number;
 	mathem: Mathem;
 	private readonly server: Server;
+	// @ts-expect-error
 	private readonly timeData: TimeData = timeData;
 
 	constructor({ view, ui, data, mathem, server }: LogicConstructorParams) {

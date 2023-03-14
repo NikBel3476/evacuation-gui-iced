@@ -4,9 +4,6 @@ import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
-		gifFinish: boolean;
-		isGifStop: boolean;
-
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
 		scale: number;

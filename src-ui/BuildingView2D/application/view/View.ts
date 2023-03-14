@@ -5,9 +5,6 @@ import { BuildingElement, Point } from '../Interfaces/Building';
 interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
-		gifFinish: boolean;
-		isGifStop: boolean;
-
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
 		scale: number;

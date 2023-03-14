@@ -135,7 +135,7 @@ const PeopleTraffic: FC = () => {
 	const handlePauseButtonClick: MouseEventHandler = _ => {
 		if (app?.timerTimeDataUpdatePause === false) {
 			app.timerTimeDataUpdatePause = true;
-			app.ui.data.isGifStop = true;
+			app.isGifStop = true;
 		}
 		if (app?.ui.videoRecorder.recordingState === 'recording') {
 			app.ui.videoRecorder.pause();

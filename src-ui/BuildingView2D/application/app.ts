@@ -16,9 +16,6 @@ export class App {
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;
 	data: {
-		gifFinish: boolean;
-		isGifStop: boolean;
-
 		cameraXY: { x: number; y: number };
 		canMove: boolean;
 		scale: number;
@@ -40,6 +37,7 @@ export class App {
 	logic: Logic;
 	encoder;
 	timerTimeDataUpdatePause: boolean = true;
+	isGifStop: boolean = false;
 	private renderLoopId: number | null = null;
 	private timerTimeDataUpdateId: number | null = null;
 	private fps: number = 0;
@@ -54,9 +52,6 @@ export class App {
 		this.mathem = new Mathem();
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
 		this.data = {
-			gifFinish: false,
-			isGifStop: false,
-
 			cameraXY: { x: 0, y: 0 },
 			canMove: false,
 			scale: 20,
@@ -152,10 +147,10 @@ export class App {
 			this.gifNewFrame();
 		}
 
-		if (this.data.isGifStop) {
+		if (this.isGifStop) {
 			this.encoder.finish();
 			this.encoder.download('newGif.gif');
-			this.data.isGifStop = false;
+			this.isGifStop = false;
 		}
 	}
 
