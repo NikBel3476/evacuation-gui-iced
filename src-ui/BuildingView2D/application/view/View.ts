@@ -32,7 +32,7 @@ interface ViewConstructorParams {
 		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		label: number;
+		// label: number;
 		exitedLabel: number;
 	};
 	mathem: Mathem;

@@ -35,7 +35,7 @@ interface LogicConstructorParams {
 		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		label: number;
+		// label: number;
 		exitedLabel: number;
 	};
 	mathem: Mathem;
@@ -96,13 +96,14 @@ export class Logic {
 				rooms.reduce((totalDensity, room) => totalDensity + room.density, 0)
 			);
 
-			if (this.data.label !== 0) {
-				this.data.exitedLabel += this.data.label - numberOfPeopleInsideBuilding;
+			if (this.ui.numberOfPeopleInsideBuilding !== 0) {
+				this.data.exitedLabel +=
+					this.ui.numberOfPeopleInsideBuilding - numberOfPeopleInsideBuilding;
 			}
 
-			this.data.label = numberOfPeopleInsideBuilding;
+			this.ui.numberOfPeopleInsideBuilding = numberOfPeopleInsideBuilding;
 		} else {
-			this.data.label = 0;
+			this.ui.numberOfPeopleInsideBuilding = 0;
 		}
 	}
 

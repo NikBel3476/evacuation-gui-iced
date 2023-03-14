@@ -31,7 +31,7 @@ interface UIConstructorParams {
 		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		label: number;
+		// label: number;
 		exitedLabel: number;
 	};
 	mathem: Mathem;
@@ -57,7 +57,20 @@ export class UI {
 		this.movingTimeHTML.textContent = String(this._evacuationTimeInSec);
 	}
 
-	private numberOfPeopleInsideBuilding: number = 0;
+	private _numberOfPeopleInsideBuilding: number = 0;
+
+	get numberOfPeopleInsideBuilding(): typeof this._numberOfPeopleInsideBuilding {
+		return this._numberOfPeopleInsideBuilding;
+	}
+
+	set numberOfPeopleInsideBuilding(
+		numberOfPeople: typeof this._numberOfPeopleInsideBuilding
+	) {
+		this._numberOfPeopleInsideBuilding = numberOfPeople;
+		this.numberOfPeopleInsideHTML.textContent = String(
+			this._numberOfPeopleInsideBuilding
+		);
+	}
 	private numberOfPeopleOutsideBuilding: number = 0;
 
 	constructor({ data, mathem, videoRecorder }: UIConstructorParams) {
@@ -79,11 +92,14 @@ export class UI {
 
 	initLabels() {
 		this.movingTimeHTML.textContent = String(this._evacuationTimeInSec);
+		this.numberOfPeopleInsideHTML.textContent = String(
+			this._numberOfPeopleInsideBuilding
+		);
 	}
 
 	updateUI() {
 		// this.movingTimeHTML.textContent = String(this.data.time);
-		this.numberOfPeopleInsideHTML.textContent = String(this.data.label);
+		// this.numberOfPeopleInsideHTML.textContent = String(this.data.label);
 		this.numberOfPeopleOutsideHTML.textContent = String(this.data.exitedLabel);
 	}
 

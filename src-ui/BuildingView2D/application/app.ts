@@ -44,7 +44,7 @@ export class App {
 		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		label: number;
+		// label: number;
 		exitedLabel: number;
 	};
 
@@ -92,7 +92,7 @@ export class App {
 			// maxNumPeople: 5,
 			peopleDen: 1,
 			peopleR: 0.25,
-			label: 0,
+			// label: 0,
 			exitedLabel: 0
 		};
 		this.view = new View({
