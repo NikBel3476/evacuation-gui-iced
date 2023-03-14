@@ -22,8 +22,6 @@ export class App {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		// time: number;
-		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -41,11 +39,8 @@ export class App {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		// label: number;
-		exitedLabel: number;
 	};
 
 	view: View;
@@ -70,8 +65,6 @@ export class App {
 			timerTimeDataUpdatePause: true,
 			timerSpeedUp: 1,
 			timeData,
-			// time: 0,
-			// timeStep: 1,
 
 			gifFinish: false,
 			isGifStop: false,
@@ -89,11 +82,8 @@ export class App {
 
 			activePeople: [],
 			peopleCoordinate: [],
-			// maxNumPeople: 5,
 			peopleDen: 1,
-			peopleR: 0.25,
-			// label: 0,
-			exitedLabel: 0
+			peopleR: 0.25
 		};
 		this.view = new View({
 			canvas: this.canvas,
@@ -171,7 +161,6 @@ export class App {
 			this.logic.updatePeopleInBuilds();
 			this.logic.updatePeopleInCamera();
 			this.logic.updateNumberOfPeopleInsideBuildingLabel();
-			this.ui.updateUI();
 			this.gifNewFrame();
 		}
 

@@ -9,8 +9,6 @@ interface UIConstructorParams {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		// time: number;
-		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -28,11 +26,8 @@ interface UIConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		// label: number;
-		exitedLabel: number;
 	};
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;
@@ -71,7 +66,21 @@ export class UI {
 			this._numberOfPeopleInsideBuilding
 		);
 	}
-	private numberOfPeopleOutsideBuilding: number = 0;
+
+	private _numberOfPeopleOutsideBuilding: number = 0;
+
+	get numberOfPeopleOutsideBuilding(): typeof this._numberOfPeopleOutsideBuilding {
+		return this._numberOfPeopleOutsideBuilding;
+	}
+
+	set numberOfPeopleOutsideBuilding(
+		numberOfPeople: typeof this._numberOfPeopleOutsideBuilding
+	) {
+		this._numberOfPeopleOutsideBuilding = numberOfPeople;
+		this.numberOfPeopleOutsideHTML.textContent = String(
+			this._numberOfPeopleOutsideBuilding
+		);
+	}
 
 	constructor({ data, mathem, videoRecorder }: UIConstructorParams) {
 		this.data = data;
@@ -95,12 +104,9 @@ export class UI {
 		this.numberOfPeopleInsideHTML.textContent = String(
 			this._numberOfPeopleInsideBuilding
 		);
-	}
-
-	updateUI() {
-		// this.movingTimeHTML.textContent = String(this.data.time);
-		// this.numberOfPeopleInsideHTML.textContent = String(this.data.label);
-		this.numberOfPeopleOutsideHTML.textContent = String(this.data.exitedLabel);
+		this.numberOfPeopleOutsideHTML.textContent = String(
+			this._numberOfPeopleOutsideBuilding
+		);
 	}
 
 	getPeopleCountInChoiceRoom(): number {

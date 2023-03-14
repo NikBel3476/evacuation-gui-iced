@@ -10,8 +10,6 @@ interface ViewConstructorParams {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		// time: number;
-		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -29,11 +27,8 @@ interface ViewConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		// label: number;
-		exitedLabel: number;
 	};
 	mathem: Mathem;
 }

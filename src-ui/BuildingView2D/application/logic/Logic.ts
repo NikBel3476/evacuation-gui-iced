@@ -13,8 +13,6 @@ interface LogicConstructorParams {
 		timerTimeDataUpdatePause: boolean;
 		timerSpeedUp: number;
 		timeData: TimeData;
-		// time: number;
-		// timeStep: number;
 
 		gifFinish: boolean;
 		isGifStop: boolean;
@@ -32,11 +30,8 @@ interface LogicConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		// maxNumPeople: number;
 		peopleDen: number;
 		peopleR: number;
-		// label: number;
-		exitedLabel: number;
 	};
 	mathem: Mathem;
 }
@@ -97,7 +92,7 @@ export class Logic {
 			);
 
 			if (this.ui.numberOfPeopleInsideBuilding !== 0) {
-				this.data.exitedLabel +=
+				this.ui.numberOfPeopleOutsideBuilding +=
 					this.ui.numberOfPeopleInsideBuilding - numberOfPeopleInsideBuilding;
 			}
 
@@ -275,6 +270,5 @@ export class Logic {
 	// Обновить экран
 	updateField(): void {
 		this.view.render();
-		this.ui.updateUI();
 	}
 }
