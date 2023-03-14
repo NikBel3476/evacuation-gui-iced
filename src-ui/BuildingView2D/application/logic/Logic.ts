@@ -13,8 +13,6 @@ interface LogicConstructorParams {
 	mathem: Mathem;
 	server: Server;
 	data: {
-		timerTimeDataUpdatePause: boolean;
-
 		gifFinish: boolean;
 		isGifStop: boolean;
 

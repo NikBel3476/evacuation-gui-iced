@@ -112,9 +112,9 @@ const PeopleTraffic: FC = () => {
 	};
 
 	const handlePlayButtonClick: MouseEventHandler = _ => {
-		if (app?.ui.data.timerTimeDataUpdatePause === true) {
+		if (app?.timerTimeDataUpdatePause === true) {
 			app.startModeling();
-			app.ui.data.timerTimeDataUpdatePause = false;
+			app.timerTimeDataUpdatePause = false;
 		}
 		switch (app?.ui.videoRecorder.recordingState) {
 			case 'inactive':
@@ -133,8 +133,8 @@ const PeopleTraffic: FC = () => {
 	};
 
 	const handlePauseButtonClick: MouseEventHandler = _ => {
-		if (app?.ui.data.timerTimeDataUpdatePause === false) {
-			app.ui.data.timerTimeDataUpdatePause = true;
+		if (app?.timerTimeDataUpdatePause === false) {
+			app.timerTimeDataUpdatePause = true;
 			app.ui.data.isGifStop = true;
 		}
 		if (app?.ui.videoRecorder.recordingState === 'recording') {

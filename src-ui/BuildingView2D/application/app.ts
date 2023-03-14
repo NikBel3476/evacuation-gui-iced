@@ -16,8 +16,6 @@ export class App {
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;
 	data: {
-		timerTimeDataUpdatePause: boolean;
-
 		gifFinish: boolean;
 		isGifStop: boolean;
 
@@ -41,6 +39,7 @@ export class App {
 	ui: UI;
 	logic: Logic;
 	encoder;
+	timerTimeDataUpdatePause: boolean = true;
 	private renderLoopId: number | null = null;
 	private timerTimeDataUpdateId: number | null = null;
 	private fps: number = 0;
@@ -55,8 +54,6 @@ export class App {
 		this.mathem = new Mathem();
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
 		this.data = {
-			timerTimeDataUpdatePause: true,
-
 			gifFinish: false,
 			isGifStop: false,
 
@@ -147,7 +144,7 @@ export class App {
 	}
 
 	updateTimeData() {
-		if (!this.data.timerTimeDataUpdatePause) {
+		if (!this.timerTimeDataUpdatePause) {
 			this.ui.evacuationTimeInSec++;
 			this.logic.updatePeopleInBuilds();
 			this.logic.updatePeopleInCamera();

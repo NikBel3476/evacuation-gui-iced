@@ -4,8 +4,6 @@ import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	data: {
-		timerTimeDataUpdatePause: boolean;
-
 		gifFinish: boolean;
 		isGifStop: boolean;
 

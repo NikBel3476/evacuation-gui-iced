@@ -5,8 +5,6 @@ import { BuildingElement, Point } from '../Interfaces/Building';
 interface ViewConstructorParams {
 	canvas: Canvas;
 	data: {
-		timerTimeDataUpdatePause: boolean;
-
 		gifFinish: boolean;
 		isGifStop: boolean;
 
