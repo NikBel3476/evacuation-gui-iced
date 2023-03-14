@@ -16,8 +16,6 @@ interface UIConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		peopleDen: number;
-		peopleR: number;
 	};
 	mathem: Mathem;
 	videoRecorder: VideoRecorder;

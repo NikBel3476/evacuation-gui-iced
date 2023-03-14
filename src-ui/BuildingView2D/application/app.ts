@@ -28,8 +28,6 @@ export class App {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		peopleDen: number;
-		peopleR: number;
 	};
 
 	view: View;
@@ -63,9 +61,7 @@ export class App {
 			activeBuilds: [],
 
 			activePeople: [],
-			peopleCoordinate: [],
-			peopleDen: 1,
-			peopleR: 0.25
+			peopleCoordinate: []
 		};
 		this.view = new View({
 			canvas: this.canvas,

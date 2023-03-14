@@ -17,8 +17,6 @@ interface ViewConstructorParams {
 
 		activePeople: Array<{ uuid: string; XY: Point[] }>;
 		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		peopleDen: number;
-		peopleR: number;
 	};
 	mathem: Mathem;
 }
@@ -27,6 +25,7 @@ export class View {
 	canvas: Canvas;
 	data: ViewConstructorParams['data'];
 	mathem: Mathem;
+	private readonly peopleR: number = 0.25;
 
 	constructor({ canvas, data, mathem }: ViewConstructorParams) {
 		this.canvas = canvas;
@@ -67,7 +66,7 @@ export class View {
 				this.canvas.circle(
 					point.x * this.data.scale - this.data.cameraXY.x,
 					point.y * this.data.scale - this.data.cameraXY.y,
-					this.data.peopleR * this.data.scale,
+					this.peopleR * this.data.scale,
 					'red'
 				)
 			);
