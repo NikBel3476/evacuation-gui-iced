@@ -1,43 +1,23 @@
+import React from 'react';
 import { View } from '../view/View';
 import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
+import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
+import { Server } from '../server/Server';
 
 interface LogicConstructorParams {
 	view: View;
 	ui: UI;
-	data: {
-		struct: Building;
-		timerTimeDataUpdatePause: boolean;
-		timerSpeedUp: number;
-		timeData: TimeData;
-		time: number;
-		timeStep: number;
-
-		gifFinish: boolean;
-		isGifStop: boolean;
-		passFrame: number;
-
-		cameraXY: { x: number; y: number };
-		canMove: boolean;
-		scale: number;
-		fieldWidth: number;
-		fieldHeight: number;
-
-		level: number;
-		choiceBuild: BuildingElement | null;
-		activeBuilds: BuildingElement[];
-
-		activePeople: Array<{ uuid: string; XY: Point[] }>;
-		peopleCoordinate: Array<{ uuid: string; XY: Point[] }>;
-		maxNumPeople: number;
-		peopleDen: number;
-		peopleR: number;
-		label: number;
-		exitedLabel: number;
-	};
 	mathem: Mathem;
+	server: Server;
+	data: {
+		cameraXY: Point;
+		scale: number;
+
+		activeBuilds: BuildingElement[];
+	};
 }
 
 export class Logic {
@@ -45,19 +25,21 @@ export class Logic {
 	ui: UI;
 	data: LogicConstructorParams['data'];
 	struct: Building;
-	level: number;
-	choiceBuild: BuildingElement | null;
+	level: number = 0;
+	choiceBuild: BuildingElement | null = null;
 	scale: number;
 	mathem: Mathem;
+	private peopleCoordinate: Array<{ uuid: string; XY: Point[] }> = [];
+	private readonly server: Server;
+	private readonly timeData: TimeData = timeData;
 
-	constructor({ view, ui, data, mathem }: LogicConstructorParams) {
+	constructor({ view, ui, data, mathem, server }: LogicConstructorParams) {
 		this.view = view;
 		this.ui = ui;
 		this.data = data;
+		this.server = server;
 
-		this.struct = this.data.struct;
-		this.level = this.data.level;
-		this.choiceBuild = this.data.choiceBuild;
+		this.struct = this.server.data;
 		this.scale = this.data.scale;
 
 		this.mathem = mathem;
@@ -80,55 +62,56 @@ export class Logic {
 
 	// Обновить список объектов в поле камеры
 	updateBuildsInCamera(): void {
-		this.data.activeBuilds = this.struct.Level[this.data.level].BuildElement.filter(
-			building => this.isInCamera(building.XY[0].points)
+		this.data.activeBuilds = this.struct.Level[this.level].BuildElement.filter(building =>
+			this.isInCamera(building.XY[0].points)
 		);
 	}
 
-	updateLabel(): void {
-		const rooms = this.data.timeData.items.find(
-			dateTime => this.data.time === Math.floor(dateTime.time)
+	updateNumberOfPeopleInsideBuildingLabel(): void {
+		const rooms = this.timeData.items.find(
+			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 
 		if (rooms) {
-			const label = Math.floor(
+			const numberOfPeopleInsideBuilding = Math.floor(
 				rooms.reduce((totalDensity, room) => totalDensity + room.density, 0)
 			);
 
-			if (this.data.label !== 0) {
-				this.data.exitedLabel += this.data.label - label;
+			if (this.ui.numberOfPeopleInsideBuilding !== 0) {
+				this.ui.numberOfPeopleOutsideBuilding +=
+					this.ui.numberOfPeopleInsideBuilding - numberOfPeopleInsideBuilding;
 			}
 
-			this.data.label = label;
+			this.ui.numberOfPeopleInsideBuilding = numberOfPeopleInsideBuilding;
 		} else {
-			this.data.label = 0;
+			this.ui.numberOfPeopleInsideBuilding = 0;
 		}
 	}
 
 	updatePeopleInCamera(): void {
-		this.data.activePeople = [];
+		this.view.activePeople = [];
 		this.data.activeBuilds.forEach(building => {
-			const coordinates = this.data.peopleCoordinate.find(
+			const coordinates = this.peopleCoordinate.find(
 				coordinate => building.Id === coordinate.uuid
 			);
 			if (coordinates) {
-				this.data.activePeople.push(coordinates);
+				this.view.activePeople.push(coordinates);
 			}
 		});
 	}
 
 	updatePeopleInBuilds(): void {
-		const rooms = this.data.timeData.items.find(
-			dateTime => this.data.time === Math.floor(dateTime.time)
+		const rooms = this.timeData.items.find(
+			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
 		)?.rooms;
 
-		this.data.peopleCoordinate = [];
+		this.peopleCoordinate = [];
 		if (rooms) {
 			rooms.forEach(room => {
 				this.struct.Level.forEach(level => {
 					level.BuildElement.forEach(building => {
 						if (room.uuid === building.Id) {
-							this.data.peopleCoordinate.push({
+							this.peopleCoordinate.push({
 								uuid: room.uuid,
 								XY: this.genPeopleCoordinate(building, room.density)
 							});
@@ -137,6 +120,14 @@ export class Logic {
 				});
 			});
 		}
+	}
+
+	getPeopleCountInChoiceRoom(): number {
+		const coordinates = this.peopleCoordinate.find(
+			coordinate => this.choiceBuild?.Id === coordinate.uuid
+		);
+
+		return coordinates?.XY.length ?? 0;
 	}
 
 	genPeopleCoordinate(build: BuildingElement, density: number): Point[] {
@@ -198,7 +189,7 @@ export class Logic {
 	}
 
 	// Движение мышки
-	mouseMove(event: MouseEvent): void {
+	mouseMove(event: React.MouseEvent): void {
 		if (event.movementX) {
 			this.moveCamera(event.movementX, 'x');
 		}
@@ -208,11 +199,11 @@ export class Logic {
 	}
 
 	// Выбрать объект
-	toChoiceBuild(event: MouseEvent): void {
-		const mouseX = event.offsetX + this.data.cameraXY.x;
-		const mouseY = event.offsetY + this.data.cameraXY.y;
+	toChoiceBuild(event: React.MouseEvent): void {
+		const mouseX = event.nativeEvent.offsetX + this.data.cameraXY.x;
+		const mouseY = event.nativeEvent.offsetY + this.data.cameraXY.y;
 
-		this.data.choiceBuild =
+		this.choiceBuild =
 			this.data.activeBuilds.find(building => {
 				const arrayX = Array(building.XY[0].points.length - 1);
 				const arrayY = Array(building.XY[0].points.length - 1);
@@ -227,7 +218,7 @@ export class Logic {
 	}
 
 	toInitialCoordination(): void {
-		const rooms = this.struct.Level[this.data.level].BuildElement;
+		const rooms = this.struct.Level[this.level].BuildElement;
 		let leftX = rooms[0].XY[0].points[0].x;
 		let topY = rooms[0].XY[0].points[0].y;
 		let rightX = rooms[0].XY[0].points[0].x;
@@ -245,9 +236,9 @@ export class Logic {
 		const xLength = Math.abs(rightX - leftX);
 		const yLength = Math.abs(botY - topY);
 		const diagonal = Math.sqrt(Math.pow(xLength, 2) + Math.pow(yLength, 2));
-		const fieldDiagonal = Math.sqrt(
-			Math.pow(this.data.fieldWidth, 2) + Math.pow(this.data.fieldHeight, 2)
-		);
+		const canvasWidth = this.view.canvas.canvas.width;
+		const canvasHeight = this.view.canvas.canvas.height;
+		const fieldDiagonal = Math.sqrt(Math.pow(canvasWidth, 2) + Math.pow(canvasHeight, 2));
 
 		this.data.scale = fieldDiagonal / diagonal;
 		this.data.cameraXY.x = leftX * this.data.scale;
@@ -259,7 +250,7 @@ export class Logic {
 		while (true) {
 			if (
 				this.data.activeBuilds.length !==
-				this.struct.Level[this.data.level].BuildElement.length
+				this.struct.Level[this.level].BuildElement.length
 			) {
 				this.data.scale -= 1;
 				this.updateBuildsInCamera();
@@ -273,6 +264,5 @@ export class Logic {
 	// Обновить экран
 	updateField(): void {
 		this.view.render();
-		this.ui.updateUI();
 	}
 }

@@ -26,7 +26,7 @@ export const configSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder
-			.addCase(getConfig.pending.type, (state, action) => {
+			.addCase(getConfig.pending.type, state => {
 				state.isLoading = true;
 			})
 			.addCase(
