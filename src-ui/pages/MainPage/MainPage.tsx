@@ -1,8 +1,9 @@
 import { invoke } from '@tauri-apps/api/tauri';
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
 
 import styles from './MainPage.module.css';
+import RouterLink from '../../components/RouterLink';
+import Button from '../../components/Button/Button';
 
 const MainPage: FC = () => {
 	const handleOpenConfigurationButtonClick = () => {
@@ -34,60 +35,40 @@ const MainPage: FC = () => {
 				<nav>
 					<ul className={styles.linkList}>
 						<li>
-							<Link
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								to="configuration"
-							>
-								Страница конфигурации
-							</Link>
+							<RouterLink to="configuration">Страница конфигурации</RouterLink>
 						</li>
 						<li>
-							<Link
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								to="peopleTraffic"
-							>
+							<RouterLink to="peopleTraffic">
 								Страница визуализации моделирования эвакуации
-							</Link>
+							</RouterLink>
 						</li>
 						<li>
-							<button
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								onClick={handleOpenConfigurationButtonClick}
-							>
+							<Button onClick={handleOpenConfigurationButtonClick}>
 								Открыть окно настроек
-							</button>
+							</Button>
 						</li>
 						<li>
-							<button
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								onClick={handleOpenConfigurationRescriptButtonClick}
-							>
+							<Button onClick={handleOpenConfigurationRescriptButtonClick}>
 								Открыть окно настроек(Rescript)
-							</button>
+							</Button>
 						</li>
 						<li>
-							<button
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								onClick={handleOpenPeopleTrafficButtonClick}
-							>
+							<Button onClick={handleOpenPeopleTrafficButtonClick}>
 								Открыть окно моделирования эвакуации
-							</button>
+							</Button>
 						</li>
 						<li>
-							<button
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								onClick={handleOpenBuildingViewButtonClick}
-							>
+							<Button onClick={handleOpenBuildingViewButtonClick}>
 								Открыть окно просмотра модели здания
-							</button>
+							</Button>
 						</li>
 						<li>
-							<button
-								className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-								onClick={handleBimStartButtonClick}
-							>
-								Запустить симуляцию
-							</button>
+							<Button onClick={handleBimStartButtonClick}>Запустить симуляцию</Button>
+						</li>
+						<li>
+							<RouterLink to="modelingView">
+								Страница визуализации моделирования(Pixi.js)
+							</RouterLink>
 						</li>
 					</ul>
 				</nav>
