@@ -1,6 +1,7 @@
 import { Canvas } from '../canvas/Canvas';
 import { Mathem } from '../mathem/Mathem';
 import { BuildingElement, Point } from '../Interfaces/Building';
+import { Graphics as PixiGraphics } from '@pixi/graphics';
 
 interface ViewConstructorParams {
 	canvas: Canvas;
@@ -49,6 +50,22 @@ export class View {
 		const RGB = 'rgb(255,255,255)';
 		this.canvas.fill(RGB);
 		this.canvas.closePath();
+	}
+
+	static drawBuildingRoomPixi(g: PixiGraphics, points: Point[]) {
+		g.moveTo(points[0].x, points[0].y);
+		g.beginFill(0xffffff);
+		g.lineStyle(0.2, 0x000000, 1);
+		points.slice(1).forEach(point => {
+			g.lineTo(point.x, point.y);
+		});
+		g.endFill();
+	}
+
+	static drawBuildingRoomsPixi(g: PixiGraphics, buildings: BuildingElement[]) {
+		buildings.forEach(building => {
+			View.drawBuildingRoomPixi(g, building.XY[0].points);
+		});
 	}
 
 	drawPeople(people: { uuid: string; XY: Point[] }, buildings: BuildingElement[]) {

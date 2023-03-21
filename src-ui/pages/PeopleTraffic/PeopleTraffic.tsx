@@ -17,7 +17,7 @@ const PeopleTraffic: FC = () => {
 	const dispatch = useAppDispatch();
 
 	const onBuildingViewMount = () => {
-		app = new App();
+		app = new App('field', 'canvas_container');
 		app.startRendering();
 		document.addEventListener('keydown', handleDocumentKeydown);
 	};
