@@ -8,16 +8,24 @@ import React, {
 import { Container, Graphics, Stage } from '@pixi/react';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
 import buildingData from '../../peopleTraffic/udsu_b1_L4_v2_190701.json';
+import evacuationTimeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from '../../BuildingView2D/application/view/View';
-import { Point } from 'pixi.js';
+import { Point as PixiPoint } from 'pixi.js';
+import { Point } from '../../BuildingView2D/application/Interfaces/Building';
+import { Logic } from '../../BuildingView2D/application/logic/Logic';
 
 const ModelingViewPage = () => {
 	const [scale, setScale] = useState<number>(5);
 	const [canMove, setCanMove] = useState<boolean>(false);
-	const [anchorCoordinates, setAnchorCoordiantes] = useState<Point>(new Point(0, 0));
+	const [anchorCoordinates, setAnchorCoordiantes] = useState<PixiPoint>(
+		new PixiPoint(0, 0)
+	);
+	const [peopleCoordinates, setPeopleCoordinates] = useState<Point[]>(
+		Logic.generatePeopleCoordinates(buildingData.Level[0], evacuationTimeData.items)
+	);
 
 	useEffect(() => {
-		console.log('render');
+		console.log(peopleCoordinates);
 	}, []);
 
 	const draw = useCallback((g: PixiGraphics) => {
@@ -41,6 +49,7 @@ const ModelingViewPage = () => {
 		// g.drawCircle(470, 90, 60);
 		// g.endFill();
 		View.drawBuildingRoomsPixi(g, buildingData.Level[0].BuildElement);
+		View.drawPeople(g, peopleCoordinates);
 	}, []);
 
 	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
@@ -68,7 +77,9 @@ const ModelingViewPage = () => {
 
 	const handleCanvasMouseMove: MouseEventHandler<HTMLCanvasElement> = event => {
 		if (canMove) {
-			setAnchorCoordiantes(p => new Point(p.x + event.movementX, p.y + event.movementY));
+			setAnchorCoordiantes(
+				p => new PixiPoint(p.x + event.movementX, p.y + event.movementY)
+			);
 		}
 	};
 

@@ -84,6 +84,14 @@ export class View {
 		this.canvas.closePath();
 	}
 
+	static drawPeople(g: PixiGraphics, peopleCoordinates: Point[]): void {
+		g.beginFill(0xff0000);
+		peopleCoordinates.forEach(coordinates =>
+			g.drawCircle(coordinates.x, coordinates.y, 0.5)
+		);
+		g.endFill();
+	}
+
 	// Отрисовка всего
 	render() {
 		this.canvas.clear();

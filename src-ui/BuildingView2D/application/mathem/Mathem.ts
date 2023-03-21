@@ -31,7 +31,27 @@ export class Mathem {
 		};
 	}
 
+	static findMinCoordinates(XY: Array<{ x: number; y: number }>): {
+		x: number;
+		y: number;
+	} {
+		return {
+			x: Math.min(...XY.map(point => point.x)),
+			y: Math.min(...XY.map(point => point.y))
+		};
+	}
+
 	findMaxCoordinates(XY: Array<{ x: number; y: number }>): { x: number; y: number } {
+		return {
+			x: Math.max(...XY.map(point => point.x)),
+			y: Math.max(...XY.map(point => point.y))
+		};
+	}
+
+	static findMaxCoordinates(XY: Array<{ x: number; y: number }>): {
+		x: number;
+		y: number;
+	} {
 		return {
 			x: Math.max(...XY.map(point => point.x)),
 			y: Math.max(...XY.map(point => point.y))
@@ -42,8 +62,28 @@ export class Mathem {
 		return Math.random() * (max - min) + min;
 	}
 
+	static getRandomArbitrary(min: number, max: number): number {
+		return Math.random() * (max - min) + min;
+	}
+
 	// Проверка на пересечение
 	inPoly(x: number, y: number, xp: number[], yp: number[]): number {
+		const npol = xp.length;
+		let j = npol - 1;
+		let c = 0;
+		for (let i = 0; i < npol; i++) {
+			if (
+				((yp[i] <= y && y < yp[j]) || (yp[j] <= y && y < yp[i])) &&
+				x > ((xp[j] - xp[i]) * (y - yp[i])) / (yp[j] - yp[i]) + xp[i]
+			) {
+				c++;
+			}
+			j = i;
+		}
+		return c;
+	}
+
+	static inPolygon(x: number, y: number, xp: number[], yp: number[]): number {
 		const npol = xp.length;
 		let j = npol - 1;
 		let c = 0;
