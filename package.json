@@ -6,9 +6,7 @@
     "license": "MIT",
     "description": "Evacuation - программа моделирования движения людей в здании.",
     "scripts": {
-        "dev": "concurrently \"npm run dev:*\"",
-        "dev:vite": "vite",
-        "dev:rescript": "rescript build -w",
+        "dev": "vite",
         "build": "rescript && tsc && vite build",
         "preview": "vite preview",
         "test": "vitest",
@@ -37,6 +35,7 @@
         ]
     },
     "devDependencies": {
+        "@jihchi/vite-plugin-rescript": "^5.1.0",
         "@rescript/react": "^0.11.0",
         "@tauri-apps/cli": "^1.2.3",
         "@testing-library/jest-dom": "^5.16.5",
@@ -49,7 +48,6 @@
         "@vitejs/plugin-react": "^3.1.0",
         "@vitest/coverage-c8": "^0.28.4",
         "autoprefixer": "^10.4.13",
-        "concurrently": "^7.6.0",
         "cypress": "^12.5.1",
         "eslint": "^8.35.0",
         "eslint-config-prettier": "^8.6.0",
