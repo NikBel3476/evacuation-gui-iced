@@ -1,11 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import configReducer from './slices/ConfigSlice';
-import floorReducer from './slices/BuildingViewSlice';
+import buildingViewReducer from './slices/BuildingViewSlice';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 const rootReducer = combineReducers({
 	configReducer,
-	floorReducer
+	buildingViewReducer
 });
 
 export const store = configureStore({

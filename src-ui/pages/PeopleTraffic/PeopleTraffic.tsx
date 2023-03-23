@@ -12,19 +12,19 @@ import {
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
 
-const PeopleTraffic: FC = () => {
+const PeopleTraffic: FC = _ => {
 	let app: App | null = null;
 	const dispatch = useAppDispatch();
 
 	const onBuildingViewMount = () => {
 		app = new App('field', 'canvas_container');
 		app.startRendering();
-		document.addEventListener('keydown', handleDocumentKeydown);
+		window.addEventListener('keydown', handleDocumentKeydown);
 	};
 
 	const onBuildingViewUnmount = () => {
-		document.removeEventListener('keydown', handleDocumentKeydown);
 		app?.stopRendering();
+		window.removeEventListener('keydown', handleDocumentKeydown);
 	};
 
 	const handleDocumentKeydown = (event: KeyboardEvent) => {
