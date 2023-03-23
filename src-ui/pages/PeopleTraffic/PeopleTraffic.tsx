@@ -19,15 +19,15 @@ const PeopleTraffic: FC = _ => {
 	const onBuildingViewMount = () => {
 		app = new App('field', 'canvas_container');
 		app.startRendering();
-		window.addEventListener('keydown', handleDocumentKeydown);
+		window.addEventListener('keydown', handleWindowKeydown);
 	};
 
 	const onBuildingViewUnmount = () => {
 		app?.stopRendering();
-		window.removeEventListener('keydown', handleDocumentKeydown);
+		window.removeEventListener('keydown', handleWindowKeydown);
 	};
 
-	const handleDocumentKeydown = (event: KeyboardEvent) => {
+	const handleWindowKeydown = (event: KeyboardEvent) => {
 		if (app) {
 			switch (event.key) {
 				case 'ArrowUp':

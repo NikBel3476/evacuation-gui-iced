@@ -22,6 +22,7 @@ import {
 	setScale
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { store } from '../../store';
 
 const ModelingViewPage = () => {
 	const { currentLevel, scale } = useAppSelector(state => state.buildingViewReducer);
@@ -103,15 +104,20 @@ const ModelingViewPage = () => {
 		}
 	};
 
-	// FIXME: currentLevel does not change after dispatch
 	const handleWindowKeydown = (event: KeyboardEvent) => {
+		const {
+			buildingViewReducer: { currentLevel }
+		} = store.getState();
 		switch (event.key) {
 			case 'ArrowUp':
 				if (currentLevel < buildingData.Level.length - 1) {
 					dispatch(incrementCurrentLevel());
+					const {
+						buildingViewReducer: { currentLevel: updatedLevel }
+					} = store.getState();
 					setPeopleCoordinates(
 						Logic.generatePeopleCoordinates(
-							buildingData.Level[currentLevel],
+							buildingData.Level[updatedLevel],
 							evacuationTimeData.items
 						)
 					);
@@ -120,9 +126,12 @@ const ModelingViewPage = () => {
 			case 'ArrowDown':
 				if (currentLevel > 0) {
 					dispatch(decrementCurrentLevel());
+					const {
+						buildingViewReducer: { currentLevel: updatedLevel }
+					} = store.getState();
 					setPeopleCoordinates(
 						Logic.generatePeopleCoordinates(
-							buildingData.Level[currentLevel],
+							buildingData.Level[updatedLevel],
 							evacuationTimeData.items
 						)
 					);
