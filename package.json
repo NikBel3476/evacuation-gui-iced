@@ -16,7 +16,9 @@
         "tauri": "tauri",
         "clean": "rescript clean -with-deps",
         "format:write": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format:check": "npm run format:check:js && npm run format:check:rescript",
+        "format:check:js": "prettier --check .",
+        "format:check:rescript": "rescript format -check -all",
         "lint:js": "npx eslint .",
         "lint:css": "npx stylelint \"**/*.css\"",
         "prepare": "husky install",
@@ -32,6 +34,9 @@
         ],
         "*.rs": [
             "rustfmt"
+        ],
+        "*.res": [
+            "rescript format"
         ]
     },
     "devDependencies": {

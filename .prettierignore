@@ -3,8 +3,8 @@ node_modules/
 dist/
 lib/
 **/target/
-
-src-ui/peopleTraffic/js/vendor/toGif/Actionscript
+coverage/
+src-ui/peopleTraffic/js/vendor/
 
 .idea/
 
@@ -12,6 +12,7 @@ src-ui/peopleTraffic/js/vendor/toGif/Actionscript
 
 **/*.html
 **/*.css
+**/*.res
 **/*.bs.js
 **/*.gen.tsx
 **/*.json
