@@ -55,7 +55,7 @@ export class View {
 	static drawBuildingRoomPixi(g: PixiGraphics, points: Point[]) {
 		g.moveTo(points[0].x, points[0].y);
 		g.beginFill(0xffffff);
-		g.lineStyle(0.2, 0x000000, 1);
+		g.lineStyle(0.1, 0x000000, 1);
 		points.slice(1).forEach(point => {
 			g.lineTo(point.x, point.y);
 		});
@@ -86,6 +86,7 @@ export class View {
 
 	static drawPeople(g: PixiGraphics, peopleCoordinates: Point[]): void {
 		g.beginFill(0xff0000);
+		g.lineStyle(0.05, 0x000000, 1);
 		peopleCoordinates.forEach(coordinates =>
 			g.drawCircle(coordinates.x, coordinates.y, 0.5)
 		);

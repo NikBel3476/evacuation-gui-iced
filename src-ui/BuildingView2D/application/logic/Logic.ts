@@ -15,7 +15,6 @@ interface LogicConstructorParams {
 	data: {
 		cameraXY: Point;
 		scale: number;
-
 		activeBuilds: BuildingElement[];
 	};
 }
@@ -122,8 +121,7 @@ export class Logic {
 		}
 	}
 
-	// FIXME: remove any type
-	static generatePeopleCoordinates(level: Level, timeData: any): Point[] {
+	static generatePeopleCoordinates(level: Level, timeData: TimeData['items']): Point[] {
 		const rooms = timeData.find(dateTime => Math.floor(dateTime.time) === 0)?.rooms;
 
 		const peopleCoordinates: Point[] = [];
