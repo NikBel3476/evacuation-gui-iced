@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from '../view/View';
 import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
-import { Building, BuildingElement, Point } from '../Interfaces/Building';
+import { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
 import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { Server } from '../server/Server';
@@ -15,7 +15,6 @@ interface LogicConstructorParams {
 	data: {
 		cameraXY: Point;
 		scale: number;
-
 		activeBuilds: BuildingElement[];
 	};
 }
@@ -122,6 +121,24 @@ export class Logic {
 		}
 	}
 
+	static generatePeopleCoordinates(level: Level, timeData: TimeData['items']): Point[] {
+		const rooms = timeData.find(dateTime => Math.floor(dateTime.time) === 0)?.rooms;
+
+		const peopleCoordinates: Point[] = [];
+		if (rooms) {
+			level.BuildElement.forEach(buildingElement =>
+				rooms.forEach(room => {
+					if (room.uuid === buildingElement.Id) {
+						peopleCoordinates.push(
+							...Logic.genPeopleCoordinate(buildingElement, room.density)
+						);
+					}
+				})
+			);
+		}
+		return peopleCoordinates;
+	}
+
 	getPeopleCountInChoiceRoom(): number {
 		const coordinates = this.peopleCoordinate.find(
 			coordinate => this.choiceBuild?.Id === coordinate.uuid
@@ -168,6 +185,50 @@ export class Logic {
 					centerXY.y + centerXY.y / 2 + minXY.y
 				);
 				intersection = this.mathem.inPoly(randX, randY, arrayX, arrayY);
+			}
+			peopleXY[i] = { x: randX, y: randY };
+		}
+		return peopleXY;
+	}
+
+	static genPeopleCoordinate(build: BuildingElement, density: number): Point[] {
+		const XY = build.XY[0].points;
+		const arrayX = Array(XY.length - 1);
+		const arrayY = Array(XY.length - 1);
+		// TODO: understand why length - 1 is needed
+		XY.slice(0, -1).forEach((point, i) => {
+			arrayX[i] = point.x;
+			arrayY[i] = point.y;
+		});
+
+		const minXY = Mathem.findMinCoordinates(XY);
+		const maxXY = Mathem.findMaxCoordinates(XY);
+		const diagonalXY = { x: maxXY.x - minXY.x, y: maxXY.y - minXY.y };
+		const centerXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
+
+		const peopleCount = Math.floor(density);
+		const peopleXY = Array<Point>(peopleCount + 1);
+		for (let i = 0; i <= peopleCount; i++) {
+			let randX = Mathem.getRandomArbitrary(
+				centerXY.x - centerXY.x / 2 + minXY.x,
+				centerXY.x + centerXY.x / 2 + minXY.x
+			);
+			let randY = Mathem.getRandomArbitrary(
+				centerXY.y - centerXY.y / 2 + minXY.y,
+				centerXY.y + centerXY.y / 2 + minXY.y
+			);
+
+			let intersection = Mathem.inPolygon(randX, randY, arrayX, arrayY);
+			while (!(intersection & 1)) {
+				randX = Mathem.getRandomArbitrary(
+					centerXY.x - centerXY.x / 2 + minXY.x,
+					centerXY.x + centerXY.x / 2 + minXY.x
+				);
+				randY = Mathem.getRandomArbitrary(
+					centerXY.y - centerXY.y / 2 + minXY.y,
+					centerXY.y + centerXY.y / 2 + minXY.y
+				);
+				intersection = Mathem.inPolygon(randX, randY, arrayX, arrayY);
 			}
 			peopleXY[i] = { x: randX, y: randY };
 		}

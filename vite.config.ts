@@ -1,10 +1,11 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import rescript from '@jihchi/vite-plugin-rescript';
 import * as path from 'path';
 
 export default defineConfig({
-	plugins: [react()],
+	plugins: [react(), rescript()],
 	// prevent vite from obscuring rust errors
 	clearScreen: false,
 	// Tauri expects a fixed port, fail if that port is not available
@@ -31,7 +32,12 @@ export default defineConfig({
 			input: {
 				main: path.resolve(__dirname, 'index.html'),
 				configuration: path.resolve(__dirname, 'src-ui', 'config', 'index.html'),
-				configurationRescript: path.resolve(__dirname, 'src-ui', 'configRescript', 'index.html'),
+				configurationRescript: path.resolve(
+					__dirname,
+					'src-ui',
+					'configRescript',
+					'index.html'
+				),
 				peopleTraffic: path.resolve(__dirname, 'src-ui', 'peopleTraffic', 'index.html'),
 				buildingView: path.resolve(__dirname, 'src-ui', 'buildingView', 'index.html')
 			}

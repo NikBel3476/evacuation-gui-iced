@@ -33,10 +33,10 @@ export class App {
 	private fpsOut: number = 0;
 	private timestamp: number = performance.now();
 
-	constructor() {
+	constructor(public canvasId: string, public canvasContainerId: string) {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
 		this.server = new Server();
-		this.canvas = new Canvas({ canvasId: 'field' });
+		this.canvas = new Canvas({ canvasId, canvasContainerId });
 		this.mathem = new Mathem();
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
 		this.data = {

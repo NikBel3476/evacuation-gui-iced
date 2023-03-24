@@ -1,9 +1,10 @@
 export class BASE_SETTINGS {
 	CANVAS: {
-		ID: string,
-		WIDTH: number,
-		HEIGHT: number
+		ID: string;
+		WIDTH: number;
+		HEIGHT: number;
 	};
+
 	SERVER;
 	GIFGENERATOR;
 

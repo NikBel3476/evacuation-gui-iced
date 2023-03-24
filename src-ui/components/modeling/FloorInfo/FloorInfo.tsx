@@ -3,8 +3,9 @@ import { useAppSelector } from '../../../hooks/redux';
 import { Link } from 'react-router-dom';
 
 const FloorInfo: FC = () => {
-	const { buildingElement } = useAppSelector(state => state.floorReducer);
-	const { currentLevel } = useAppSelector(state => state.floorReducer);
+	const { currentLevel, buildingElement } = useAppSelector(
+		state => state.buildingViewReducer
+	);
 
 	return (
 		<aside className="p-4 bg-sky-400 grid grid-cols-1 gap-y-2 content-start">

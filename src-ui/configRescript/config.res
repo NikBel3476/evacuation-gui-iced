@@ -4,45 +4,39 @@ open Promise
 // %%raw(`import { invoke } from '@tauri-apps/api';`)
 
 // TODO: complete binding
-@module("@tauri-apps/api") external invoke: (~cmd: string, ~args: {..}=?, unit) => Promise.t<{..}> = "invoke"
+@module("@tauri-apps/api")
+external invoke: (~cmd: string, ~args: {..}=?, unit) => Promise.t<{..}> = "invoke"
 
 let errorHandler = (errorMessage: string) => {
-	switch document->Document.querySelector(".config") {
-	| Some(configElement) => {
-		configElement
-        ->Element.classList
-        ->DomTokenList.add("display-none")
-    }
-	| None => Js.log("No config element found")
-	}
+  switch document->Document.querySelector(".config") {
+  | Some(configElement) => configElement->Element.classList->DomTokenList.add("display-none")
+  | None => Js.log("No config element found")
+  }
 
-	switch document->Document.querySelector(".config-error") {
-	| Some(configErrorElement) => {
-		configErrorElement
-		->Element.setInnerHTML(`<p>${errorMessage}</p>`)
-    }
-	| None => Js.log("No config error element found")
-	}
+  switch document->Document.querySelector(".config-error") {
+  | Some(configErrorElement) => configErrorElement->Element.setInnerHTML(`<p>${errorMessage}</p>`)
+  | None => Js.log("No config error element found")
+  }
 }
 
 let loadConfigHandler = _ => {
-    let _ = invoke(~cmd = "read_config", ())
+  let _ =
+    invoke(~cmd="read_config", ())
     ->then(config => {
-        Js.log(config)
-        resolve()
+      Js.log(config)
+      resolve()
     })
     ->catch(e => {
-        switch e {
-        | JsError(obj) =>
-            switch Js.Exn.message(obj) {
-            | Some(message) => errorHandler(message)
-            | None => errorHandler(`Unexpected error`)
-            }
-        | _ => errorHandler(`Unexpected error`)
+      switch e {
+      | JsError(obj) =>
+        switch Js.Exn.message(obj) {
+        | Some(message) => errorHandler(message)
+        | None => errorHandler(`Unexpected error`)
         }
-        resolve()
+      | _ => errorHandler(`Unexpected error`)
+      }
+      resolve()
     })
-    ()
 }
 
 switch document->Document.getElementById("start-btn") {

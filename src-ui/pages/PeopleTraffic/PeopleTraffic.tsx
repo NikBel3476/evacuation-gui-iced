@@ -12,22 +12,22 @@ import {
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
 
-const PeopleTraffic: FC = () => {
+const PeopleTraffic: FC = _ => {
 	let app: App | null = null;
 	const dispatch = useAppDispatch();
 
 	const onBuildingViewMount = () => {
-		app = new App();
+		app = new App('field', 'canvas_container');
 		app.startRendering();
-		document.addEventListener('keydown', handleDocumentKeydown);
+		window.addEventListener('keydown', handleWindowKeydown);
 	};
 
 	const onBuildingViewUnmount = () => {
-		document.removeEventListener('keydown', handleDocumentKeydown);
 		app?.stopRendering();
+		window.removeEventListener('keydown', handleWindowKeydown);
 	};
 
-	const handleDocumentKeydown = (event: KeyboardEvent) => {
+	const handleWindowKeydown = (event: KeyboardEvent) => {
 		if (app) {
 			switch (event.key) {
 				case 'ArrowUp':

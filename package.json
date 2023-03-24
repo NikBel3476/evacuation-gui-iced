@@ -6,9 +6,7 @@
     "license": "MIT",
     "description": "Evacuation - программа моделирования движения людей в здании.",
     "scripts": {
-        "dev": "concurrently \"npm run dev:*\"",
-        "dev:vite": "vite",
-        "dev:rescript": "rescript build -w",
+        "dev": "vite",
         "build": "rescript && tsc && vite build",
         "preview": "vite preview",
         "test": "vitest",
@@ -18,7 +16,10 @@
         "tauri": "tauri",
         "clean": "rescript clean -with-deps",
         "format:write": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format:check": "npm run format:check:js && npm run format:check:rust",
+        "format:check:js": "prettier --check .",
+        "format:check:rescript": "rescript format -check -all",
+        "format:check:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml --check",
         "lint:js": "npx eslint .",
         "lint:css": "npx stylelint \"**/*.css\"",
         "prepare": "husky install",
@@ -34,9 +35,13 @@
         ],
         "*.rs": [
             "rustfmt"
+        ],
+        "*.res": [
+            "rescript format"
         ]
     },
     "devDependencies": {
+        "@jihchi/vite-plugin-rescript": "^5.1.0",
         "@rescript/react": "^0.11.0",
         "@tauri-apps/cli": "^1.2.3",
         "@testing-library/jest-dom": "^5.16.5",
@@ -49,7 +54,6 @@
         "@vitejs/plugin-react": "^3.1.0",
         "@vitest/coverage-c8": "^0.28.4",
         "autoprefixer": "^10.4.13",
-        "concurrently": "^7.6.0",
         "cypress": "^12.5.1",
         "eslint": "^8.35.0",
         "eslint-config-prettier": "^8.6.0",
@@ -81,11 +85,13 @@
     },
     "dependencies": {
         "@heroicons/react": "^2.0.16",
+        "@pixi/react": "^7.0.3",
         "@reduxjs/toolkit": "^1.9.3",
         "@ryyppy/rescript-promise": "^2.1.0",
         "@tauri-apps/api": "^1.2.0",
         "classnames": "^2.3.2",
         "konva": "^8.4.2",
+        "pixi.js": "^7.2.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-konva": "^18.2.4",

@@ -4,6 +4,7 @@ import { BuildingElement } from '../../interfaces/BuildingElement';
 interface BuildingViewState {
 	buildingElement: BuildingElement | null;
 	currentLevel: number;
+	scale: number;
 	evacuationTime: number;
 	numberOfPeopleInsideBuilding: number;
 	numberOfPeopleOutsideBuilding: number;
@@ -12,6 +13,7 @@ interface BuildingViewState {
 const initialState: BuildingViewState = {
 	buildingElement: null,
 	currentLevel: 0,
+	scale: 1,
 	evacuationTime: 0,
 	numberOfPeopleInsideBuilding: 0,
 	numberOfPeopleOutsideBuilding: 0
@@ -62,6 +64,21 @@ export const buildingViewSlice = createSlice({
 		decrementCurrentLevel: state => {
 			state.currentLevel--;
 		},
+		setScale: (state, action: PayloadAction<number>) => {
+			state.scale = action.payload;
+		},
+		incrementScale: state => {
+			state.scale += 0.1;
+		},
+		incrementScaleBy: (state, action: PayloadAction<number>) => {
+			state.scale += action.payload;
+		},
+		decrementScale: state => {
+			state.scale -= 0.1;
+		},
+		decrementScaleBy: (state, action: PayloadAction<number>) => {
+			state.scale -= action.payload;
+		},
 		incrementEvacuationTime: state => {
 			state.evacuationTime++;
 		},
@@ -84,6 +101,11 @@ export const {
 	setElementArea,
 	incrementCurrentLevel,
 	decrementCurrentLevel,
+	setScale,
+	incrementScale,
+	incrementScaleBy,
+	decrementScale,
+	decrementScaleBy,
 	incrementEvacuationTime,
 	setPeopleInsideBuilding,
 	setPeopleOutsideBuilding
