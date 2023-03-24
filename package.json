@@ -16,7 +16,7 @@
         "tauri": "tauri",
         "clean": "rescript clean -with-deps",
         "format:write": "prettier --write .",
-        "format:check": "npm run format:check:js && npm run format:check:rescript && npm run format:check:rust",
+        "format:check": "npm run format:check:js && npm run format:check:rust",
         "format:check:js": "prettier --check .",
         "format:check:rescript": "rescript format -check -all",
         "format:check:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml --check",

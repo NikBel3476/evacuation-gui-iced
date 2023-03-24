@@ -57,7 +57,7 @@ const ModelingViewPage = () => {
 			View.drawBuildingRoomsPixi(g, buildingData.Level[currentLevel].BuildElement);
 			View.drawPeople(g, peopleCoordinates);
 		},
-		[peopleCoordinates]
+		[currentLevel, peopleCoordinates]
 	);
 
 	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
