@@ -7,7 +7,7 @@
     "description": "Evacuation - программа моделирования движения людей в здании.",
     "scripts": {
         "dev": "vite",
-        "build": "rescript && tsc && vite build",
+        "build": "tsc && vite build",
         "preview": "vite preview",
         "test": "vitest",
         "coverage": "vitest run --coverage",
