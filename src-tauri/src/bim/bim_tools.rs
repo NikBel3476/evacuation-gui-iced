@@ -264,14 +264,21 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 		let mut related_zones = [BimZone::default(), BimZone::default()];
 
 		for (i, output) in transit.outputs.iter().enumerate() {
-			let zone = zones.iter().find(|zone| zone.uuid.eq(output)).unwrap_or_else(|| {
-				panic!(
-					"Failed to find an element connected to transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
-					transit.id,
-					transit.uuid,
-					transit.name
-				);
-			});
+			let zone = zones
+				.iter()
+				.find(|zone| zone.uuid.eq(output))
+				.unwrap_or_else(|| {
+					// panic!(
+					// 	"Failed to find an element connected to transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
+					// 	transit.id,
+					// 	transit.uuid,
+					// 	transit.name
+					// );
+					panic!(
+						"Failed to find an element connected to transit.\n{:#?}",
+						transit
+					)
+				});
 
 			if zone.sign == BimElementSign::Staircase {
 				stair_sign_counter += 1;
@@ -426,7 +433,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 						is_blocked: false,
 						is_visited: false,
 						no_proceeding: 0.0,
-						width: -1.0, //Calculated below
+						width: -1.0, // calculate below
 					};
 					transits.push(transit.clone());
 					transits_list.push(transit);
