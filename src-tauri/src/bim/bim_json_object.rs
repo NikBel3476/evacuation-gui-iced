@@ -1,5 +1,6 @@
 use super::bim_polygon_tools;
-use super::json_object::parse_building_from_json;
+use crate::bim::json_object::BuildingStruct;
+use crate::bim::json_renga::BuildingStructRenga;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -74,8 +75,15 @@ pub struct BimJsonObject {
 }
 
 pub fn bim_json_object_new(path_to_file: &str) -> BimJsonObject {
-	let building = parse_building_from_json(path_to_file)
-		.unwrap_or_else(|e| panic!("Failed to parse building. Error: {e}"));
+	let building = match path_to_file.contains("renga") {
+		true => Box::new(BuildingStruct::from(
+			BuildingStructRenga::parse_building_from_json(path_to_file)
+				.unwrap_or_else(|e| panic!("Failed to parse building. Error: {e}"))
+				.as_ref(),
+		)),
+		false => BuildingStruct::parse_building_from_json(path_to_file)
+			.unwrap_or_else(|e| panic!("Failed to parse building. Error: {e}")),
+	};
 	let mut bim_element_rs_id: u64 = 0;
 	let mut bim_element_d_id: u64 = 0;
 
@@ -126,7 +134,10 @@ pub fn bim_json_object_new(path_to_file: &str) -> BimJsonObject {
 						},
 						outputs: element.outputs.clone(),
 						polygon: bim_polygon_tools::Polygon {
-							points: element.xy[0].points.clone(),
+							points: match element.xy.is_empty() {
+								true => vec![],
+								false => element.xy[0].points.clone(),
+							},
 						},
 					})
 					.collect::<Vec<BimJsonElement>>(),

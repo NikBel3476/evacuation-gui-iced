@@ -24,6 +24,7 @@ mod cli;
 pub mod configuration;
 mod graph;
 mod json_object;
+mod json_renga;
 
 pub fn run_rust() {
 	// TODO: remove mock file path

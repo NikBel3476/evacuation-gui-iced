@@ -1,10 +1,14 @@
 use super::bim_polygon_tools::Line;
+use crate::bim::json_renga::{
+	AddressRenga, BuildingElementRenga, BuildingLevelRenga, BuildingStructRenga,
+};
+use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs;
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 pub struct Address {
 	#[serde(rename = "City")]
 	pub city: String,
@@ -12,6 +16,16 @@ pub struct Address {
 	pub street_address: String,
 	#[serde(rename = "AddInfo")]
 	pub add_info: String,
+}
+
+impl From<AddressRenga> for Address {
+	fn from(addressRenga: AddressRenga) -> Self {
+		Self {
+			city: addressRenga.city,
+			street_address: addressRenga.street_address,
+			add_info: addressRenga.add_info,
+		}
+	}
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Default)]
@@ -93,6 +107,46 @@ pub struct BuildElement {
 	pub number_of_people: u64,
 }
 
+impl From<&BuildingElementRenga> for BuildElement {
+	fn from(element_renga: &BuildingElementRenga) -> Self {
+		let mut rng = rand::thread_rng();
+		let pivot_point = Point {
+			x: rng.gen_range(0.0..=10.0),
+			y: rng.gen_range(0.0..=10.0),
+		};
+		Self {
+			outputs: element_renga.outputs.clone(),
+			// TODO: replace random with real coordinates
+			xy: vec![Coordinates {
+				points: vec![
+					pivot_point,
+					Point {
+						x: pivot_point.x + 1.0,
+						..pivot_point
+					},
+					Point {
+						x: pivot_point.x + 1.0,
+						y: pivot_point.y - 1.0,
+					},
+					Point {
+						y: pivot_point.y - 1.0,
+						..pivot_point
+					},
+					pivot_point,
+				],
+			}],
+			// TODO: implement
+			number_of_people: 0,
+			size_z: element_renga.size_z,
+			sign: element_renga.sign.clone(),
+			// TODO: implement
+			id: element_renga.uuid,
+			uuid: element_renga.uuid.clone(),
+			name: element_renga.name.clone(),
+		}
+	}
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Level {
 	#[serde(rename = "NameLevel")]
@@ -101,6 +155,20 @@ pub struct Level {
 	pub z_level: f64,
 	#[serde(rename = "BuildElement")]
 	pub build_elements: Vec<BuildElement>,
+}
+
+impl From<&BuildingLevelRenga> for Level {
+	fn from(level_renga: &BuildingLevelRenga) -> Self {
+		Self {
+			name: level_renga.name.clone(),
+			z_level: level_renga.z_level,
+			build_elements: level_renga
+				.building_elements
+				.iter()
+				.map(|element_renga| BuildElement::from(element_renga))
+				.collect(),
+		}
+	}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -115,21 +183,39 @@ pub struct BuildingStruct {
 	pub levels: Vec<Level>,
 }
 
-#[no_mangle]
-pub fn parse_building_from_json(path_to_file: &str) -> Result<Box<BuildingStruct>, Box<dyn Error>> {
-	let json_content = fs::read_to_string(path_to_file).unwrap_or_else(|err| {
-		panic!(
-			"Ошибка чтения файла конфигурации здания {}: {}",
-			path_to_file, err
-		);
-	});
+impl BuildingStruct {
+	pub fn parse_building_from_json(
+		path_to_file: &str,
+	) -> Result<Box<BuildingStruct>, Box<dyn Error>> {
+		let json_content = fs::read_to_string(path_to_file).unwrap_or_else(|err| {
+			panic!(
+				"Ошибка чтения файла конфигурации здания {}: {}",
+				path_to_file, err
+			);
+		});
 
-	let data: BuildingStruct = serde_json::from_str(&json_content).unwrap_or_else(|err| {
-		panic!(
-			"Ошибка десериализации файла конфигурации здания {}: {}",
-			path_to_file, err
-		);
-	});
+		let data: BuildingStruct = serde_json::from_str(&json_content).unwrap_or_else(|err| {
+			panic!(
+				"Ошибка десериализации файла конфигурации здания {}: {}",
+				path_to_file, err
+			);
+		});
 
-	Ok(Box::new(data))
+		Ok(Box::new(data))
+	}
+}
+
+impl From<&BuildingStructRenga> for BuildingStruct {
+	fn from(building_struct_renga: &BuildingStructRenga) -> Self {
+		Self {
+			address: Address::from(building_struct_renga.address.clone()),
+			devs: building_struct_renga.devs.clone(),
+			building_name: building_struct_renga.name.clone(),
+			levels: building_struct_renga
+				.levels
+				.iter()
+				.map(|level_renga| Level::from(level_renga))
+				.collect(),
+		}
+	}
 }
