@@ -8,6 +8,7 @@ import React, {
 import { Container, Graphics, Stage } from '@pixi/react';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
 import buildingData from '../../peopleTraffic/udsu_b1_L4_v2_190701.json';
+// import buildingData from '../../../res/test_school.json';
 import timeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from '../../BuildingView2D/application/view/View';
 import { Point as PixiPoint } from 'pixi.js';
