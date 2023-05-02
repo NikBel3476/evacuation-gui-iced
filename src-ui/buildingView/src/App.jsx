@@ -1,8 +1,8 @@
 import './App.css';
 import dataBuild from './res/building.json';
-import React from 'react';
-import { Rect, Line, Stage, Layer, Circle } from 'react-konva';
-import { useState, setState } from 'react';
+import React, { useState } from 'react';
+import { Layer, Line, Stage } from 'react-konva';
+
 let scale = 50;
 
 const PEOPLE_RADIUS = 1 * scale;

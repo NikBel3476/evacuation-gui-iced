@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { getConfig } from '../../store/actionCreators/getConfig';
 import { changeLoggerFile } from '../../store/slices/ConfigSlice';
+import Select from '../../components/Select';
 
 const ConfigurationPage: FC = () => {
 	const dispatch = useAppDispatch();
@@ -38,16 +39,7 @@ const ConfigurationPage: FC = () => {
 						<label htmlFor="bim_filenames" className="text-2xl">
 							Файлы цифровых моделей зданий
 						</label>
-						<select
-							className="mt-2 p-1 block rounded-md border-0 border-transparent outline-none shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-600"
-							id="bim_filenames"
-						>
-							{config.files.map(file => (
-								<option key={file} value={file}>
-									{file}
-								</option>
-							))}
-						</select>
+						<Select options={config.files} />
 					</section>
 					<section className="mt-5">
 						<label htmlFor="logger_filename" className="text-2xl">

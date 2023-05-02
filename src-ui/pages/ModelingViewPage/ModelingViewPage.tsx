@@ -1,4 +1,5 @@
 import React, {
+	ChangeEvent,
 	MouseEventHandler,
 	useCallback,
 	useEffect,
@@ -7,8 +8,7 @@ import React, {
 } from 'react';
 import { Container, Graphics, Stage } from '@pixi/react';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
-import buildingData from '../../peopleTraffic/udsu_b1_L4_v2_190701.json';
-// import buildingData from '../../../res/test_school.json';
+import buildingData from '../../../res/udsu_b1_L4_v2_190701.json';
 import timeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from '../../BuildingView2D/application/view/View';
 import { Point as PixiPoint } from 'pixi.js';
@@ -28,8 +28,13 @@ import styles from './ModelingViewPage.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
 import ControlPanel from '../../components/modeling/ControlPanel';
 import { TimeData } from '../../BuildingView2D/application/Interfaces/TimeData';
+import { getConfig } from '../../store/actionCreators/getConfig';
+import { bimFiles } from '../../consts';
 
 const ModelingViewPage = () => {
+	const { config, isLoading, error } = useAppSelector(state => state.configReducer);
+	const [bimFile, setBimFile] = useState<object | null>(null);
+
 	const evacuationTimeData = timeData as TimeData;
 	const { currentLevel, scale } = useAppSelector(state => state.buildingViewReducer);
 	const dispatch = useAppDispatch();
@@ -46,6 +51,7 @@ const ModelingViewPage = () => {
 
 	useEffect(() => {
 		dispatch(setScale(8));
+		void dispatch(getConfig());
 		window.addEventListener('keydown', handleWindowKeydown);
 		return () => {
 			window.removeEventListener('keydown', handleWindowKeydown);
@@ -136,9 +142,13 @@ const ModelingViewPage = () => {
 		}
 	};
 
+	const handleSelectFileChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		setBimFile(bimFiles[e.target.value]);
+	};
+
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo />
+			<FloorInfo fileList={config?.files ?? []} onSelectChange={handleSelectFileChange} />
 			<div className="w-full h-full overflow-hidden">
 				<Stage
 					id="canvas"
