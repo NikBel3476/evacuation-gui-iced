@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BuildingElement } from '../../interfaces/BuildingElement';
+import { BimJson } from '../../interfaces/BimJson';
 
 interface BuildingViewState {
 	buildingElement: BuildingElement | null;
@@ -8,6 +9,7 @@ interface BuildingViewState {
 	evacuationTime: number;
 	numberOfPeopleInsideBuilding: number;
 	numberOfPeopleOutsideBuilding: number;
+	bim?: BimJson;
 }
 
 const initialState: BuildingViewState = {
@@ -64,6 +66,9 @@ export const buildingViewSlice = createSlice({
 		decrementCurrentLevel: state => {
 			state.currentLevel--;
 		},
+		setCurrentLevel: (state, action: PayloadAction<number>) => {
+			state.currentLevel = action.payload;
+		},
 		setScale: (state, action: PayloadAction<number>) => {
 			state.scale = action.payload;
 		},
@@ -87,6 +92,9 @@ export const buildingViewSlice = createSlice({
 		},
 		setPeopleOutsideBuilding: (state, action: PayloadAction<number>) => {
 			state.numberOfPeopleOutsideBuilding = action.payload;
+		},
+		setBim: (state, action: PayloadAction<BimJson>) => {
+			state.bim = action.payload;
 		}
 	}
 });
@@ -101,6 +109,7 @@ export const {
 	setElementArea,
 	incrementCurrentLevel,
 	decrementCurrentLevel,
+	setCurrentLevel,
 	setScale,
 	incrementScale,
 	incrementScaleBy,
@@ -108,7 +117,8 @@ export const {
 	decrementScaleBy,
 	incrementEvacuationTime,
 	setPeopleInsideBuilding,
-	setPeopleOutsideBuilding
+	setPeopleOutsideBuilding,
+	setBim
 } = buildingViewSlice.actions;
 
 export default buildingViewSlice.reducer;

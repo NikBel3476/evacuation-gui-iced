@@ -146,7 +146,7 @@ const PeopleTraffic: FC = _ => {
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo />
+			<FloorInfo fileList={[]} />
 			<BuildingView
 				onMount={onBuildingViewMount}
 				onUnmount={onBuildingViewUnmount}

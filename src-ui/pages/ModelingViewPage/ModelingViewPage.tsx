@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import { Container, Graphics, Stage } from '@pixi/react';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
-import buildingData from '../../../res/udsu_b1_L4_v2_190701.json';
 import timeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from '../../BuildingView2D/application/view/View';
 import { Point as PixiPoint } from 'pixi.js';
@@ -19,6 +18,8 @@ import {
 	decrementScale,
 	incrementCurrentLevel,
 	incrementScale,
+	setBim,
+	setCurrentLevel,
 	setScale
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
@@ -29,11 +30,13 @@ import FloorInfo from '../../components/modeling/FloorInfo';
 import ControlPanel from '../../components/modeling/ControlPanel';
 import { TimeData } from '../../BuildingView2D/application/Interfaces/TimeData';
 import { getConfig } from '../../store/actionCreators/getConfig';
-import { bimFiles } from '../../consts';
+import { bimFiles } from '../../consts/bimFiles';
+import { BimJson } from '../../interfaces/BimJson';
 
 const ModelingViewPage = () => {
-	const { config, isLoading, error } = useAppSelector(state => state.configReducer);
-	const [bimFile, setBimFile] = useState<object | null>(null);
+	const [buildingData, setBuildingData] = useState<BimJson>(
+		bimFiles[Object.keys(bimFiles)[0]]
+	);
 
 	const evacuationTimeData = timeData as TimeData;
 	const { currentLevel, scale } = useAppSelector(state => state.buildingViewReducer);
@@ -52,11 +55,15 @@ const ModelingViewPage = () => {
 	useEffect(() => {
 		dispatch(setScale(8));
 		void dispatch(getConfig());
+	}, [dispatch]);
+
+	// FIXME: resolve access to state in window events
+	useEffect(() => {
 		window.addEventListener('keydown', handleWindowKeydown);
 		return () => {
 			window.removeEventListener('keydown', handleWindowKeydown);
 		};
-	}, [dispatch]);
+	}, [buildingData]);
 
 	const draw = useCallback(
 		(g: PixiGraphics) => {
@@ -64,7 +71,7 @@ const ModelingViewPage = () => {
 			View.drawBuildingRoomsPixi(g, buildingData.Level[currentLevel].BuildElement);
 			View.drawPeople(g, peopleCoordinates);
 		},
-		[currentLevel, peopleCoordinates]
+		[currentLevel, peopleCoordinates, buildingData]
 	);
 
 	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
@@ -143,12 +150,17 @@ const ModelingViewPage = () => {
 	};
 
 	const handleSelectFileChange = (e: ChangeEvent<HTMLSelectElement>) => {
-		setBimFile(bimFiles[e.target.value]);
+		void dispatch(setCurrentLevel(0));
+		setBuildingData(bimFiles[e.target.value]);
+		void dispatch(setBim(bimFiles[e.target.value]));
 	};
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo fileList={config?.files ?? []} onSelectChange={handleSelectFileChange} />
+			<FloorInfo
+				fileList={Object.keys(bimFiles)}
+				onSelectChange={handleSelectFileChange}
+			/>
 			<div className="w-full h-full overflow-hidden">
 				<Stage
 					id="canvas"
