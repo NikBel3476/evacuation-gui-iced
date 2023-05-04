@@ -14,12 +14,17 @@ pub struct Polygon {
 }
 
 impl Polygon {
-	pub fn area(&self) -> f64 {
+	pub fn area(&self) -> Result<f64, &str> {
 		let num_of_triangle_corner = (self.points.len() - 2) * 3;
 
 		let mut triangle_list = vec![0; num_of_triangle_corner];
 
 		let number_of_triangles = self.triangulate(&mut triangle_list);
+
+		// FIXME: figure out how triangulate rooms of different shapes
+		if number_of_triangles * 3 != num_of_triangle_corner as u64 {
+			return Err("Number of triangle corners and number of triangles are disproportionate");
+		}
 
 		// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
 		// p=(ab+bc+ca)0.5
@@ -35,7 +40,7 @@ impl Polygon {
 			area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
 		}
 
-		area_element
+		Ok(area_element)
 	}
 
 	/// #Returns

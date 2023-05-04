@@ -9138,7 +9138,7 @@
           ],
           "Output": [
             "28e97d54-cfd6-41eb-8f33-bd7df0cf32c8",
-            "b2427447-b61c-4b39-ba4d-90a0172a4dba"
+            "1a2dce1d-0ded-4aad-96e4-a17c6513d6b9"
           ]
         },
         {
@@ -17254,12 +17254,12 @@
             }
           ],
           "Output": [
-            "b2427447-b61c-4b39-ba4d-90a0172a4dba"
+            "1a2dce1d-0ded-4aad-96e4-a17c6513d6b9"
           ]
         },
         {
-          "@": "b2427447-b61c-4b39-ba4d-90a0172a4dba",
-          "Id": "b2427447-b61c-4b39-ba4d-90a0172a4dba",
+          "@": "1a2dce1d-0ded-4aad-96e4-a17c6513d6b9",
+          "Id": "1a2dce1d-0ded-4aad-96e4-a17c6513d6b9",
           "Name": "1 - Помещение",
           "SizeZ": 0.0,
           "Sign": "Room",

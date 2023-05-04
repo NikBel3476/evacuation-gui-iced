@@ -19,11 +19,11 @@ pub struct Address {
 }
 
 impl From<AddressRenga> for Address {
-	fn from(addressRenga: AddressRenga) -> Self {
+	fn from(address_renga: AddressRenga) -> Self {
 		Self {
-			city: addressRenga.city,
-			street_address: addressRenga.street_address,
-			add_info: addressRenga.add_info,
+			city: address_renga.city,
+			street_address: address_renga.street_address,
+			add_info: address_renga.add_info,
 		}
 	}
 }
@@ -109,7 +109,7 @@ pub struct BuildElement {
 
 impl From<&BuildingElementRenga> for BuildElement {
 	fn from(element_renga: &BuildingElementRenga) -> Self {
-		let mut rng = rand::thread_rng();
+		let mut rng = thread_rng();
 		let pivot_point = Point {
 			x: rng.gen_range(0.0..=10.0),
 			y: rng.gen_range(0.0..=10.0),
@@ -141,7 +141,7 @@ impl From<&BuildingElementRenga> for BuildElement {
 			sign: element_renga.sign.clone(),
 			// TODO: implement
 			id: element_renga.uuid,
-			uuid: element_renga.uuid.clone(),
+			uuid: element_renga.uuid,
 			name: element_renga.name.clone(),
 		}
 	}
@@ -165,7 +165,7 @@ impl From<&BuildingLevelRenga> for Level {
 			build_elements: level_renga
 				.building_elements
 				.iter()
-				.map(|element_renga| BuildElement::from(element_renga))
+				.map(BuildElement::from)
 				.collect(),
 		}
 	}
@@ -214,7 +214,7 @@ impl From<&BuildingStructRenga> for BuildingStruct {
 			levels: building_struct_renga
 				.levels
 				.iter()
-				.map(|level_renga| Level::from(level_renga))
+				.map(Level::from)
 				.collect(),
 		}
 	}

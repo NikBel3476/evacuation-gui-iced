@@ -217,7 +217,7 @@ pub fn outside_init_rust(bim_json: &BimJsonObject) -> BimZone {
 		for element in &level.build_elements {
 			match element.sign {
 				BimElementSign::DoorWayOut => {
-					outputs.push(element.uuid.clone());
+					outputs.push(element.uuid);
 				}
 				BimElementSign::Room | BimElementSign::Staircase => {
 					id += 1;
@@ -387,7 +387,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 
 		for build_element_json in &level_json.build_elements {
 			let id = build_element_json.id;
-			let uuid = build_element_json.uuid.clone();
+			let uuid = build_element_json.uuid;
 			let name = build_element_json.name.clone();
 			let size_z = build_element_json.size_z;
 			let z_level = build_element_json.z_level;
@@ -407,7 +407,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 						// FIXME: unsafe cast u64 to f64
 						number_of_people: build_element_json.number_of_people as f64,
 						outputs,
-						area: polygon.area(),
+						area: polygon.area().unwrap_or_default(),
 						polygon,
 						is_blocked: false,
 						is_visited: false,
