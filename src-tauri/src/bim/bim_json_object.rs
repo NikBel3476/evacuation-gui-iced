@@ -23,6 +23,7 @@ pub enum BimElementSign {
 }
 
 /// Структура, описывающая элемент
+#[derive(Debug)]
 pub struct BimJsonElement {
 	/// [JSON] UUID идентификатор элемента
 	pub uuid: Uuid,

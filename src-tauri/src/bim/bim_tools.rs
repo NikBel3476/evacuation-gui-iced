@@ -407,7 +407,12 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 						// FIXME: unsafe cast u64 to f64
 						number_of_people: build_element_json.number_of_people as f64,
 						outputs,
-						area: polygon.area().unwrap_or_default(),
+						area: polygon.area().unwrap_or_else(|msg| {
+							panic!(
+								"\n{msg}\nFailed to calculate area\n {:#?}",
+								build_element_json
+							)
+						}),
 						polygon,
 						is_blocked: false,
 						is_visited: false,

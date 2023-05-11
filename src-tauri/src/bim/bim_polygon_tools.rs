@@ -1,7 +1,7 @@
 use super::json_object::Point;
 use std::cmp::Ordering;
 use std::ffi::CString;
-use triangle_rs::{triangulate, triangulateio};
+use triangle_rs::{triangulate, triangulateio, Delaunay};
 
 pub struct Line {
 	pub p1: Point,
@@ -14,25 +14,43 @@ pub struct Polygon {
 }
 
 impl Polygon {
-	pub fn area(&self) -> Result<f64, &str> {
-		let num_of_triangle_corner = (self.points.len() - 2) * 3;
+	pub fn area(&self) -> Result<f64, String> {
+		// let num_of_triangle_corner = (self.points.len() - 2) * 3;
+		let mut number_of_triangle_corners = self.points.len();
 
-		let mut triangle_list = vec![0; num_of_triangle_corner];
+		// TODO: translate to English
+		// Увеличение количества точек, до кратного трем
+		// Необходимо, потому иначе на выходе будет столько же точек, сколько на входе
+		// и для квадрата получится не два треугольника, а 1 и пара точек
+		// т.е. если количество точек не кратно трем,
+		// то последний треугольник не будет замкнут
+		// if number_of_triangle_corners % 3 != 0 {
+		// 	number_of_triangle_corners += 3 - number_of_triangle_corners % 3;
+		// }
 
-		let number_of_triangles = self.triangulate(&mut triangle_list);
+		let mut triangle_list = vec![0; number_of_triangle_corners];
+
+		// let number_of_triangles = self.triangulate(&mut triangle_list);
+		let tri = self.triangulate(&mut triangle_list);
 
 		// FIXME: figure out how triangulate rooms of different shapes
-		if number_of_triangles * 3 != num_of_triangle_corner as u64 {
-			return Err("Number of triangle corners and number of triangles are disproportionate");
-		}
+		// if number_of_triangles * 3 != number_of_triangle_corners as u64 {
+		// 	return Err(
+		// 		format!(
+		// 			"Number of triangle corners and number of triangles are disproportionate:\nNumber of triangle corners: {}\nNumber of triangles: {}",
+		// 			number_of_triangle_corners,
+		// 			number_of_triangles
+		// 		)
+		// 	);
+		// }
 
 		// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
 		// p=(ab+bc+ca)0.5
 		let mut area_element = 0.0;
-		for i in 0..number_of_triangles {
-			let a = &self.points[triangle_list[(i * 3) as usize] as usize];
-			let b = &self.points[triangle_list[(i * 3 + 1) as usize] as usize];
-			let c = &self.points[triangle_list[(i * 3 + 2) as usize] as usize];
+		for i in (0..number_of_triangle_corners).step_by(3) {
+			let a = &self.points[tri.triangles[(i) as usize] as usize];
+			let b = &self.points[tri.triangles[(i + 1) as usize] as usize];
+			let c = &self.points[tri.triangles[(i + 2) as usize] as usize];
 			let ab = a.distance_to(b);
 			let bc = b.distance_to(c);
 			let ca = c.distance_to(a);
@@ -47,13 +65,17 @@ impl Polygon {
 	/// Массив номеров точек треугольников
 	///
 	/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
-	pub fn triangulate(&self, triangle_list: &mut [i32]) -> u64 {
+	pub fn triangulate(&self, triangle_list: &mut [i32]) -> Box<Delaunay> {
 		let mut point_list = vec![0.0; 2 * self.points.len()];
 
 		for i in 0..self.points.len() {
 			point_list[i * 2] = self.points[i].x;
 			point_list[i * 2 + 1] = self.points[i].y;
 		}
+
+		let mut builder = triangle_rs::Builder::new();
+		let tri = builder.add_nodes(&point_list).build();
+		return Box::new(tri);
 
 		let mut polygon_to_triangulate = triangulateio {
 			pointlist: point_list.as_mut_ptr(),
@@ -81,21 +103,21 @@ impl Polygon {
 			numberofedges: 0,
 		};
 
-		let triswitches = CString::new("zQ").unwrap_or_else(|_| {
-			panic!("Failed to create CString from \"zQ\" at triangle_polygon_rust fn in bim_polygon_tools crate")
-		});
-		unsafe {
-			triangulate(
-				triswitches.into_raw(),
-				&mut polygon_to_triangulate,
-				&mut polygon_to_triangulate,
-				std::ptr::null_mut(),
-			)
-		}
+		// let triswitches = CString::new("zQ").unwrap_or_else(|_| {
+		// 	panic!("Failed to create CString from \"zQ\" at triangle_polygon_rust fn in bim_polygon_tools crate")
+		// });
+		// unsafe {
+		// 	triangulate(
+		// 		triswitches.into_raw(),
+		// 		&mut polygon_to_triangulate,
+		// 		&mut polygon_to_triangulate,
+		// 		std::ptr::null_mut(),
+		// 	);
+		// }
 
-		u64::try_from(polygon_to_triangulate.numberoftriangles).unwrap_or_else(|e| {
-			panic!("Failed to convert numberoftriangles to u64 at triangle_polygon_rust fn in bim_polygon_tools crate. {e}")
-		})
+		// u64::try_from(polygon_to_triangulate.numberoftriangles).unwrap_or_else(|e| {
+		// 	panic!("Failed to convert numberoftriangles to u64 at triangle_polygon_rust fn in bim_polygon_tools crate. {e}")
+		// })
 	}
 }
 
@@ -126,21 +148,27 @@ fn is_point_in_triangle(
 }
 
 pub fn is_point_in_polygon(point: &Point, polygon: &Polygon) -> bool {
-	let num_of_triangle_corner = polygon.points.len().checked_sub(2).unwrap_or_else(|| {
+	// FIXME: check old version realization
+	/*let num_of_triangle_corner = polygon.points.len().checked_sub(2).unwrap_or_else(|| {
 		panic!(
 			"Attempt to subtract with overflow. Number of polygon points: {}",
 			polygon.points.len()
 		)
-	}) * 3;
+	}) * 3;*/
+	let mut number_of_triangle_corners = polygon.points.len();
+	// if number_of_triangle_corners % 3 != 0 {
+	// 	number_of_triangle_corners += 3 - number_of_triangle_corners % 3;
+	// }
 
-	let mut triangle_list = vec![0; num_of_triangle_corner];
+	let mut triangle_list = vec![0; number_of_triangle_corners];
 
-	let number_of_triangles = polygon.triangulate(&mut triangle_list);
+	// let number_of_triangles = polygon.triangulate(&mut triangle_list);
+	let tri = polygon.triangulate(&mut triangle_list);
 
-	for i in 0..number_of_triangles {
-		let a = &polygon.points[triangle_list[(i * 3) as usize] as usize];
-		let b = &polygon.points[triangle_list[(i * 3 + 1) as usize] as usize];
-		let c = &polygon.points[triangle_list[(i * 3 + 2) as usize] as usize];
+	for i in (0..number_of_triangle_corners).step_by(3) {
+		let a = &polygon.points[tri.triangles[(i) as usize] as usize];
+		let b = &polygon.points[tri.triangles[(i + 1) as usize] as usize];
+		let c = &polygon.points[tri.triangles[(i + 2) as usize] as usize];
 		if is_point_in_triangle(a.x, a.y, b.x, b.y, c.x, c.y, point.x, point.y) {
 			return true;
 		}
