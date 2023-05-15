@@ -4,7 +4,8 @@
         "../res/one_zone_one_exit.json",
         "../res/three_zone_three_transit.json",
         "../res/building_test.json",
-        "../res/udsu_b1_L4_v2_190701.json"
+        "../res/udsu_b1_L4_v2_190701.json",
+        "../res/test_school.json"
     ],
     "logger_configure": "../logger.conf",
     "distribution": {

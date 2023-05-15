@@ -76,6 +76,7 @@ pub struct BimJsonObject {
 }
 
 pub fn bim_json_object_new(path_to_file: &str) -> BimJsonObject {
+	// TODO: remove renga search in path
 	let building = match path_to_file.contains("renga") {
 		true => Box::new(BuildingStruct::from(
 			BuildingStructRenga::parse_building_from_json(path_to_file)
@@ -105,7 +106,7 @@ pub fn bim_json_object_new(path_to_file: &str) -> BimJsonObject {
 					.build_elements
 					.iter()
 					.map(|element| BimJsonElement {
-						uuid: element.id.clone(),
+						uuid: element.id,
 						name: element.name.clone(),
 						id: match element.sign.as_str() {
 							"Room" | "Staircase" => {

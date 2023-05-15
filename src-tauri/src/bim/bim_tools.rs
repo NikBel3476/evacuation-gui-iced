@@ -263,17 +263,19 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 		let mut stair_sign_counter = 0u8; // Если stair_sign_counter = 2, то проем межэтажный (между лестницами)
 		let mut related_zones = [BimZone::default(), BimZone::default()];
 
+		if transit.outputs.is_empty() || transit.outputs.len() > 2 {
+			panic!(
+				"Transition has {} outputs\n{:#?}",
+				transit.outputs.len(),
+				transit
+			);
+		}
+
 		for (i, output) in transit.outputs.iter().enumerate() {
 			let zone = zones
 				.iter()
 				.find(|zone| zone.uuid.eq(output))
 				.unwrap_or_else(|| {
-					// panic!(
-					// 	"Failed to find an element connected to transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
-					// 	transit.id,
-					// 	transit.uuid,
-					// 	transit.name
-					// );
 					panic!(
 						"Failed to find an element connected to transit.\n{:#?}",
 						transit
@@ -304,9 +306,14 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 		let mut edge2_number_of_points = 2usize;
 
 		for tpoint in &transit.polygon.points {
-			let point_in_polygon = is_point_in_polygon(tpoint, &related_zones[0].polygon);
+			let is_point_in_polygon = match related_zones[0].sign {
+				BimElementSign::Undefined => false,
+				_ => is_point_in_polygon(tpoint, &related_zones[0].polygon).unwrap_or_else(|msg| {
+					panic!("{msg}\n{:#?}\n{:#?}", transit, &related_zones);
+				}),
+			};
 
-			match point_in_polygon {
+			match is_point_in_polygon {
 				true => {
 					match edge1_number_of_points {
 						2 => edge1.p1 = *tpoint,
@@ -327,12 +334,14 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 		}
 
 		let mut width = -1f64;
-		if edge1_number_of_points > 0 {
+		if edge1_number_of_points > 0 || edge2_number_of_points > 0 {
 			panic!(
-				"Failed to calculate width of transit. Transit id: {}, Transit uuid: {}, Transit name: {}",
-				transit.id,
-				transit.uuid,
-				transit.name
+				"Failed to calculate width of transition.\n\
+				{:#?}\n\
+				{:#?}\n\
+				edge1: {edge1_number_of_points}\n\
+				edge2: {edge2_number_of_points}",
+				transit, &related_zones
 			);
 		}
 
@@ -394,7 +403,13 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 			let sign = build_element_json.sign;
 			let outputs = build_element_json.outputs.clone();
 			let polygon = build_element_json.polygon.clone();
-			// TODO: replace string on enum
+			let area = polygon.area().unwrap_or_else(|msg| {
+				panic!(
+					"\n{msg}\nFailed to calculate area\n {:#?}",
+					build_element_json
+				)
+			});
+
 			match build_element_json.sign {
 				BimElementSign::Room | BimElementSign::Staircase => {
 					let zone = BimZone {
@@ -407,12 +422,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 						// FIXME: unsafe cast u64 to f64
 						number_of_people: build_element_json.number_of_people as f64,
 						outputs,
-						area: polygon.area().unwrap_or_else(|msg| {
-							panic!(
-								"\n{msg}\nFailed to calculate area\n {:#?}",
-								build_element_json
-							)
-						}),
+						area,
 						polygon,
 						is_blocked: false,
 						is_visited: false,
@@ -457,7 +467,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 		match bim_level.zones.is_empty() || bim_level.transits.is_empty() {
 			true => {
 				eprintln!(
-					"[func: bim_tools_new] :: number of zones ({}) or number of transits ({}) is zero",
+					"[func: bim_tools_new] :: number of zones ({}) or number of transits ({}) equals zero",
 					bim_level.zones.len(),
 					bim_level.transits.len()
 				);

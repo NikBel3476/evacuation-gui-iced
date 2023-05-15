@@ -31,7 +31,8 @@ impl Polygon {
 		let mut triangle_list = vec![0; number_of_triangle_corners];
 
 		// let number_of_triangles = self.triangulate(&mut triangle_list);
-		let tri = self.triangulate(&mut triangle_list);
+		let tri = self.triangulate();
+		Ok(tri.area())
 
 		// FIXME: figure out how triangulate rooms of different shapes
 		// if number_of_triangles * 3 != number_of_triangle_corners as u64 {
@@ -46,62 +47,63 @@ impl Polygon {
 
 		// calculate the area by the formula S=(p(p-ab)(p-bc)(p-ca))^0.5;
 		// p=(ab+bc+ca)0.5
-		let mut area_element = 0.0;
-		for i in (0..number_of_triangle_corners).step_by(3) {
-			let a = &self.points[tri.triangles[(i) as usize] as usize];
-			let b = &self.points[tri.triangles[(i + 1) as usize] as usize];
-			let c = &self.points[tri.triangles[(i + 2) as usize] as usize];
-			let ab = a.distance_to(b);
-			let bc = b.distance_to(c);
-			let ca = c.distance_to(a);
-			let p = (ab + bc + ca) * 0.5;
-			area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
-		}
-
-		Ok(area_element)
+		// let mut area_element = 0.0;
+		// for i in (0..number_of_triangle_corners).step_by(3) {
+		// 	let a = &self.points[tri.triangles[(i) as usize] as usize];
+		// 	let b = &self.points[tri.triangles[(i + 1) as usize] as usize];
+		// 	let c = &self.points[tri.triangles[(i + 2) as usize] as usize];
+		// 	let ab = a.distance_to(b);
+		// 	let bc = b.distance_to(c);
+		// 	let ca = c.distance_to(a);
+		// 	let p = (ab + bc + ca) * 0.5;
+		// 	area_element += (p * (p - ab) * (p - bc) * (p - ca)).sqrt();
+		// }
+		//
+		// Ok(area_element)
 	}
 
 	/// #Returns
 	/// Массив номеров точек треугольников
 	///
 	/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
-	pub fn triangulate(&self, triangle_list: &mut [i32]) -> Box<Delaunay> {
-		let mut point_list = vec![0.0; 2 * self.points.len()];
+	pub fn triangulate(&self) -> Box<Delaunay> {
+		let point_list = self
+			.points
+			.iter()
+			.flat_map(|point| vec![point.x, point.y])
+			.collect::<Vec<f64>>();
 
-		for i in 0..self.points.len() {
-			point_list[i * 2] = self.points[i].x;
-			point_list[i * 2 + 1] = self.points[i].y;
-		}
+		let mut builder = triangle_rs::Builder::new()
+			// .set_switches("Q")
+			.add_nodes(&point_list);
+		let tri = builder.build();
+		Box::new(tri)
 
-		let mut builder = triangle_rs::Builder::new();
-		let tri = builder.add_nodes(&point_list).build();
-		return Box::new(tri);
-
-		let mut polygon_to_triangulate = triangulateio {
-			pointlist: point_list.as_mut_ptr(),
-			pointattributelist: std::ptr::null_mut(),
-			pointmarkerlist: std::ptr::null_mut(),
-			numberofpoints: self.points.len() as i32,
-			trianglelist: triangle_list.as_mut_ptr(), // Индексы точек треугольников против часовой стрелки
-			numberofpointattributes: 0,
-			triangleattributelist: std::ptr::null_mut(),
-			trianglearealist: std::ptr::null_mut(),
-			neighborlist: std::ptr::null_mut(),
-			numberoftriangles: 0,
-			numberofcorners: 0,
-			numberoftriangleattributes: 0,
-			segmentlist: std::ptr::null_mut(),
-			segmentmarkerlist: std::ptr::null_mut(),
-			numberofsegments: 0,
-			holelist: std::ptr::null_mut(),
-			numberofholes: 0,
-			regionlist: std::ptr::null_mut(),
-			numberofregions: 0,
-			edgelist: std::ptr::null_mut(),
-			edgemarkerlist: std::ptr::null_mut(),
-			normlist: std::ptr::null_mut(),
-			numberofedges: 0,
-		};
+		// let mut polygon_to_triangulate = triangulateio {
+		// 	pointlist: point_list.as_mut_ptr(),
+		// 	pointattributelist: std::ptr::null_mut(),
+		// 	pointmarkerlist: std::ptr::null_mut(),
+		// 	numberofpoints: self.points.len() as i32,
+		// 	trianglelist: triangle_list.as_mut_ptr(), // Индексы точек треугольников против часовой стрелки
+		// 	numberofpointattributes: 0,
+		// 	triangleattributelist: std::ptr::null_mut(),
+		// 	trianglearealist: std::ptr::null_mut(),
+		// 	neighborlist: std::ptr::null_mut(),
+		// 	numberoftriangles: 0,
+		// 	numberofcorners: 0,
+		// 	numberoftriangleattributes: 0,
+		// 	segmentlist: std::ptr::null_mut(),
+		// 	segmentmarkerlist: std::ptr::null_mut(),
+		// 	numberofsegments: 0,
+		// 	holelist: std::ptr::null_mut(),
+		// 	numberofholes: 0,
+		// 	regionlist: std::ptr::null_mut(),
+		// 	numberofregions: 0,
+		// 	edgelist: std::ptr::null_mut(),
+		// 	edgemarkerlist: std::ptr::null_mut(),
+		// 	normlist: std::ptr::null_mut(),
+		// 	numberofedges: 0,
+		// };
 
 		// let triswitches = CString::new("zQ").unwrap_or_else(|_| {
 		// 	panic!("Failed to create CString from \"zQ\" at triangle_polygon_rust fn in bim_polygon_tools crate")
@@ -147,34 +149,20 @@ fn is_point_in_triangle(
 	q1 >= 0 && q2 >= 0 && q3 >= 0
 }
 
-pub fn is_point_in_polygon(point: &Point, polygon: &Polygon) -> bool {
-	// FIXME: check old version realization
-	/*let num_of_triangle_corner = polygon.points.len().checked_sub(2).unwrap_or_else(|| {
-		panic!(
-			"Attempt to subtract with overflow. Number of polygon points: {}",
-			polygon.points.len()
-		)
-	}) * 3;*/
-	let mut number_of_triangle_corners = polygon.points.len();
-	// if number_of_triangle_corners % 3 != 0 {
-	// 	number_of_triangle_corners += 3 - number_of_triangle_corners % 3;
-	// }
-
-	let mut triangle_list = vec![0; number_of_triangle_corners];
+pub fn is_point_in_polygon(point: &Point, polygon: &Polygon) -> Result<bool, String> {
+	if polygon.points.len() < 3 {
+		return Err(String::from("Less than 3 vertices"));
+	}
 
 	// let number_of_triangles = polygon.triangulate(&mut triangle_list);
-	let tri = polygon.triangulate(&mut triangle_list);
-
-	for i in (0..number_of_triangle_corners).step_by(3) {
-		let a = &polygon.points[tri.triangles[(i) as usize] as usize];
-		let b = &polygon.points[tri.triangles[(i + 1) as usize] as usize];
-		let c = &polygon.points[tri.triangles[(i + 2) as usize] as usize];
-		if is_point_in_triangle(a.x, a.y, b.x, b.y, c.x, c.y, point.x, point.y) {
-			return true;
+	let tri = polygon.triangulate();
+	for i in 0..tri.n_triangles() {
+		if tri.is_point_inside(&[point.x, point.y], i) {
+			return Ok(true);
 		}
 	}
 
-	false
+	Ok(false)
 }
 
 /// signed area of a triangle
