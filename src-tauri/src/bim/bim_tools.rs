@@ -308,9 +308,12 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 		for tpoint in &transit.polygon.points {
 			let is_point_in_polygon = match related_zones[0].sign {
 				BimElementSign::Undefined => false,
-				_ => is_point_in_polygon(tpoint, &related_zones[0].polygon).unwrap_or_else(|msg| {
-					panic!("{msg}\n{:#?}\n{:#?}", transit, &related_zones);
-				}),
+				_ => related_zones[0]
+					.polygon
+					.is_point_inside(tpoint)
+					.unwrap_or_else(|msg| {
+						panic!("{msg}\n{:#?}\n{:#?}", transit, &related_zones);
+					}),
 			};
 
 			match is_point_in_polygon {
