@@ -14,27 +14,27 @@ pub struct Polygon {
 }
 
 impl Polygon {
-	pub fn area(&self) -> Result<f64, String> {
-		let tri = self.triangulate();
-		Ok(tri.area())
-	}
-
 	/// #Returns
 	/// Массив номеров точек треугольников
 	///
 	/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
 	pub fn triangulate(&self) -> Box<Delaunay> {
-		let point_list = self
+		let polygon = self
 			.points
 			.iter()
 			.flat_map(|point| vec![point.x, point.y])
 			.collect::<Vec<f64>>();
 
-		let mut builder = triangle_rs::Builder::new()
-			// .set_switches("Q")
-			.add_nodes(&point_list);
-		let tri = builder.build();
+		let tri = triangle_rs::Builder::new()
+			.set_switches("pDqQ")
+			.add_polygon(&polygon)
+			.build();
 		Box::new(tri)
+	}
+
+	pub fn area(&self) -> Result<f64, String> {
+		let tri = self.triangulate();
+		Ok(tri.area())
 	}
 
 	pub fn is_point_inside(&self, point: &Point) -> Result<bool, String> {

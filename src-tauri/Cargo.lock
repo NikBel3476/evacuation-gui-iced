@@ -3237,7 +3237,7 @@ dependencies = [
 [[package]]
 name = "triangle-rs"
 version = "0.1.0"
-source = "git+https://github.com/NikBel3476/triangle-rs.git?branch=main#0db9367ea3f7b86d612860aa95f24744226fa462"
+source = "git+https://github.com/NikBel3476/triangle-rs.git?branch=main#c76a5377af5e172692061dc55c8534d1528a1a4d"
 dependencies = [
  "cc",
  "rayon",
