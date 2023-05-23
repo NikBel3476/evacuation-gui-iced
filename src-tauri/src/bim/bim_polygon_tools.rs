@@ -1,7 +1,8 @@
 use super::json_object::Point;
+use spade::{ConstrainedDelaunayTriangulation, Point2, Triangulation};
 use std::cmp::Ordering;
 use std::ffi::CString;
-use triangle_rs::{triangulate, triangulateio, Delaunay};
+use triangle_rs::Delaunay;
 
 pub struct Line {
 	pub p1: Point,
@@ -11,6 +12,7 @@ pub struct Line {
 #[derive(Debug, Clone, Default)]
 pub struct Polygon {
 	pub points: Vec<Point>,
+	delaunay: Delaunay,
 }
 
 impl Polygon {
@@ -18,7 +20,7 @@ impl Polygon {
 	/// Массив номеров точек треугольников
 	///
 	/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
-	pub fn triangulate(&self) -> Box<Delaunay> {
+	pub fn triangulate(&self) -> Delaunay /*ConstrainedDelaunayTriangulation<Point2<f64>>*/ {
 		let polygon = self
 			.points
 			.iter()
@@ -26,15 +28,33 @@ impl Polygon {
 			.collect::<Vec<f64>>();
 
 		let tri = triangle_rs::Builder::new()
-			.set_switches("pDqQ")
+			.set_switches("pQ")
 			.add_polygon(&polygon)
 			.build();
-		Box::new(tri)
+
+		tri
+
+		// let mut cdt = ConstrainedDelaunayTriangulation::<Point2<f64>>::new();
+		// self.points.chunks(2).for_each(|points| {
+		// 	cdt.insert(Point2::new(points[0].x, points[0].y))
+		// 		.unwrap_or_else(|err| {
+		// 			panic!("{err}\n{:?}", points[0]);
+		// 		});
+		// 	cdt.insert(Point2::new(points[1].x, points[1].y))
+		// 		.unwrap_or_else(|err| {
+		// 			panic!("{err}\n{:?}", points[1]);
+		// 		});
+		// });
+		//
+		// cdt
 	}
 
-	pub fn area(&self) -> Result<f64, String> {
-		let tri = self.triangulate();
-		Ok(tri.area())
+	pub fn area(&self) -> Result<f64, String> /*f64*/ {
+		// let tri = self.triangulate();
+		Ok(self.delaunay.area())
+		// let cdt = self.triangulate();
+		// cdt.inner_faces()
+		// 	.fold(0.0, |(area, triangle)| area + triangle.face().area())
 	}
 
 	pub fn is_point_inside(&self, point: &Point) -> Result<bool, String> {
@@ -42,9 +62,32 @@ impl Polygon {
 			return Err(String::from("Less than 3 vertices"));
 		}
 
-		let tri = self.triangulate();
-		Ok(tri.is_point_inside(&[point.x, point.y]))
+		// let tri = self.triangulate();
+		Ok(self.delaunay.is_point_inside(&[point.x, point.y]))
 	}
+}
+
+impl From<&[Point]> for Polygon {
+	fn from(points: &[Point]) -> Self {
+		Self {
+			points: points.to_vec(),
+			delaunay: triangulate(points),
+		}
+	}
+}
+
+fn triangulate(points: &[Point]) -> Delaunay {
+	let polygon = points
+		.iter()
+		.flat_map(|point| vec![point.x, point.y])
+		.collect::<Vec<f64>>();
+
+	let tri = triangle_rs::Builder::new()
+		.set_switches("pQ")
+		.add_polygon(&polygon)
+		.build();
+
+	tri
 }
 
 fn where_point_rust(a_ax: f64, a_ay: f64, a_bx: f64, a_by: f64, a_px: f64, a_py: f64) -> i32 {

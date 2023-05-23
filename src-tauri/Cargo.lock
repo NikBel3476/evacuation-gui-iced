@@ -694,6 +694,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "spade",
  "tauri",
  "tauri-build",
  "triangle-rs",
@@ -1822,6 +1823,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "optional"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "978aa494585d3ca4ad74929863093e87cac9790d81fe7aba2b3dc2890643a0fc"
+
+[[package]]
 name = "os_info"
 version = "3.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2342,6 +2349,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "robust"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5864e7ef1a6b7bcf1d6ca3f655e65e724ed3b52546a0d0a663c991522f552ea"
+
+[[package]]
 name = "rustc_version"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2682,6 +2695,18 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps 5.0.0",
+]
+
+[[package]]
+name = "spade"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88e65803986868d2372c582007c39ba89936a36ea5f236bf7a7728dc258f04f9"
+dependencies = [
+ "num-traits",
+ "optional",
+ "robust",
+ "smallvec",
 ]
 
 [[package]]
@@ -3237,7 +3262,7 @@ dependencies = [
 [[package]]
 name = "triangle-rs"
 version = "0.1.0"
-source = "git+https://github.com/NikBel3476/triangle-rs.git?branch=main#c76a5377af5e172692061dc55c8534d1528a1a4d"
+source = "git+https://github.com/NikBel3476/triangle-rs.git?branch=main#0b6437ea797f1ba2e02d29378bc80878ecad34ff"
 dependencies = [
  "cc",
  "rayon",

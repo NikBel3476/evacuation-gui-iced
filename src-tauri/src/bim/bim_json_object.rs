@@ -135,12 +135,10 @@ pub fn bim_json_object_new(path_to_file: &str) -> BimJsonObject {
 							_ => BimElementSign::Undefined,
 						},
 						outputs: element.outputs.clone(),
-						polygon: bim_polygon_tools::Polygon {
-							points: match element.xy.is_empty() {
-								true => vec![],
-								false => element.xy[0].points.clone(),
-							},
-						},
+						polygon: bim_polygon_tools::Polygon::from(match element.xy.is_empty() {
+							true => &[],
+							false => element.xy[0].points.as_slice(),
+						}),
 					})
 					.collect::<Vec<BimJsonElement>>(),
 			})

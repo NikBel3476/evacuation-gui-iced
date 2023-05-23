@@ -26,6 +26,7 @@ petgraph = "0.6"
 rand = "0.8.5"
 uuid = { version = "1.3", features = ["v4", "fast-rng", "macro-diagnostics", "serde"] }
 triangle-rs = { git = "https://github.com/NikBel3476/triangle-rs.git", branch = "main" }
+spade = "2.2.0"
 
 [features]
 # by default Tauri runs in production mode

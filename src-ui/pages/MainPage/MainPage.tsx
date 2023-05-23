@@ -23,7 +23,9 @@ const MainPage: FC = () => {
 	};
 
 	const handleBimStartButtonClick = () => {
-		void invoke('bim_start');
+		void invoke('bim_start').then(() => {
+			console.log('completed');
+		});
 	};
 
 	return (

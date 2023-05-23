@@ -29,7 +29,7 @@ fn read_config() -> Result<configuration::ScenarioCfg, String> {
 }
 
 #[tauri::command]
-async fn open_configuration_window(handle: AppHandle) {
+fn open_configuration_window(handle: AppHandle) {
 	let _configuration_window = WindowBuilder::new(
 		&handle,
 		"configuration",
@@ -41,7 +41,7 @@ async fn open_configuration_window(handle: AppHandle) {
 }
 
 #[tauri::command]
-async fn open_configuration_rescript_window(handle: AppHandle) {
+fn open_configuration_rescript_window(handle: AppHandle) {
 	let _configuration_window = WindowBuilder::new(
 		&handle,
 		"configurationRescript",
@@ -53,7 +53,7 @@ async fn open_configuration_rescript_window(handle: AppHandle) {
 }
 
 #[tauri::command]
-async fn open_people_traffic_window(handle: AppHandle) {
+fn open_people_traffic_window(handle: AppHandle) {
 	let _people_traffic_window = WindowBuilder::new(
 		&handle,
 		"people_traffic",
@@ -66,7 +66,7 @@ async fn open_people_traffic_window(handle: AppHandle) {
 }
 
 #[tauri::command]
-async fn open_building_view_window(handle: AppHandle) {
+fn open_building_view_window(handle: AppHandle) {
 	let _building_view_window = WindowBuilder::new(
 		&handle,
 		"building_view",
@@ -79,6 +79,6 @@ async fn open_building_view_window(handle: AppHandle) {
 }
 
 #[tauri::command]
-async fn bim_start() {
+fn bim_start() {
 	run_rust();
 }
