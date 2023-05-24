@@ -5,9 +5,11 @@
 
 use bim::configuration;
 use bim::run_rust;
+use python::call_python::run_python;
 use tauri::{AppHandle, WindowBuilder};
 
 mod bim;
+mod python;
 
 fn main() {
 	tauri::Builder::default()
@@ -17,7 +19,8 @@ fn main() {
 			open_configuration_rescript_window,
 			open_people_traffic_window,
 			open_building_view_window,
-			bim_start
+			bim_start,
+			python_start
 		])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
@@ -81,4 +84,9 @@ fn open_building_view_window(handle: AppHandle) {
 #[tauri::command]
 fn bim_start() {
 	run_rust();
+}
+
+#[tauri::command]
+fn python_start() {
+	run_python().expect("Failed to run python");
 }

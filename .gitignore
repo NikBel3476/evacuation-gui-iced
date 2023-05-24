@@ -5,3 +5,4 @@ src/build/
 coverage/
 
 .idea/
+*.rnp

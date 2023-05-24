@@ -28,6 +28,12 @@ const MainPage: FC = () => {
 		});
 	};
 
+	const handleRunPythonButtonClick = () => {
+		void invoke('python_start').then(() => {
+			console.log('python started');
+		});
+	};
+
 	return (
 		<main>
 			<header>
@@ -71,6 +77,9 @@ const MainPage: FC = () => {
 							<RouterLink to="modelingView">
 								Страница визуализации моделирования(Pixi.js)
 							</RouterLink>
+						</li>
+						<li>
+							<Button onClick={handleRunPythonButtonClick}>Запустить python</Button>
 						</li>
 					</ul>
 				</nav>
