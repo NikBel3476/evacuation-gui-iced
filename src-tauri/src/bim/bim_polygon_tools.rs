@@ -1,7 +1,6 @@
 use super::json_object::Point;
 use spade::{ConstrainedDelaunayTriangulation, Point2, Triangulation};
 use std::cmp::Ordering;
-use std::ffi::CString;
 use triangle_rs::Delaunay;
 
 pub struct Line {
@@ -12,7 +11,7 @@ pub struct Line {
 #[derive(Debug, Clone, Default)]
 pub struct Polygon {
 	pub points: Vec<Point>,
-	delaunay: Delaunay,
+	// delaunay: Delaunay,
 }
 
 impl Polygon {
@@ -20,41 +19,61 @@ impl Polygon {
 	/// Массив номеров точек треугольников
 	///
 	/// https://userpages.umbc.edu/~rostamia/cbook/triangle.html
-	pub fn triangulate(&self) -> Delaunay /*ConstrainedDelaunayTriangulation<Point2<f64>>*/ {
-		let polygon = self
-			.points
-			.iter()
-			.flat_map(|point| vec![point.x, point.y])
-			.collect::<Vec<f64>>();
-
-		let tri = triangle_rs::Builder::new()
-			.set_switches("pQ")
-			.add_polygon(&polygon)
-			.build();
-
-		tri
-
-		// let mut cdt = ConstrainedDelaunayTriangulation::<Point2<f64>>::new();
-		// self.points.chunks(2).for_each(|points| {
-		// 	cdt.insert(Point2::new(points[0].x, points[0].y))
-		// 		.unwrap_or_else(|err| {
-		// 			panic!("{err}\n{:?}", points[0]);
-		// 		});
-		// 	cdt.insert(Point2::new(points[1].x, points[1].y))
-		// 		.unwrap_or_else(|err| {
-		// 			panic!("{err}\n{:?}", points[1]);
-		// 		});
-		// });
+	pub fn triangulate(&self) -> ConstrainedDelaunayTriangulation<Point2<f64>> {
+		// let polygon = self
+		// 	.points
+		// 	.iter()
+		// 	.flat_map(|point| vec![point.x, point.y])
+		// 	.collect::<Vec<f64>>();
 		//
-		// cdt
+		// let tri = triangle_rs::Builder::new()
+		// 	.set_switches("pQ")
+		// 	.add_polygon(&polygon)
+		// 	.build();
+		//
+		// tri
+
+		let mut cdt = ConstrainedDelaunayTriangulation::<Point2<f64>>::new();
+		self.points.chunks(2).for_each(|points| match points.len() {
+			2 => {
+				let vertex0 = Point2::new(points[0].x, points[0].y);
+				let vertex1 = Point2::new(points[1].x, points[1].y);
+				cdt.insert(vertex0).unwrap_or_else(|err| {
+					panic!("{err}\n{:?}", points[0]);
+				});
+				cdt.insert(vertex1).unwrap_or_else(|err| {
+					panic!("{err}\n{:?}", points[1]);
+				});
+
+				cdt.add_constraint_edge(vertex0, vertex1)
+					.unwrap_or_else(|err| {
+						panic!("{err}\n{:?}\n{:?}", vertex0, vertex1);
+					});
+			}
+			1 => {
+				let vertex0 = Point2::new(points[0].x, points[0].y);
+				let vertex1 = Point2::new(self.points[0].x, self.points[0].y);
+				cdt.insert(vertex0).unwrap_or_else(|err| {
+					panic!("{err}\n{:?}", points[0]);
+				});
+
+				cdt.add_constraint_edge(vertex0, vertex1)
+					.unwrap_or_else(|err| {
+						panic!("{err}\n{:?}\n{:?}", vertex0, vertex1);
+					});
+			}
+			_ => {}
+		});
+
+		cdt
 	}
 
-	pub fn area(&self) -> Result<f64, String> /*f64*/ {
+	pub fn area(&self) -> f64 {
 		// let tri = self.triangulate();
-		Ok(self.delaunay.area())
-		// let cdt = self.triangulate();
-		// cdt.inner_faces()
-		// 	.fold(0.0, |(area, triangle)| area + triangle.face().area())
+		// Ok(self.delaunay.area())
+		let cdt = self.triangulate();
+		cdt.inner_faces()
+			.fold(0.0, |area, triangle| area + triangle.area())
 	}
 
 	pub fn is_point_inside(&self, point: &Point) -> Result<bool, String> {
@@ -63,7 +82,22 @@ impl Polygon {
 		}
 
 		// let tri = self.triangulate();
-		Ok(self.delaunay.is_point_inside(&[point.x, point.y]))
+		// Ok(self.delaunay.is_point_inside(&[point.x, point.y]))
+		let cdt = self.triangulate();
+		Ok(cdt.inner_faces().any(|face| {
+			let [a, b, c] = face.vertices();
+			let d1 = self.sign(point, &a.position(), &b.position());
+			let d2 = self.sign(point, &b.position(), &c.position());
+			let d3 = self.sign(point, &c.position(), &a.position());
+			let has_neg = (d1 < 0.0) || (d2 < 0.0) || (d3 < 0.0);
+			let has_pos = (d1 > 0.0) || (d2 > 0.0) || (d3 > 0.0);
+
+			!(has_neg && has_pos)
+		}))
+	}
+
+	fn sign(&self, p1: &Point, p2: &Point2<f64>, p3: &Point2<f64>) -> f64 {
+		(p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
 	}
 }
 
@@ -71,7 +105,7 @@ impl From<&[Point]> for Polygon {
 	fn from(points: &[Point]) -> Self {
 		Self {
 			points: points.to_vec(),
-			delaunay: triangulate(points),
+			// delaunay: triangulate(points),
 		}
 	}
 }
@@ -116,14 +150,14 @@ fn is_point_in_triangle(
 	q1 >= 0 && q2 >= 0 && q3 >= 0
 }
 
-pub fn is_point_in_polygon(point: &Point, polygon: &Polygon) -> Result<bool, String> {
-	if polygon.points.len() < 3 {
-		return Err(String::from("Less than 3 vertices"));
-	}
-
-	let tri = polygon.triangulate();
-	Ok(tri.is_point_inside(&[point.x, point.y]))
-}
+// pub fn is_point_in_polygon(point: &Point, polygon: &Polygon) -> Result<bool, String> {
+// 	if polygon.points.len() < 3 {
+// 		return Err(String::from("Less than 3 vertices"));
+// 	}
+//
+// 	let tri = polygon.triangulate();
+// 	Ok(tri.is_point_inside(&[point.x, point.y]))
+// }
 
 /// signed area of a triangle
 pub fn area(p1: &Point, p2: &Point, p3: &Point) -> f64 {

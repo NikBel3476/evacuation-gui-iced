@@ -245,3 +245,13 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 	set_density_max(scenario_configuration.modeling.max_density);
 	set_density_min(scenario_configuration.modeling.min_density);
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn run_modeling() {
+		run_rust();
+	}
+}

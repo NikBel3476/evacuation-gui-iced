@@ -1,5 +1,5 @@
 use super::bim_json_object::{BimElementSign, BimJsonObject};
-use super::bim_polygon_tools::{is_intersect_line, is_point_in_polygon, Line, Polygon};
+use super::bim_polygon_tools::{is_intersect_line, Line, Polygon};
 use super::json_object::Point;
 use std::cmp::Ordering;
 use uuid::{uuid, Uuid};
@@ -406,12 +406,7 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 			let sign = build_element_json.sign;
 			let outputs = build_element_json.outputs.clone();
 			let polygon = build_element_json.polygon.clone();
-			let area = polygon.area().unwrap_or_else(|msg| {
-				panic!(
-					"\n{msg}\nFailed to calculate area\n {:#?}",
-					build_element_json
-				)
-			});
+			let area = polygon.area();
 
 			match build_element_json.sign {
 				BimElementSign::Room | BimElementSign::Staircase => {
