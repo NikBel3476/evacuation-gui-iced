@@ -111,7 +111,7 @@ impl Bim {
 	}
 }
 
-pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
+pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Result<Line, String> {
 	let mut line_intersected = Line {
 		p1: Point { x: 0.0, y: 0.0 },
 		p2: Point { x: 0.0, y: 0.0 },
@@ -121,12 +121,12 @@ pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 	for i in 1..polygon_element.points.len() {
 		// FIXME: bypass to get double mut ref
 		let (left, right) = polygon_element.points.split_at(i);
-		let point_element_a = left.last().unwrap_or_else(|| {
-			panic!("Failed to get last element of left part at intersected_edge_rust fn in bim_tools crate");
-		});
-		let point_element_b = right.first().unwrap_or_else(|| {
-			panic!("Failed to get first element of right part at intersected_edge_rust fn in bim_tools crate");
-		});
+		let point_element_a = left.last().expect(
+			"Failed to get last element of left part at intersected_edge_rust fn in bim_tools crate"
+		);
+		let point_element_b = right.first().expect(
+			"Failed to get first element of right part at intersected_edge_rust fn in bim_tools crate"
+		);
 		let line_tmp = Line {
 			p1: *point_element_a,
 			p2: *point_element_b,
@@ -140,10 +140,10 @@ pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 	}
 
 	if num_of_intersections != 1 {
-		panic!("[func: intersected_edge] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов.");
+		return Err(format!("[func: intersected_edge] :: Ошибка геометрии. Проверьте правильность ввода дверей и виртуальных проемов. num_of_intersections: {num_of_intersections}"));
 	}
 
-	line_intersected
+	Ok(line_intersected)
 }
 
 /// Возможные варианты стыковки помещений, которые соединены проемом
@@ -167,7 +167,12 @@ pub fn intersected_edge(polygon_element: &Polygon, line: &Line) -> Line {
 /// *************************************************************************
 /// 1. Определить грани помещения, которые пересекает короткая сторона проема
 /// 2. Вычислить среднее проекций граней друг на друга
-pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Line) -> f64 {
+pub fn door_way_width(
+	zone1: &Polygon,
+	zone2: &Polygon,
+	edge1: &Line,
+	edge2: &Line,
+) -> Result<f64, String> {
 	// TODO: l1p1 == l2p1 and l1p2 == l2p2 ??? figure out why this is so
 	/* old c code
 	point_t *l1p1 = edge1->p1;
@@ -179,7 +184,7 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 	double length2 = geom_tools_length_side_rust(l2p1, l2p2);
 	 */
 	let l1p1 = edge1.p1;
-	let l1p2 = edge2.p2;
+	let l1p2 = edge2.p1;
 	let length1 = l1p1.distance_to(&l1p2);
 
 	let l2p1 = edge1.p1;
@@ -193,8 +198,8 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 	};
 
 	// Линии, которые находятся друг напротив друга и связаны проемом
-	let edge_element_a = intersected_edge(zone1, &d_line);
-	let edge_element_b = intersected_edge(zone2, &d_line);
+	let edge_element_a = intersected_edge(zone1, &d_line)?;
+	let edge_element_b = intersected_edge(zone2, &d_line)?;
 
 	// Поиск точек, которые являются ближайшими к отрезку edgeElement
 	// Расстояние между этими точками и является шириной проема
@@ -206,7 +211,7 @@ pub fn door_way_width(zone1: &Polygon, zone2: &Polygon, edge1: &Line, edge2: &Li
 	let point4 = edge_element_b.p2.nearest_point_on_line(&edge_element_a);
 	let distance34 = point3.distance_to(&point4);
 
-	(distance12 + distance34) * 0.5
+	Ok((distance12 + distance34) * 0.5)
 }
 
 pub fn outside_init_rust(bim_json: &BimJsonObject) -> BimZone {
@@ -361,7 +366,8 @@ pub fn calculate_transits_width(zones: &[BimZone], transits: &mut [BimTransit]) 
 					&related_zones[1].polygon,
 					&edge1,
 					&edge2,
-				);
+				)
+				.unwrap_or_else(|err_msg| panic!("{err_msg}\n{:#?}", transit));
 			}
 			_ => {}
 		}

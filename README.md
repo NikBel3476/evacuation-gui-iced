@@ -79,3 +79,6 @@ from_bim  -- распеделение, которое задано в прост
 
 ### modeling
 
+
+### some useful links
+http://www.fireevacuation.ru/files/files-5-1/evac2015.pdf?ysclid=liyie02rcj367967370

@@ -4,7 +4,13 @@
         "../res/one_zone_one_exit.json",
         "../res/three_zone_three_transit.json",
         "../res/building_test.json",
-        "../res/udsu_b1_L4_v2_190701.json"
+        "../res/udsu_b1_L4_v2_190701.json",
+        "../res/udsu_b1_L4_v1_190701.json",
+        "../res/udsu_b2_L4_v1_190701.json",
+        "../res/udsu_b3_L3_v1_190701.json",
+        "../res/udsu_b4_L5_v1_190701.json",
+        "../res/udsu_b5_L4_v1_200102.json",
+        "../res/udsu_b7_L8_v1_190701.json"
     ],
     "logger_configure": "../logger.conf",
     "distribution": {
