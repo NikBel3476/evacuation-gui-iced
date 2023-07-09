@@ -1,0 +1,8 @@
+---
+source: src/bim.rs
+expression: modeling_result
+---
+number_of_people_in_building: 0
+evacuation_time_in_seconds: 107.40000000000008
+number_of_evacuated_people: 167.94662345452588
+
