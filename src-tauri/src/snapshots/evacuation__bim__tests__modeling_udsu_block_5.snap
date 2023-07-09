@@ -3,6 +3,6 @@ source: src/bim.rs
 expression: modeling_result
 ---
 number_of_people_in_building: 0
-evacuation_time_in_seconds: 505.1999999999919
-number_of_evacuated_people: 5230.643383491081
+evacuation_time_in_seconds: 90.60000000000007
+number_of_evacuated_people: 523.0643383491171
 
