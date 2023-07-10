@@ -40,7 +40,6 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './target'
           key: ${{ matrix.platform }}
 
       - name: Sync node version and setup cache
