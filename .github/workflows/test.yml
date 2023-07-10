@@ -65,8 +65,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Rust tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml -- --test-threads=1
+      - name: Run xtask coverage
+        uses: actions-rs/cargo@v1
+        with:
+          command: xtask
+          args: coverage
 
       - name: Run cypress tests (ubuntu)
         uses: cypress-io/github-action@v5
@@ -83,12 +86,6 @@ jobs:
             start: npm run start-server
             browser: edge
             cache-key: ${{ matrix.platform }}-${{ runner.os }}-hash-${{ hashFiles('package-lock.json') }}
-
-      - name: Run xtask coverage
-        uses: actions-rs/cargo@v1
-        with:
-          command: xtask
-          args: coverage
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
