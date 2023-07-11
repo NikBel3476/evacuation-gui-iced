@@ -23,7 +23,7 @@
         "lint:all": "npm run lint:js && npm run lint:rust && npm run lint:css",
         "lint:js": "npx eslint .",
         "lint:css": "npx stylelint \"**/*.css\"",
-        "lint:rust": "cargo clippy",
+        "lint:rust": "cargo clippy -- -D warnings",
         "prepare": "husky install",
         "start-server": "http-server ./dist -p 8080",
         "cypress:test:ci": "start-server-and-test start-server http://localhost:8080 cypress:run"
