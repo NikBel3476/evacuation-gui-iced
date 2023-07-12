@@ -430,14 +430,12 @@ pub fn time_reset() {
 mod tests {
 	use super::super::bim_polygon_tools::Polygon;
 	use super::*;
+	use rstest::*;
 	use uuid::uuid;
 
-	#[test]
-	fn speed_in_element_eq() {
-		unsafe {
-			EVAC_SPEED_MAX_RUST = 100.0;
-		}
-		let receiving_zone = BimZone {
+	#[fixture]
+	fn receiving_zone() -> BimZone {
+		BimZone {
 			id: 1,
 			name: "Receiving zone".to_string(),
 			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
@@ -453,8 +451,12 @@ mod tests {
 			size_z: 2.0,
 			polygon: Polygon::default(),
 			potential: 1.0,
-		};
-		let transmitting_zone = BimZone {
+		}
+	}
+
+	#[fixture]
+	fn transmitting_zone() -> BimZone {
+		BimZone {
 			id: 2,
 			name: "Transmitting zone".to_string(),
 			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
@@ -470,7 +472,32 @@ mod tests {
 			size_z: 2.0,
 			polygon: Polygon::default(),
 			potential: 1.0,
-		};
+		}
+	}
+
+	#[fixture]
+	fn transit() -> BimTransit {
+		BimTransit {
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			id: 1,
+			name: "Transit".to_string(),
+			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
+			polygon: Polygon::default(),
+			size_z: 2.0,
+			z_level: 1.0,
+			width: 1.0,
+			no_proceeding: 0.0,
+			sign: BimElementSign::DoorWay,
+			is_visited: false,
+			is_blocked: false,
+		}
+	}
+
+	#[rstest]
+	fn speed_in_element_eq(transmitting_zone: BimZone, receiving_zone: BimZone) {
+		unsafe {
+			EVAC_SPEED_MAX_RUST = 100.0;
+		}
 
 		assert_eq!(
 			speed_in_element(&receiving_zone, &transmitting_zone),
@@ -478,45 +505,11 @@ mod tests {
 		);
 	}
 
-	#[test]
-	fn speed_at_exit_eq() {
+	#[rstest]
+	fn speed_at_exit_eq(receiving_zone: BimZone, transmitting_zone: BimZone) {
 		unsafe {
 			EVAC_SPEED_MAX_RUST = 100.0;
 		}
-		let receiving_zone = BimZone {
-			id: 1,
-			name: "Receiving zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
-		let transmitting_zone = BimZone {
-			id: 2,
-			name: "Transmitting zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
 		let transit_width = 1.0;
 
 		assert_eq!(
@@ -525,28 +518,11 @@ mod tests {
 		);
 	}
 
-	#[test]
-	fn change_num_of_people_eq() {
+	#[rstest]
+	fn change_num_of_people_eq(transmitting_zone: BimZone) {
 		unsafe {
 			EVAC_MODELING_STEP_RUST = 0.01;
 		}
-		let transmitting_zone = BimZone {
-			id: 2,
-			name: "Transmitting zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
 		let transit_width = 1.0;
 		let speed_at_exit = 50.0;
 
@@ -556,117 +532,28 @@ mod tests {
 		);
 	}
 
-	#[test]
-	fn potential_element_eq() {
-		let receiving_zone = BimZone {
-			id: 1,
-			name: "Receiving zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
-		let transmitting_zone = BimZone {
-			id: 2,
-			name: "Transmitting zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
-		let transit = BimTransit {
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			id: 1,
-			name: "Transit".to_string(),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			polygon: Polygon::default(),
-			size_z: 2.0,
-			z_level: 1.0,
-			width: 1.0,
-			no_proceeding: 0.0,
-			sign: BimElementSign::DoorWay,
-			is_visited: false,
-			is_blocked: false,
-		};
-
+	#[rstest]
+	fn potential_element_eq(
+		receiving_zone: BimZone,
+		transmitting_zone: BimZone,
+		transit: BimTransit,
+	) {
 		assert_eq!(
 			potential_element(&receiving_zone, &transmitting_zone, &transit),
 			1.039461221097587
 		);
 	}
 
-	#[test]
-	fn part_people_flow_eq() {
+	#[rstest]
+	fn part_people_flow_eq(
+		receiving_zone: BimZone,
+		transmitting_zone: BimZone,
+		transit: BimTransit,
+	) {
 		unsafe {
 			EVAC_DENSITY_MIN_RUST = 0.1;
 			EVAC_DENSITY_MAX_RUST = 5.0;
 		}
-		let receiving_zone = BimZone {
-			id: 1,
-			name: "Receiving zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
-		let transmitting_zone = BimZone {
-			id: 2,
-			name: "Transmitting zone".to_string(),
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			area: 10.0,
-			z_level: 1.0,
-			number_of_people: 10.0,
-			hazard_level: 0,
-			is_blocked: false,
-			is_visited: false,
-			is_safe: true,
-			sign: BimElementSign::Room,
-			size_z: 2.0,
-			polygon: Polygon::default(),
-			potential: 1.0,
-		};
-		let transit = BimTransit {
-			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
-			id: 1,
-			name: "Transit".to_string(),
-			outputs: vec![uuid!("00000000-0000-0000-0000-000000000000")],
-			polygon: Polygon::default(),
-			size_z: 2.0,
-			z_level: 1.0,
-			width: 1.0,
-			no_proceeding: 0.0,
-			sign: BimElementSign::DoorWay,
-			is_visited: false,
-			is_blocked: false,
-		};
 
 		assert_eq!(
 			part_people_flow(&receiving_zone, &transmitting_zone, &transit),

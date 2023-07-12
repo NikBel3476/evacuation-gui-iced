@@ -297,194 +297,140 @@ pub fn is_intersect_line(l1: &Line, l2: &Line) -> bool {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use rstest::*;
 
-	#[test]
-	fn area_triangle() {
-		let polygon_points = vec![
-			Point { x: 0.0, y: -1.0 },
-			Point { x: 1.0, y: 0.0 },
-			Point { x: 0.0, y: 1.0 },
-			Point { x: 0.0, y: -1.0 },
-		];
-		let polygon = Polygon {
-			points: polygon_points,
-		};
-		assert_eq!(polygon.area(), 1.0);
+	#[fixture]
+	fn triangle_polygon_with_area_1() -> Polygon {
+		Polygon {
+			points: vec![
+				Point { x: 0.0, y: -1.0 },
+				Point { x: 1.0, y: 0.0 },
+				Point { x: 0.0, y: 1.0 },
+				Point { x: 0.0, y: -1.0 },
+			],
+		}
 	}
 
-	#[test]
-	fn area_parallelogram() {
-		let polygon_points = vec![
-			Point { x: -2.0, y: -1.0 },
-			Point { x: 2.0, y: -1.0 },
-			Point { x: 3.0, y: 1.0 },
-			Point { x: -1.0, y: 1.0 },
-			Point { x: -2.0, y: -1.0 },
-		];
-		let polygon = Polygon {
-			points: polygon_points,
-		};
-		assert_eq!(polygon.area(), 8.0);
-	}
-
-	#[test]
-	fn area_complex_figure_with_right_angles() {
-		let polygon_points: Vec<Point> = vec![
-			Point {
-				x: 35.97872543334961,
-				y: -34.659114837646484,
-			},
-			Point {
-				x: 35.97872543334961,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 33.9708251953125,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 33.9708251953125,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 34.07872772216797,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 34.0787277221679,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 33.15372467041016,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 33.153724670410156,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.25210189819336,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.25210189819336,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 32.90689468383789,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 32.90689468383789,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.003726959228516,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.00372695922856,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 32.0787277221679,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 32.07872772216797,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 32.193763732910156,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 32.19376373291015,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 30.50872802734375,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 30.50872802734375,
-				y: -34.659114837646484,
-			},
-			Point {
-				x: 35.97872543334961,
-				y: -34.659114837646484,
-			},
-		];
-
-		let polygon = Polygon {
-			points: polygon_points,
-		};
-
-		assert_eq!(polygon.area(), 15.44548203003071);
-	}
-
-	#[test]
-	fn point_inside_triangle() {
-		let polygon = Polygon {
+	#[fixture]
+	fn triangle_polygon_with_area_0_5() -> Polygon {
+		Polygon {
 			points: vec![
 				Point { x: 0.0, y: 0.0 },
 				Point { x: 1.0, y: 0.0 },
 				Point { x: 0.0, y: 1.0 },
 				Point { x: 0.0, y: 0.0 },
 			],
-		};
-
-		let points = vec![
-			Point { x: 0.0, y: 0.0 },
-			Point { x: 0.5, y: 0.0 },
-			Point { x: 1.0, y: 0.0 },
-			Point { x: 0.5, y: 0.5 },
-			Point { x: 0.0, y: 1.0 },
-			Point { x: 0.0, y: 0.5 },
-			Point { x: 0.0, y: 0.0 },
-		];
-
-		for point in &points {
-			assert!(
-				polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be inside triangle\n",
-				point
-			)
 		}
 	}
 
-	#[test]
-	fn point_outside_triangle() {
-		let polygon = Polygon {
+	#[fixture]
+	fn parallelogram_polygon() -> Polygon {
+		Polygon {
 			points: vec![
-				Point { x: 0.0, y: 0.0 },
-				Point { x: 1.0, y: 0.0 },
-				Point { x: 0.0, y: 1.0 },
-				Point { x: 0.0, y: 0.0 },
+				Point { x: -2.0, y: -1.0 },
+				Point { x: 2.0, y: -1.0 },
+				Point { x: 3.0, y: 1.0 },
+				Point { x: -1.0, y: 1.0 },
+				Point { x: -2.0, y: -1.0 },
 			],
-		};
-
-		let points = vec![
-			Point { x: -1.0, y: -1.0 },
-			Point { x: 0.5, y: -1.0 },
-			Point { x: 1.5, y: -0.5 },
-			Point { x: 1.0, y: 1.0 },
-			Point { x: -0.5, y: 1.5 },
-			Point { x: -0.5, y: 0.5 },
-		];
-
-		for point in &points {
-			assert!(
-				!polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be outside triangle\n",
-				point
-			)
 		}
 	}
 
-	#[test]
-	fn point_inside_square() {
-		let polygon = Polygon {
+	#[fixture]
+	fn complex_figure_with_right_angles_polygon() -> Polygon {
+		Polygon {
+			points: vec![
+				Point {
+					x: 35.97872543334961,
+					y: -34.659114837646484,
+				},
+				Point {
+					x: 35.97872543334961,
+					y: -37.01911163330078,
+				},
+				Point {
+					x: 33.9708251953125,
+					y: -37.01911163330078,
+				},
+				Point {
+					x: 33.9708251953125,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 34.07872772216797,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 34.0787277221679,
+					y: -38.4352912902832,
+				},
+				Point {
+					x: 33.15372467041016,
+					y: -38.4352912902832,
+				},
+				Point {
+					x: 33.153724670410156,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 33.25210189819336,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 33.25210189819336,
+					y: -37.01911163330078,
+				},
+				Point {
+					x: 32.90689468383789,
+					y: -37.01911163330078,
+				},
+				Point {
+					x: 32.90689468383789,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 33.003726959228516,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 33.00372695922856,
+					y: -38.4352912902832,
+				},
+				Point {
+					x: 32.0787277221679,
+					y: -38.4352912902832,
+				},
+				Point {
+					x: 32.07872772216797,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 32.193763732910156,
+					y: -37.219112396240234,
+				},
+				Point {
+					x: 32.19376373291015,
+					y: -37.01911163330078,
+				},
+				Point {
+					x: 30.50872802734375,
+					y: -37.01911163330078,
+				},
+				Point {
+					x: 30.50872802734375,
+					y: -34.659114837646484,
+				},
+				Point {
+					x: 35.97872543334961,
+					y: -34.659114837646484,
+				},
+			],
+		}
+	}
+
+	#[fixture]
+	fn square_polygon() -> Polygon {
+		Polygon {
 			points: vec![
 				Point { x: 0.0, y: 0.0 },
 				Point { x: 1.0, y: 0.0 },
@@ -492,62 +438,12 @@ mod tests {
 				Point { x: 0.0, y: 1.0 },
 				Point { x: 0.0, y: 0.0 },
 			],
-		};
-
-		let points = vec![
-			Point { x: 0.0, y: 0.0 },
-			Point { x: 0.5, y: 0.0 },
-			Point { x: 1.0, y: 0.0 },
-			Point { x: 1.0, y: 0.5 },
-			Point { x: 1.0, y: 1.0 },
-			Point { x: 0.5, y: 1.0 },
-			Point { x: 0.0, y: 1.0 },
-			Point { x: 0.0, y: 0.5 },
-			Point { x: 0.5, y: 0.5 },
-		];
-
-		for point in &points {
-			assert!(
-				polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be inside square\n",
-				point
-			)
 		}
 	}
 
-	#[test]
-	fn point_outside_square() {
-		let polygon = Polygon {
-			points: vec![
-				Point { x: 0.0, y: 0.0 },
-				Point { x: 1.0, y: 0.0 },
-				Point { x: 1.0, y: 1.0 },
-				Point { x: 0.0, y: 1.0 },
-				Point { x: 0.0, y: 0.0 },
-			],
-		};
-		let points = vec![
-			Point { x: -0.5, y: -0.5 },
-			Point { x: 0.5, y: -0.5 },
-			Point { x: 1.5, y: -0.5 },
-			Point { x: 1.5, y: 0.5 },
-			Point { x: 1.5, y: 1.5 },
-			Point { x: 0.5, y: 1.5 },
-			Point { x: -0.5, y: 1.5 },
-			Point { x: -0.5, y: 0.5 },
-		];
-		for point in &points {
-			assert!(
-				!polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be outside square\n",
-				point
-			)
-		}
-	}
-
-	#[test]
-	fn rectangles_intersection() {
-		let polygon = Polygon {
+	#[fixture]
+	fn rectangle_for_intersection_test() -> Polygon {
+		Polygon {
 			points: vec![
 				Point {
 					x: 1.0804720876503242,
@@ -570,9 +466,12 @@ mod tests {
 					y: 9.784116583159095,
 				},
 			],
-		};
+		}
+	}
 
-		let points_outside = vec![
+	#[fixture]
+	fn points_outside_rectangle_for_intersection_test() -> Vec<Point> {
+		vec![
 			Point {
 				x: 7.198563041059868,
 				y: 10.888132995804426,
@@ -581,8 +480,12 @@ mod tests {
 				x: 8.877588001957976,
 				y: 10.934133679664647,
 			},
-		];
-		let points_inside = vec![
+		]
+	}
+
+	#[fixture]
+	fn points_inside_rectangle_for_intersection_test() -> Vec<Point> {
+		vec![
 			Point {
 				x: 8.854587660027866,
 				y: 9.577113505788097,
@@ -591,119 +494,12 @@ mod tests {
 				x: 7.198563041059868,
 				y: 9.554113163857984,
 			},
-		];
-
-		points_outside.iter().for_each(|point| {
-			assert!(
-				!polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be outside rectangle\n",
-				point
-			)
-		});
-
-		points_inside.iter().for_each(|point| {
-			assert!(
-				polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be inside rectangle\n",
-				point
-			)
-		});
+		]
 	}
 
-	#[test]
-	fn intersection_of_a_figure_and_a_rectangle() {
-		let polygon_points = vec![
-			Point {
-				x: 35.97872543334961,
-				y: -34.659114837646484,
-			},
-			Point {
-				x: 35.97872543334961,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 33.9708251953125,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 33.9708251953125,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 34.07872772216797,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 34.0787277221679,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 33.15372467041016,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 33.153724670410156,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.25210189819336,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.25210189819336,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 32.90689468383789,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 32.90689468383789,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.003726959228516,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 33.00372695922856,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 32.0787277221679,
-				y: -38.4352912902832,
-			},
-			Point {
-				x: 32.07872772216797,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 32.193763732910156,
-				y: -37.219112396240234,
-			},
-			Point {
-				x: 32.19376373291015,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 30.50872802734375,
-				y: -37.01911163330078,
-			},
-			Point {
-				x: 30.50872802734375,
-				y: -34.659114837646484,
-			},
-			Point {
-				x: 35.97872543334961,
-				y: -34.659114837646484,
-			},
-		];
-
-		let polygon = Polygon {
-			points: polygon_points,
-		};
-
-		let points_outside = vec![
+	#[fixture]
+	fn points_outside_figure_for_intersection_test() -> Vec<Point> {
+		vec![
 			Point {
 				x: 31.87872886657715,
 				y: -38.24702072143555,
@@ -712,8 +508,12 @@ mod tests {
 				x: 31.87872886657715,
 				y: -37.34701919555664,
 			},
-		];
-		let points_inside = vec![
+		]
+	}
+
+	#[fixture]
+	fn points_inside_figure_for_intersection_test() -> Vec<Point> {
+		vec![
 			Point {
 				x: 32.07872772216797,
 				y: -38.24702072143555,
@@ -722,12 +522,103 @@ mod tests {
 				x: 32.07872772216797,
 				y: -37.34701919555664,
 			},
-		];
+		]
+	}
 
+	#[rstest]
+	#[case::triangle_polygon(triangle_polygon_with_area_1(), 1.0)]
+	#[case::parallelogram_polygon(parallelogram_polygon(), 8.0)]
+	#[case::parallelogram_polygon(complex_figure_with_right_angles_polygon(), 15.44548203003071)]
+	fn figure_area(#[case] polygon: Polygon, #[case] expected_area: f64) {
+		assert_eq!(polygon.area(), expected_area)
+	}
+
+	#[rstest]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.0, y: 0.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.5, y: 0.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 1.0, y: 0.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.5, y: 0.5 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.0, y: 1.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.0, y: 0.5 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.0, y: 0.0 })]
+	fn point_inside_triangle(#[case] triangle_polygon: Polygon, #[case] point: Point) {
+		assert!(
+			triangle_polygon.is_point_inside(&point).unwrap(),
+			"\nPoint {:?} should be inside triangle\n",
+			point
+		)
+	}
+
+	#[rstest]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: -1.0, y: -1.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 0.5, y: -1.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 1.5, y: -0.5 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: 1.0, y: 1.0 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: -0.5, y: 1.5 })]
+	#[case(triangle_polygon_with_area_0_5(), Point { x: -0.5, y: 0.5 })]
+	fn point_outside_triangle(#[case] triangle_polygon: Polygon, #[case] point: Point) {
+		assert!(
+			!triangle_polygon.is_point_inside(&point).unwrap(),
+			"\nPoint {:?} should be outside triangle\n",
+			point
+		)
+	}
+
+	#[rstest]
+	#[case(square_polygon(), Point { x: 0.0, y: 0.0 })]
+	#[case(square_polygon(), Point { x: 0.5, y: 0.0 })]
+	#[case(square_polygon(), Point { x: 1.0, y: 0.0 })]
+	#[case(square_polygon(), Point { x: 1.0, y: 0.5 })]
+	#[case(square_polygon(), Point { x: 1.0, y: 1.0 })]
+	#[case(square_polygon(), Point { x: 0.5, y: 1.0 })]
+	#[case(square_polygon(), Point { x: 0.0, y: 1.0 })]
+	#[case(square_polygon(), Point { x: 0.0, y: 0.5 })]
+	#[case(square_polygon(), Point { x: 0.5, y: 0.5 })]
+	fn point_inside_square(#[case] square_polygon: Polygon, #[case] point: Point) {
+		assert!(
+			square_polygon.is_point_inside(&point).unwrap(),
+			"\nPoint {:?} should be inside square\n",
+			point
+		)
+	}
+
+	#[rstest]
+	#[case(square_polygon(), Point { x: -0.5, y: -0.5 })]
+	#[case(square_polygon(), Point { x: 0.5, y: -0.5 })]
+	#[case(square_polygon(), Point { x: 1.5, y: -0.5 })]
+	#[case(square_polygon(), Point { x: 1.5, y: 0.5 })]
+	#[case(square_polygon(), Point { x: 1.5, y: 1.5 })]
+	#[case(square_polygon(), Point { x: 0.5, y: 1.5 })]
+	#[case(square_polygon(), Point { x: -0.5, y: 1.5 })]
+	#[case(square_polygon(), Point { x: -0.5, y: 0.5 })]
+	fn point_outside_square(#[case] square_polygon: Polygon, #[case] point: Point) {
+		assert!(
+			!square_polygon.is_point_inside(&point).unwrap(),
+			"\nPoint {:?} should be outside square\n",
+			point
+		)
+	}
+
+	#[rstest]
+	#[case::rectangles(
+		rectangle_for_intersection_test(),
+		points_outside_rectangle_for_intersection_test(),
+		points_inside_rectangle_for_intersection_test()
+	)]
+	#[case::figure_and_a_rectangle(
+		complex_figure_with_right_angles_polygon(),
+		points_outside_figure_for_intersection_test(),
+		points_inside_figure_for_intersection_test()
+	)]
+	fn polygon_intersection(
+		#[case] polygon: Polygon,
+		#[case] points_outside: Vec<Point>,
+		#[case] points_inside: Vec<Point>,
+	) {
 		points_outside.iter().for_each(|point| {
 			assert!(
 				!polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be outside figure\n",
+				"\nPoint {:?} should be outside polygon\n",
 				point
 			)
 		});
@@ -735,7 +626,7 @@ mod tests {
 		points_inside.iter().for_each(|point| {
 			assert!(
 				polygon.is_point_inside(point).unwrap(),
-				"\nPoint {:?} should be inside figure\n",
+				"\nPoint {:?} should be inside polygon\n",
 				point
 			)
 		});

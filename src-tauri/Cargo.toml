@@ -37,6 +37,7 @@ pyo3 = { version = "0.18.3", features = ["auto-initialize"] }
 
 [dev-dependencies]
 insta = { version = "1.29.0", features = ["yaml"] }
+rstest = "0.18.1"
 
 [features]
 # by default Tauri runs in production mode

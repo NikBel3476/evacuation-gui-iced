@@ -76,24 +76,28 @@ pub fn bim_output_body(bim: &Bim, time: f64, file: &mut File) {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use rstest::*;
 
-	#[test]
-	#[cfg(any(target_os = "linux", target_os = "macos"))]
-	fn test_bim_basename_linux_and_macos() {
-		let path_ptr = "../res/two_levels.json";
-		let out_file = bim_basename_rust(path_ptr);
-		let expected_path = "../result/two_levels";
-
-		assert_eq!(expected_path, out_file);
+	#[fixture]
+	fn path_to_file<'a>() -> &'a str {
+		"../res/two_levels.json"
 	}
 
-	#[test]
-	#[cfg(target_os = "windows")]
-	fn test_bim_basename_windows() {
-		let path_ptr = "../res/two_levels.json";
-		let out_file = bim_basename_rust(path_ptr);
-		let expected_path = "..\\result\\two_levels";
+	#[fixture]
+	fn expected_path<'a>() -> &'a str {
+		if cfg!(linux) || cfg!(macos) {
+			"../result/two_levels"
+		} else if cfg!(windows) {
+			"..\\result\\two_levels"
+		} else {
+			panic!("This platform is not supported")
+		}
+	}
 
-		assert_eq!(expected_path, out_file);
+	#[rstest]
+	fn test_bim_basename_windows(path_to_file: &str, expected_path: &str) {
+		let out_file_path = bim_basename_rust(path_to_file);
+
+		assert_eq!(expected_path, out_file_path);
 	}
 }
