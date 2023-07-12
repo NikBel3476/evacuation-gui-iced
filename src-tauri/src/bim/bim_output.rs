@@ -85,7 +85,7 @@ mod tests {
 
 	#[fixture]
 	fn expected_path<'a>() -> &'a str {
-		if cfg!(linux) || cfg!(macos) {
+		if cfg!(unix) {
 			"../result/two_levels"
 		} else if cfg!(windows) {
 			"..\\result\\two_levels"
