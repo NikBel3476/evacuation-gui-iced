@@ -1,4 +1,5 @@
 use super::bim_tools::Bim;
+use crate::bim::bim_tools::DistributionState;
 use std::fs::File;
 use std::io::Write;
 use std::ops::Add;
@@ -71,6 +72,24 @@ pub fn bim_output_body(bim: &Bim, time: f64, file: &mut File) {
 
 	file.write_all(b"\n").expect("Failed to write to file");
 	file.flush().expect("Failed to flush file");
+}
+
+pub fn bim_output_body_detailed(distribution_states: Vec<DistributionState>, file: &mut File) {
+	for distribution_state in &distribution_states {
+		file.write_all(format!("{:.2},", distribution_state.time_in_minutes).as_bytes())
+			.expect("Failed to write to file");
+
+		distribution_state
+			.distribution
+			.iter()
+			.for_each(|number_of_people| {
+				file.write_all(format!("{:.2},", number_of_people).as_bytes())
+					.expect("Failed to write distribution to file");
+			});
+
+		file.write_all(b"\n").expect("Failed to write to file");
+		file.flush().expect("Failed to flush file");
+	}
 }
 
 #[cfg(test)]

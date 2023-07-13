@@ -1,6 +1,11 @@
 use super::bim_json_object::{BimElementSign, BimJsonObject};
 use super::bim_polygon_tools::{is_intersect_line, Line, Polygon};
 use super::json_object::Point;
+use crate::bim::bim_evac::{
+	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s, time_inc,
+	time_reset,
+};
+use crate::bim::bim_graph::bim_graph_new;
 use std::cmp::Ordering;
 use uuid::{uuid, Uuid};
 
@@ -92,6 +97,18 @@ pub struct Bim {
 	pub transits: Vec<BimTransit>,
 }
 
+pub struct EvacuationModelingResult {
+	pub number_of_people_inside_building: f64,
+	pub number_of_evacuated_people: f64,
+	pub time_in_seconds: f64,
+	pub people_distribution_stats: Vec<DistributionState>,
+}
+
+pub struct DistributionState {
+	pub time_in_minutes: f64,
+	pub distribution: Vec<f64>,
+}
+
 impl Bim {
 	pub fn area(&self) -> f64 {
 		self.levels.iter().fold(0.0, |acc, level| {
@@ -108,6 +125,60 @@ impl Bim {
 			BimElementSign::Outside => acc,
 			_ => acc + zone.number_of_people,
 		})
+	}
+
+	pub fn run_modeling(&mut self) -> EvacuationModelingResult {
+		let graph = bim_graph_new(self);
+
+		evac_def_modeling_step(self);
+		time_reset();
+
+		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
+		let mut people_distribution_stats: Vec<DistributionState> =
+			vec![self.distributions_statistics()];
+		loop {
+			// evac_moving_step_test_with_log(bim_graph, &mut bim.zones, &mut bim.transits);
+			evac_moving_step_test_with_log_rust(&graph, &mut self.zones, &mut self.transits);
+			time_inc();
+			// bim_output_body(&bim, get_time_m(), &mut fp_detail);
+			people_distribution_stats.push(self.distributions_statistics());
+
+			if self.number_of_people_in_building() <= remainder {
+				break;
+			}
+		}
+
+		EvacuationModelingResult {
+			number_of_people_inside_building: self.number_of_people(),
+			number_of_evacuated_people: self.zones[self.zones.len() - 1].number_of_people,
+			time_in_seconds: get_time_s(),
+			people_distribution_stats,
+		}
+	}
+
+	fn distributions_statistics(&self) -> DistributionState {
+		let mut distribution_stats = vec![];
+		for zone in &self.zones {
+			distribution_stats.push(zone.number_of_people);
+		}
+		for transition in &self.transits {
+			distribution_stats.push(transition.no_proceeding);
+		}
+
+		DistributionState {
+			time_in_minutes: get_time_m(),
+			distribution: distribution_stats,
+		}
+	}
+
+	fn number_of_people_in_building(&self) -> f64 {
+		let mut num_of_people = 0.0;
+		for zone in &self.zones {
+			if zone.is_visited {
+				num_of_people += zone.number_of_people;
+			}
+		}
+		num_of_people
 	}
 }
 

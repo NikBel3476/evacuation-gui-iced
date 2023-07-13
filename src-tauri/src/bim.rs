@@ -1,3 +1,4 @@
+use crate::bim::bim_output::bim_output_body_detailed;
 use bim_evac::{
 	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
 	set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
@@ -33,7 +34,7 @@ pub fn run_rust() {
 	};
 
 	let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
-		.unwrap_or_else(|e| panic!("Error reading the scenario configuration file. Error: {e}"));
+		.expect("Error reading the scenario configuration file");
 
 	// TODO: add the logger
 	for file in &scenario_configuration.files {
@@ -55,9 +56,8 @@ pub fn run_rust() {
 			true => std::fs::File::options()
 				.append(true)
 				.open(&log)
-				.unwrap_or_else(|e| panic!("Error opening the log file. Error: {e}")),
-			false => std::fs::File::create(&log)
-				.unwrap_or_else(|e| panic!("Error create the log file. Error: {e}")),
+				.expect("Error opening the log file"),
+			false => std::fs::File::create(&log).expect("Error create the log file"),
 		};
 
 		let current_time = chrono::Local::now()
@@ -67,7 +67,7 @@ pub fn run_rust() {
 		print!("{current_time} {filename_log}");
 		log_file
 			.write_all(filename_log.as_bytes())
-			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+			.expect("Failed to write log to file");
 
 		let bim_json = bim_json_object_new(file);
 
@@ -76,24 +76,31 @@ pub fn run_rust() {
 		applying_scenario_bim_params(&mut bim, &scenario_configuration);
 
 		bim_output_head(&bim, &mut fp_detail);
-		bim_output_body(&bim, 0.0, &mut fp_detail);
+		// bim_output_body(&bim, 0.0, &mut fp_detail);
 
-		let mut on_modeling_loop_iteration = |bim: &Bim| {
-			bim_output_body(bim, get_time_m(), &mut fp_detail);
-		};
+		// let mut on_modeling_loop_iteration = |bim: &Bim| {
+		// 	bim_output_body(bim, get_time_m(), &mut fp_detail);
+		// };
 
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
+		// run_modeling(&mut bim, &mut on_modeling_loop_iteration);
+		let modeling_result = bim.run_modeling();
 
-		let num_of_evacuated_people = bim.number_of_people();
-		let evacuation_time_m = get_time_m();
-		let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
+		bim_output_body_detailed(modeling_result.people_distribution_stats, &mut fp_detail);
+
+		// let num_of_evacuated_people = bim.number_of_people();
+		// let evacuation_time_m = get_time_m();
+		// let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
+
+		let number_of_people_inside_building = modeling_result.number_of_people_inside_building;
+		let evacuation_time_m = modeling_result.time_in_seconds / 60.0;
+		let evacuated_people = modeling_result.number_of_evacuated_people;
 
 		let evac_time_log = format!(
 			"{current_time} Длительность эвакуации: {:.2} с. ({:.2} мин.)\n",
-			get_time_s(),
-			evacuation_time_m
+			modeling_result.time_in_seconds,
+			modeling_result.time_in_seconds / 60.0
 		);
-		let number_of_people_log = format!("{current_time} Количество человек: в здании - {num_of_evacuated_people:.2} (в безопасной зоне - {evacuated_people:.2}) чел.\n");
+		let number_of_people_log = format!("{current_time} Количество человек: в здании - {number_of_people_inside_building:.2} (в безопасной зоне - {evacuated_people:.2}) чел.\n");
 		let delimiter = format!("{current_time} ---------------------------------------\n");
 
 		print!("{evac_time_log}");
@@ -115,7 +122,7 @@ pub fn run_rust() {
 		fp_short
 			.write_all(
 				format!(
-					"{evacuation_time_m:.2},{num_of_evacuated_people:.2},{evacuated_people:.2}\n"
+					"{evacuation_time_m:.2},{number_of_people_inside_building:.2},{evacuated_people:.2}\n"
 				)
 				.as_bytes(),
 			)
