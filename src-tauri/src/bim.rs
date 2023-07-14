@@ -273,12 +273,12 @@ mod tests {
 	use uuid::uuid;
 
 	macro_rules! set_snapshot_suffix {
-    ($($expr:expr),*) => {
-        let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_suffix(format!($($expr,)*));
-        let _guard = settings.bind_to_scope();
-    }
-}
+		($($expr:expr),*) => {
+			let mut settings = insta::Settings::clone_current();
+			settings.set_snapshot_suffix(format!($($expr,)*));
+			let _guard = settings.bind_to_scope();
+		}
+	}
 
 	#[derive(Serialize)]
 	struct ModelingResult {
@@ -356,6 +356,35 @@ mod tests {
 			evacuation_time_in_seconds: get_time_s(),
 			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
 		};
+
+		let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
+		set_snapshot_suffix!("{file_name}");
+		assert_yaml_snapshot!(modeling_result);
+	}
+
+	#[rstest]
+	#[case::example_one_exit(scenario_configuration(), "../res/example-one-exit.json")]
+	#[case::example_two_exits(scenario_configuration(), "../res/example-two-exits.json")]
+	#[case::one_zone_one_exit(scenario_configuration(), "../res/one_zone_one_exit.json")]
+	#[case::three_zone_three_transit(
+		scenario_configuration(),
+		"../res/three_zone_three_transit.json"
+	)]
+	#[case::two_levels(scenario_configuration(), "../res/two_levels.json")]
+	#[case::building_test(scenario_configuration(), "../res/building_test.json")]
+	#[case::udsu_b1_L4_v2_190701(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
+	#[case::udsu_b2_L4_v1_190701(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
+	#[case::udsu_b3_L3_v1_190701(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
+	#[case::udsu_b4_L5_v1_190701(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
+	#[case::udsu_b5_L4_v1_200102(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
+	#[case::udsu_b7_L8_v1_190701(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
+	fn evacuation_modeling(#[case] scenario_configuration: ScenarioCfg, #[case] file_path: &str) {
+		let bim_json = bim_json_object_new(file_path);
+		let mut bim = bim_tools_new_rust(&bim_json);
+
+		applying_scenario_bim_params(&mut bim, &scenario_configuration);
+
+		let modeling_result = bim.run_modeling();
 
 		let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
 		set_snapshot_suffix!("{file_name}");

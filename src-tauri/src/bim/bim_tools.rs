@@ -6,6 +6,7 @@ use crate::bim::bim_evac::{
 	time_reset,
 };
 use crate::bim::bim_graph::bim_graph_new;
+use serde::Serialize;
 use std::cmp::Ordering;
 use uuid::{uuid, Uuid};
 
@@ -97,13 +98,16 @@ pub struct Bim {
 	pub transits: Vec<BimTransit>,
 }
 
+#[derive(Serialize)]
 pub struct EvacuationModelingResult {
 	pub number_of_people_inside_building: f64,
 	pub number_of_evacuated_people: f64,
 	pub time_in_seconds: f64,
+	#[serde(skip)]
 	pub people_distribution_stats: Vec<DistributionState>,
 }
 
+#[derive(Serialize)]
 pub struct DistributionState {
 	pub time_in_minutes: f64,
 	pub distribution: Vec<f64>,
