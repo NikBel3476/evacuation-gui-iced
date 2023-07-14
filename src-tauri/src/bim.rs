@@ -232,11 +232,11 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 
 fn run_modeling(bim: &mut Bim, on_loop_iteration: &mut dyn FnMut(&Bim)) {
 	// let graph = bim_graph_new_rust(&bim);
-	let graph = bim_graph_new(&bim);
+	let graph = bim_graph_new(bim);
 	// let bim_graph = bim_graph_new_test(&bim);
 	// TODO: add print graph
 
-	evac_def_modeling_step(&bim);
+	evac_def_modeling_step(bim);
 	time_reset();
 
 	let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
@@ -245,7 +245,7 @@ fn run_modeling(bim: &mut Bim, on_loop_iteration: &mut dyn FnMut(&Bim)) {
 		evac_moving_step_test_with_log_rust(&graph, &mut bim.zones, &mut bim.transits);
 		time_inc();
 		// bim_output_body(&bim, get_time_m(), &mut fp_detail);
-		on_loop_iteration(&bim);
+		on_loop_iteration(bim);
 
 		let mut num_of_people = 0.0;
 		for zone in &bim.zones {
@@ -267,8 +267,18 @@ mod tests {
 		Distribution, DistributionSpecial, Modeling, Transition, TransitionSpecial,
 	};
 	use insta::assert_yaml_snapshot;
+	use rstest::*;
 	use serde::Serialize;
+	use std::path::Path;
 	use uuid::uuid;
+
+	macro_rules! set_snapshot_suffix {
+    ($($expr:expr),*) => {
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_suffix(format!($($expr,)*));
+        let _guard = settings.bind_to_scope();
+    }
+}
 
 	#[derive(Serialize)]
 	struct ModelingResult {
@@ -277,44 +287,62 @@ mod tests {
 		number_of_evacuated_people: f64,
 	}
 
+	#[fixture]
+	fn scenario_configuration() -> ScenarioCfg {
+		ScenarioCfg {
+			files: vec![],
+			logger_config: String::from(""),
+			distribution: Distribution {
+				distribution_type: DistributionType::Uniform,
+				density: 0.1,
+				special: vec![DistributionSpecial {
+					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
+					density: 1.0,
+					comment: String::new(),
+				}],
+			},
+			transition: Transition {
+				transitions_type: TransitionType::FromBim,
+				doorway_in: 0.0,
+				doorway_out: 0.0,
+				special: vec![TransitionSpecial {
+					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
+					width: 1.5,
+					comment: String::new(),
+				}],
+			},
+			modeling: Modeling {
+				step: 0.01,
+				max_speed: 100.0,
+				min_density: 0.1,
+				max_density: 5.0,
+			},
+		}
+	}
+
 	#[test]
 	fn test_run_modeling() {
 		run_rust();
 	}
 
-	#[test]
-	fn modeling_example_one_exit() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/example-one-exit.json";
-		let bim_json = bim_json_object_new(file);
+	#[rstest]
+	#[case::example_one_exit(scenario_configuration(), "../res/example-one-exit.json")]
+	#[case::example_two_exits(scenario_configuration(), "../res/example-two-exits.json")]
+	#[case::one_zone_one_exit(scenario_configuration(), "../res/one_zone_one_exit.json")]
+	#[case::three_zone_three_transit(
+		scenario_configuration(),
+		"../res/three_zone_three_transit.json"
+	)]
+	#[case::two_levels(scenario_configuration(), "../res/two_levels.json")]
+	#[case::building_test(scenario_configuration(), "../res/building_test.json")]
+	#[case::udsu_b1_L4_v2_190701(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
+	#[case::udsu_b2_L4_v1_190701(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
+	#[case::udsu_b3_L3_v1_190701(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
+	#[case::udsu_b4_L5_v1_190701(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
+	#[case::udsu_b5_L4_v1_200102(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
+	#[case::udsu_b7_L8_v1_190701(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
+	fn modeling(#[case] scenario_configuration: ScenarioCfg, #[case] file_path: &str) {
+		let bim_json = bim_json_object_new(file_path);
 		let mut bim = bim_tools_new_rust(&bim_json);
 
 		applying_scenario_bim_params(&mut bim, &scenario_configuration);
@@ -329,556 +357,8 @@ mod tests {
 			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
 		};
 
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_example_two_exits() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/example-two-exits.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_one_zone_one_exit() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/one_zone_one_exit.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_three_zones_three_transits() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/three_zone_three_transit.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_two_levels() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/two_levels.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_building_test() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/building_test.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_udsu_block_1() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/udsu_b1_L4_v2_190701.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_udsu_block_2() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/udsu_b2_L4_v1_190701.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_udsu_block_3() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/udsu_b3_L3_v1_190701.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_udsu_block_4() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/udsu_b4_L5_v1_190701.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_udsu_block_5() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/udsu_b5_L4_v1_200102.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[test]
-	fn modeling_udsu_block_7() {
-		let scenario_configuration = ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
-			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
-				density: 0.1,
-				special: vec![DistributionSpecial {
-					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
-					density: 1.0,
-					comment: String::new(),
-				}],
-			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
-				doorway_in: 0.0,
-				doorway_out: 0.0,
-				special: vec![TransitionSpecial {
-					uuid: vec![uuid!("dcbd8b6e-6dd0-4583-8aac-2492797f8032")],
-					width: 1.5,
-					comment: String::new(),
-				}],
-			},
-			modeling: Modeling {
-				step: 0.01,
-				max_speed: 100.0,
-				min_density: 0.1,
-				max_density: 5.0,
-			},
-		};
-		let file = "../res/udsu_b7_L8_v1_190701.json";
-		let bim_json = bim_json_object_new(file);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
+		let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
+		set_snapshot_suffix!("{file_name}");
 		assert_yaml_snapshot!(modeling_result);
 	}
 }
