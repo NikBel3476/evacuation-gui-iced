@@ -1,6 +1,5 @@
 ---
 source: src-tauri/src/bim.rs
-assertion_line: 391
 expression: modeling_result
 ---
 number_of_people_inside_building: 0
