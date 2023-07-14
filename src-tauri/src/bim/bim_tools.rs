@@ -10,6 +10,10 @@ use serde::Serialize;
 use std::cmp::Ordering;
 use uuid::{uuid, Uuid};
 
+const EVACUATION_MODELING_STEP: f64 = 0.01;
+const EVACUATION_MODELING_MAX_SPEED: f64 = 100.0;
+const EVACUATION_TIME: f64 = 0.0;
+
 /// Структура, расширяющая элемент DOOR_*
 #[derive(Debug, Clone, Default)]
 pub struct BimTransit {
@@ -96,6 +100,11 @@ pub struct Bim {
 	pub zones: Vec<BimZone>,
 	/// Список переходов объекта
 	pub transits: Vec<BimTransit>,
+	/// мин
+	pub evacuation_modeling_step: f64,
+	/// м/мин
+	pub evacuation_modeling_max_speed: f64,
+	pub evacuation_time_in_minutes: f64,
 }
 
 #[derive(Serialize)]
@@ -134,16 +143,15 @@ impl Bim {
 	pub fn run_modeling(&mut self) -> EvacuationModelingResult {
 		let graph = bim_graph_new(self);
 
-		evac_def_modeling_step(self);
-		time_reset();
+		self.define_modeling_step();
+		self.reset_time();
 
 		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
 		let mut people_distribution_stats: Vec<DistributionState> =
 			vec![self.distributions_statistics()];
 		loop {
-			// evac_moving_step_test_with_log(bim_graph, &mut bim.zones, &mut bim.transits);
 			evac_moving_step_test_with_log_rust(&graph, &mut self.zones, &mut self.transits);
-			time_inc();
+			self.increment_time();
 			// bim_output_body(&bim, get_time_m(), &mut fp_detail);
 			people_distribution_stats.push(self.distributions_statistics());
 
@@ -155,7 +163,7 @@ impl Bim {
 		EvacuationModelingResult {
 			number_of_people_inside_building: self.number_of_people(),
 			number_of_evacuated_people: self.zones[self.zones.len() - 1].number_of_people,
-			time_in_seconds: get_time_s(),
+			time_in_seconds: self.get_time_s(),
 			people_distribution_stats,
 		}
 	}
@@ -183,6 +191,32 @@ impl Bim {
 			}
 		}
 		num_of_people
+	}
+
+	fn define_modeling_step(&mut self) {
+		let average_size = self.area() / self.zones.len() as f64;
+		let hxy = average_size.sqrt();
+
+		self.evacuation_modeling_step = match self.evacuation_modeling_step.total_cmp(&0.0) {
+			Ordering::Equal => hxy / self.evacuation_modeling_max_speed * 0.1,
+			_ => self.evacuation_modeling_step,
+		}
+	}
+
+	fn reset_time(&mut self) {
+		self.evacuation_time_in_minutes = 0.0;
+	}
+
+	fn get_time_s(&self) -> f64 {
+		self.evacuation_time_in_minutes * 60.0
+	}
+
+	fn get_time_m(&self) -> f64 {
+		self.evacuation_time_in_minutes
+	}
+
+	fn increment_time(&mut self) {
+		self.evacuation_time_in_minutes += self.evacuation_modeling_step;
 	}
 }
 
@@ -570,5 +604,8 @@ pub fn bim_tools_new_rust(bim_json: &BimJsonObject) -> Bim {
 		zones: zones_list,
 		levels: levels_list,
 		name: bim_json.building_name.clone(),
+		evacuation_modeling_step: EVACUATION_MODELING_STEP,
+		evacuation_modeling_max_speed: EVACUATION_MODELING_MAX_SPEED,
+		evacuation_time_in_minutes: EVACUATION_TIME,
 	}
 }

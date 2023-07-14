@@ -1,4 +1,6 @@
-use crate::bim::bim_output::bim_output_body_detailed;
+use std::io::Write;
+use std::time::Instant;
+
 use bim_evac::{
 	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
 	set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
@@ -12,7 +14,8 @@ use bim_output::{
 use bim_tools::{bim_tools_new_rust, Bim};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
-use std::io::Write;
+
+use crate::bim::bim_output::bim_output_body_detailed;
 
 mod bim_cli;
 mod bim_evac;
@@ -36,6 +39,7 @@ pub fn run_rust() {
 	let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
 		.expect("Error reading the scenario configuration file");
 
+	let start = Instant::now();
 	// TODO: add the logger
 	for file in &scenario_configuration.files {
 		let filename = bim_basename_rust(file);
@@ -76,20 +80,10 @@ pub fn run_rust() {
 		applying_scenario_bim_params(&mut bim, &scenario_configuration);
 
 		bim_output_head(&bim, &mut fp_detail);
-		// bim_output_body(&bim, 0.0, &mut fp_detail);
 
-		// let mut on_modeling_loop_iteration = |bim: &Bim| {
-		// 	bim_output_body(bim, get_time_m(), &mut fp_detail);
-		// };
-
-		// run_modeling(&mut bim, &mut on_modeling_loop_iteration);
 		let modeling_result = bim.run_modeling();
 
 		bim_output_body_detailed(modeling_result.people_distribution_stats, &mut fp_detail);
-
-		// let num_of_evacuated_people = bim.number_of_people();
-		// let evacuation_time_m = get_time_m();
-		// let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
 
 		let number_of_people_inside_building = modeling_result.number_of_people_inside_building;
 		let evacuation_time_m = modeling_result.time_in_seconds / 60.0;
@@ -131,6 +125,110 @@ pub fn run_rust() {
 			.flush()
 			.unwrap_or_else(|e| panic!("Failed to flush fp_short to file. Error: {e}"));
 	}
+	let end = start.elapsed();
+	println!("Completed in {:.2} s", end.as_secs_f64())
+}
+
+pub fn run_rust_old() {
+	// TODO: remove mock file path
+	let cli_parameters = CliParameters {
+		scenario_file: String::from("../scenario.json"),
+	};
+
+	let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
+		.expect("Error reading the scenario configuration file");
+
+	let start = Instant::now();
+	// TODO: add the logger
+	for file in &scenario_configuration.files {
+		let filename = bim_basename_rust(file);
+		let log_filename = bim_basename_rust("log.txt");
+
+		// Files with results
+		let output_detail =
+			bim_create_file_name_rust(&filename, OUTPUT_DETAIL_FILE_RUST, OUTPUT_SUFFIX);
+		let output_short =
+			bim_create_file_name_rust(&filename, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX);
+		let log = bim_create_file_name_rust(&log_filename, "_rust", ".txt");
+
+		let mut fp_detail =
+			std::fs::File::create(&output_detail).expect("Error opening the output file");
+		let mut fp_short =
+			std::fs::File::create(&output_short).expect("Error opening the output file");
+		let mut log_file = match std::path::Path::new(&log).exists() {
+			true => std::fs::File::options()
+				.append(true)
+				.open(&log)
+				.expect("Error opening the log file"),
+			false => std::fs::File::create(&log).expect("Error create the log file"),
+		};
+
+		let current_time = chrono::Local::now()
+			.format("%Y-%m-%d %H:%M:%S.%6f")
+			.to_string();
+		let filename_log = format!("The file name of the used bim `{filename}.json`\n");
+		print!("{current_time} {filename_log}");
+		log_file
+			.write_all(filename_log.as_bytes())
+			.expect("Failed to write log to file");
+
+		let bim_json = bim_json_object_new(file);
+
+		let mut bim = bim_tools_new_rust(&bim_json);
+
+		applying_scenario_bim_params(&mut bim, &scenario_configuration);
+
+		bim_output_head(&bim, &mut fp_detail);
+		bim_output_body(&bim, 0.0, &mut fp_detail);
+
+		let mut on_modeling_loop_iteration = |bim: &Bim| {
+			bim_output_body(bim, get_time_m(), &mut fp_detail);
+		};
+
+		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
+
+		let num_of_evacuated_people = bim.number_of_people();
+		let evacuation_time_m = get_time_m();
+		let evacuated_people = bim.zones[bim.zones.len() - 1].number_of_people;
+
+		let evac_time_log = format!(
+			"{current_time} Длительность эвакуации: {:.2} с. ({:.2} мин.)\n",
+			get_time_s(),
+			get_time_m()
+		);
+		let number_of_people_log = format!("{current_time} Количество человек: в здании - {num_of_evacuated_people:.2} (в безопасной зоне - {evacuated_people:.2}) чел.\n");
+		let delimiter = format!("{current_time} ---------------------------------------\n");
+
+		print!("{evac_time_log}");
+		log_file
+			.write_all(evac_time_log.as_bytes())
+			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+		print!("{number_of_people_log}");
+		log_file
+			.write_all(number_of_people_log.as_bytes())
+			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+		print!("{delimiter}");
+		log_file
+			.write_all(delimiter.as_bytes())
+			.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+		log_file
+			.flush()
+			.unwrap_or_else(|e| panic!("Failed to flush log to file. Error: {e}"));
+
+		fp_short
+			.write_all(
+				format!(
+					"{evacuation_time_m:.2},{num_of_evacuated_people:.2},{evacuated_people:.2}\n"
+				)
+				.as_bytes(),
+			)
+			.unwrap_or_else(|e| panic!("Failed to write fp_short to file. Error: {e}"));
+		fp_short
+			.flush()
+			.unwrap_or_else(|e| panic!("Failed to flush fp_short to file. Error: {e}"));
+	}
+	let end = start.elapsed();
+	println!("Completed in {:.2} s", end.as_secs_f64())
 }
 
 pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &ScenarioCfg) {
@@ -228,6 +326,9 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 	set_speed_max(scenario_configuration.modeling.max_speed);
 	set_density_max(scenario_configuration.modeling.max_density);
 	set_density_min(scenario_configuration.modeling.min_density);
+
+	bim.evacuation_modeling_step = scenario_configuration.modeling.step;
+	bim.evacuation_modeling_max_speed = scenario_configuration.modeling.max_speed;
 }
 
 fn run_modeling(bim: &mut Bim, on_loop_iteration: &mut dyn FnMut(&Bim)) {
@@ -262,15 +363,18 @@ fn run_modeling(bim: &mut Bim, on_loop_iteration: &mut dyn FnMut(&Bim)) {
 
 #[cfg(test)]
 mod tests {
-	use super::*;
-	use crate::bim::configuration::{
-		Distribution, DistributionSpecial, Modeling, Transition, TransitionSpecial,
-	};
+	use std::path::Path;
+
 	use insta::assert_yaml_snapshot;
 	use rstest::*;
 	use serde::Serialize;
-	use std::path::Path;
 	use uuid::uuid;
+
+	use crate::bim::configuration::{
+		Distribution, DistributionSpecial, Modeling, Transition, TransitionSpecial,
+	};
+
+	use super::*;
 
 	macro_rules! set_snapshot_suffix {
 		($($expr:expr),*) => {
@@ -325,6 +429,43 @@ mod tests {
 		run_rust();
 	}
 
+	// #[rstest]
+	// #[case::example_one_exit(scenario_configuration(), "../res/example-one-exit.json")]
+	// #[case::example_two_exits(scenario_configuration(), "../res/example-two-exits.json")]
+	// #[case::one_zone_one_exit(scenario_configuration(), "../res/one_zone_one_exit.json")]
+	// #[case::three_zone_three_transit(
+	// 	scenario_configuration(),
+	// 	"../res/three_zone_three_transit.json"
+	// )]
+	// #[case::two_levels(scenario_configuration(), "../res/two_levels.json")]
+	// #[case::building_test(scenario_configuration(), "../res/building_test.json")]
+	// #[case::udsu_b1_L4_v2_190701(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
+	// #[case::udsu_b2_L4_v1_190701(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
+	// #[case::udsu_b3_L3_v1_190701(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
+	// #[case::udsu_b4_L5_v1_190701(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
+	// #[case::udsu_b5_L4_v1_200102(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
+	// #[case::udsu_b7_L8_v1_190701(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
+	// fn modeling(#[case] scenario_configuration: ScenarioCfg, #[case] file_path: &str) {
+	// 	let bim_json = bim_json_object_new(file_path);
+	// 	let mut bim = bim_tools_new_rust(&bim_json);
+	//
+	// 	applying_scenario_bim_params(&mut bim, &scenario_configuration);
+	//
+	// 	let mut on_modeling_loop_iteration = |_: &Bim| {};
+	//
+	// 	run_modeling(&mut bim, &mut on_modeling_loop_iteration);
+	//
+	// 	let modeling_result = ModelingResult {
+	// 		number_of_people_in_building: bim.number_of_people(),
+	// 		evacuation_time_in_seconds: get_time_s(),
+	// 		number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
+	// 	};
+	//
+	// 	let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
+	// 	set_snapshot_suffix!("{file_name}");
+	// 	assert_yaml_snapshot!(modeling_result);
+	// }
+
 	#[rstest]
 	#[case::example_one_exit(scenario_configuration(), "../res/example-one-exit.json")]
 	#[case::example_two_exits(scenario_configuration(), "../res/example-two-exits.json")]
@@ -335,49 +476,12 @@ mod tests {
 	)]
 	#[case::two_levels(scenario_configuration(), "../res/two_levels.json")]
 	#[case::building_test(scenario_configuration(), "../res/building_test.json")]
-	#[case::udsu_b1_L4_v2_190701(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
-	#[case::udsu_b2_L4_v1_190701(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
-	#[case::udsu_b3_L3_v1_190701(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
-	#[case::udsu_b4_L5_v1_190701(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
-	#[case::udsu_b5_L4_v1_200102(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
-	#[case::udsu_b7_L8_v1_190701(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
-	fn modeling(#[case] scenario_configuration: ScenarioCfg, #[case] file_path: &str) {
-		let bim_json = bim_json_object_new(file_path);
-		let mut bim = bim_tools_new_rust(&bim_json);
-
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
-
-		let mut on_modeling_loop_iteration = |_: &Bim| {};
-
-		run_modeling(&mut bim, &mut on_modeling_loop_iteration);
-
-		let modeling_result = ModelingResult {
-			number_of_people_in_building: bim.number_of_people(),
-			evacuation_time_in_seconds: get_time_s(),
-			number_of_evacuated_people: bim.zones[bim.zones.len() - 1].number_of_people,
-		};
-
-		let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
-		set_snapshot_suffix!("{file_name}");
-		assert_yaml_snapshot!(modeling_result);
-	}
-
-	#[rstest]
-	#[case::example_one_exit(scenario_configuration(), "../res/example-one-exit.json")]
-	#[case::example_two_exits(scenario_configuration(), "../res/example-two-exits.json")]
-	#[case::one_zone_one_exit(scenario_configuration(), "../res/one_zone_one_exit.json")]
-	#[case::three_zone_three_transit(
-		scenario_configuration(),
-		"../res/three_zone_three_transit.json"
-	)]
-	#[case::two_levels(scenario_configuration(), "../res/two_levels.json")]
-	#[case::building_test(scenario_configuration(), "../res/building_test.json")]
-	#[case::udsu_b1_L4_v2_190701(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
-	#[case::udsu_b2_L4_v1_190701(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
-	#[case::udsu_b3_L3_v1_190701(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
-	#[case::udsu_b4_L5_v1_190701(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
-	#[case::udsu_b5_L4_v1_200102(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
-	#[case::udsu_b7_L8_v1_190701(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
+	#[case::udsu_block_1(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
+	#[case::udsu_block_2(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
+	#[case::udsu_block_3(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
+	#[case::udsu_block_4(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
+	#[case::udsu_block_5(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
+	#[case::udsu_block_7(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
 	fn evacuation_modeling(#[case] scenario_configuration: ScenarioCfg, #[case] file_path: &str) {
 		let bim_json = bim_json_object_new(file_path);
 		let mut bim = bim_tools_new_rust(&bim_json);

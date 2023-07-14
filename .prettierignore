@@ -18,5 +18,3 @@ src-ui/peopleTraffic/js/vendor/
 **/*.json
 **/*.md
 **/*.yml
-
-.clang-tidy
