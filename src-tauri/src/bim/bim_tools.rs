@@ -178,7 +178,7 @@ impl Bim {
 		}
 
 		DistributionState {
-			time_in_minutes: get_time_m(),
+			time_in_minutes: self.evacuation_time_in_minutes,
 			distribution: distribution_stats,
 		}
 	}

@@ -482,16 +482,21 @@ mod tests {
 	#[case::udsu_block_4(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
 	#[case::udsu_block_5(scenario_configuration(), "../res/udsu_b5_L4_v1_200102.json")]
 	#[case::udsu_block_7(scenario_configuration(), "../res/udsu_b7_L8_v1_190701.json")]
-	fn evacuation_modeling(#[case] scenario_configuration: ScenarioCfg, #[case] file_path: &str) {
+	fn evacuation_modeling(
+		#[case] mut scenario_configuration: ScenarioCfg,
+		#[case] file_path: &str,
+		#[values(0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0)] density: f64,
+	) {
 		let bim_json = bim_json_object_new(file_path);
 		let mut bim = bim_tools_new_rust(&bim_json);
 
+		scenario_configuration.distribution.density = density;
 		applying_scenario_bim_params(&mut bim, &scenario_configuration);
 
 		let modeling_result = bim.run_modeling();
 
 		let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
-		set_snapshot_suffix!("{file_name}");
+		set_snapshot_suffix!("{file_name}-density-{density:.1}");
 		assert_yaml_snapshot!(modeling_result);
 	}
 }
