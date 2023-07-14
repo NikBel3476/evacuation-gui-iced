@@ -5054,12 +5054,6 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "clap",
- "derive_builder",
- "dialoguer",
- "duct",
- "fs_extra",
- "glob",
  "xtaskops",
 ]
 

@@ -68,6 +68,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Run Rust tests
+        run: cargo test
+
       - name: Run xtask coverage
         uses: actions-rs/cargo@v1
         with:
