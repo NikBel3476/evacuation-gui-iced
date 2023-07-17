@@ -477,6 +477,7 @@ mod tests {
 	#[case::two_levels(scenario_configuration(), "../res/two_levels.json")]
 	#[case::building_test(scenario_configuration(), "../res/building_test.json")]
 	#[case::udsu_block_1(scenario_configuration(), "../res/udsu_b1_L4_v2_190701.json")]
+	#[case::udsu_block_1_old(scenario_configuration(), "../res/b1-v2.1_with_corridors_v1.1.json")]
 	#[case::udsu_block_2(scenario_configuration(), "../res/udsu_b2_L4_v1_190701.json")]
 	#[case::udsu_block_3(scenario_configuration(), "../res/udsu_b3_L3_v1_190701.json")]
 	#[case::udsu_block_4(scenario_configuration(), "../res/udsu_b4_L5_v1_190701.json")]
