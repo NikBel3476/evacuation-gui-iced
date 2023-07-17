@@ -12,6 +12,7 @@ import udsu_b5_L4_v1 from '../../res/udsu_b5_L4_v1_200102.json';
 import udsu_b7_L8_v1 from '../../res/udsu_b7_L8_v1_190701.json';
 import { BimJson } from '../interfaces/BimJson';
 
+// TODO: replace hardcoded paths with paths from scenario.json
 export const bimFiles: Record<string, BimJson> = {
 	'../res/two_levels.json': twoLevels as BimJson,
 	'../res/one_zone_one_exit.json': oneZoneOneExit as BimJson,

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { loadScenarioConfig } from '../../rustCalls/config';
+import { loadScenarioConfig } from '../../rustCalls';
 
 export const getConfig = createAsyncThunk('config/getConfig', async (_, thunkAPI) => {
 	try {

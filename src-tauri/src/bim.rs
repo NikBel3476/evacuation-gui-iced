@@ -16,6 +16,7 @@ use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 
 use crate::bim::bim_output::bim_output_body_detailed;
+use crate::bim::bim_tools::EvacuationModelingResult;
 
 mod bim_cli;
 mod bim_evac;
@@ -23,7 +24,7 @@ mod bim_graph;
 mod bim_json_object;
 mod bim_output;
 mod bim_polygon_tools;
-mod bim_tools;
+pub mod bim_tools;
 mod cli;
 pub mod configuration;
 mod graph;
@@ -83,7 +84,7 @@ pub fn run_rust() {
 
 		let modeling_result = bim.run_modeling();
 
-		bim_output_body_detailed(modeling_result.people_distribution_stats, &mut fp_detail);
+		bim_output_body_detailed(&modeling_result.people_distribution_stats, &mut fp_detail);
 
 		let number_of_people_inside_building = modeling_result.number_of_people_inside_building;
 		let evacuation_time_m = modeling_result.time_in_seconds / 60.0;
@@ -127,6 +128,103 @@ pub fn run_rust() {
 	}
 	let end = start.elapsed();
 	println!("Completed in {:.2} s", end.as_secs_f64())
+}
+
+pub fn run_evacuation_modeling(file: &str) -> EvacuationModelingResult {
+	// TODO: remove mock file path
+	let cli_parameters = CliParameters {
+		scenario_file: String::from("../scenario.json"),
+	};
+
+	let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
+		.expect("Error reading the scenario configuration file");
+
+	let start = Instant::now();
+	// TODO: add the logger
+	let filename = bim_basename_rust(file);
+	let log_filename = bim_basename_rust("log.txt");
+
+	// Files with results
+	let output_detail =
+		bim_create_file_name_rust(&filename, OUTPUT_DETAIL_FILE_RUST, OUTPUT_SUFFIX);
+	let output_short = bim_create_file_name_rust(&filename, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX);
+	let log = bim_create_file_name_rust(&log_filename, "_rust", ".txt");
+
+	let mut fp_detail =
+		std::fs::File::create(&output_detail).expect("Error opening the output file");
+	let mut fp_short = std::fs::File::create(&output_short).expect("Error opening the output file");
+	let mut log_file = match std::path::Path::new(&log).exists() {
+		true => std::fs::File::options()
+			.append(true)
+			.open(&log)
+			.expect("Error opening the log file"),
+		false => std::fs::File::create(&log).expect("Error create the log file"),
+	};
+
+	let current_time = chrono::Local::now()
+		.format("%Y-%m-%d %H:%M:%S.%6f")
+		.to_string();
+	let filename_log = format!("The file name of the used bim `{filename}.json`\n");
+	print!("{current_time} {filename_log}");
+	log_file
+		.write_all(filename_log.as_bytes())
+		.expect("Failed to write log to file");
+
+	let bim_json = bim_json_object_new(file);
+
+	let mut bim = bim_tools_new_rust(&bim_json);
+
+	applying_scenario_bim_params(&mut bim, &scenario_configuration);
+
+	bim_output_head(&bim, &mut fp_detail);
+
+	let modeling_result = bim.run_modeling();
+
+	bim_output_body_detailed(&modeling_result.people_distribution_stats, &mut fp_detail);
+
+	let number_of_people_inside_building = modeling_result.number_of_people_inside_building;
+	let evacuation_time_m = modeling_result.time_in_seconds / 60.0;
+	let evacuated_people = modeling_result.number_of_evacuated_people;
+
+	let evac_time_log = format!(
+		"{current_time} Длительность эвакуации: {:.2} с. ({:.2} мин.)\n",
+		modeling_result.time_in_seconds,
+		modeling_result.time_in_seconds / 60.0
+	);
+	let number_of_people_log = format!("{current_time} Количество человек: в здании - {number_of_people_inside_building:.2} (в безопасной зоне - {evacuated_people:.2}) чел.\n");
+	let delimiter = format!("{current_time} ---------------------------------------\n");
+
+	print!("{evac_time_log}");
+	log_file
+		.write_all(evac_time_log.as_bytes())
+		.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+	print!("{number_of_people_log}");
+	log_file
+		.write_all(number_of_people_log.as_bytes())
+		.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+	print!("{delimiter}");
+	log_file
+		.write_all(delimiter.as_bytes())
+		.unwrap_or_else(|e| panic!("Failed to write log to file. Error: {e}"));
+	log_file
+		.flush()
+		.unwrap_or_else(|e| panic!("Failed to flush log to file. Error: {e}"));
+
+	fp_short
+		.write_all(
+			format!(
+					"{evacuation_time_m:.2},{number_of_people_inside_building:.2},{evacuated_people:.2}\n"
+				)
+			.as_bytes(),
+		)
+		.unwrap_or_else(|e| panic!("Failed to write fp_short to file. Error: {e}"));
+	fp_short
+		.flush()
+		.unwrap_or_else(|e| panic!("Failed to flush fp_short to file. Error: {e}"));
+
+	let end = start.elapsed();
+	println!("Completed in {:.2} s", end.as_secs_f64());
+	modeling_result
 }
 
 pub fn run_rust_old() {

@@ -74,10 +74,10 @@ pub fn bim_output_body(bim: &Bim, time: f64, file: &mut File) {
 	file.flush().expect("Failed to flush file");
 }
 
-pub fn bim_output_body_detailed(distribution_states: Vec<DistributionState>, file: &mut File) {
+pub fn bim_output_body_detailed(distribution_states: &[DistributionState], file: &mut File) {
 	let mut bw = BufWriter::new(file);
 
-	for distribution_state in &distribution_states {
+	for distribution_state in distribution_states {
 		bw.write_all(format!("{:.2},", distribution_state.time_in_minutes).as_bytes())
 			.expect("Failed to write to file");
 

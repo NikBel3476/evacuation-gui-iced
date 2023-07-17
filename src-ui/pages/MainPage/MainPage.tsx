@@ -71,7 +71,10 @@ const MainPage: FC = () => {
 							</Button>
 						</li>
 						<li>
-							<Button onClick={handleBimStartButtonClick}>Запустить симуляцию</Button>
+							<Button onClick={handleBimStartButtonClick}>Запустить моделирование</Button>
+						</li>
+						<li>
+							<RouterLink to="modeling">Страница моделирования</RouterLink>
 						</li>
 						<li>
 							<RouterLink to="modelingView">
