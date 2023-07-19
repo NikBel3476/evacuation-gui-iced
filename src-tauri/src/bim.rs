@@ -1,6 +1,7 @@
 use std::io::Write;
 use std::time::Instant;
 
+use crate::bim::bim_output::bim_output_body_detailed;
 use bim_evac::{
 	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
 	set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
@@ -14,8 +15,6 @@ use bim_output::{
 use bim_tools::{bim_tools_new_rust, Bim};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
-
-use crate::bim::bim_output::bim_output_body_detailed;
 
 mod bim_cli;
 mod bim_evac;

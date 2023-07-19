@@ -1,4 +1,6 @@
 use super::bim_tools::{Bim, BimTransit, BimZone};
+use petgraph::graph::UnGraph;
+use uuid::uuid;
 
 /// https://www.techiedelight.com/implement-graph-data-structure-c
 /// Data structure to store a graph object
@@ -27,6 +29,51 @@ pub fn bim_graph_new(bim: &Bim) -> BimGraph {
 	graph_create(&edges, bim.zones.len())
 }
 
+pub fn bim_petgraph_new(bim: &Bim) -> UnGraph<&BimZone, BimTransit> {
+	let mut graph = UnGraph::new_undirected();
+	for transition in &bim.transits {
+		match transition.outputs.len() {
+			2 => {
+				let first_node = bim
+					.zones
+					.iter()
+					.find(|zone| zone.uuid.eq(&transition.outputs[0]))
+					.expect("Cannot find zone");
+				let second_node = bim
+					.zones
+					.iter()
+					.find(|zone| zone.uuid.eq(&transition.outputs[1]))
+					.expect("Cannot find zone");
+
+				let first_node_index = graph.add_node(first_node);
+				let second_node_index = graph.add_node(second_node);
+				graph.add_edge(first_node_index, second_node_index, transition.clone());
+			}
+			1 => {
+				let first_node = bim
+					.zones
+					.iter()
+					.find(|zone| zone.uuid.eq(&transition.outputs[0]))
+					.expect("Cannot find zone");
+				let second_node = bim
+					.zones
+					.iter()
+					.find(|zone| zone.uuid.eq(&uuid!("00000000-0000-0000-0000-000000000000"))) // TODO: remove hardcoded uuid
+					.expect("Cannot find zone");
+
+				let first_node_index = graph.add_node(first_node);
+				let second_node_index = graph.add_node(second_node);
+				graph.add_edge(first_node_index, second_node_index, transition.clone());
+			}
+			number_of_outputs => panic!(
+				"Transition {} have {number_of_outputs} outputs",
+				transition.uuid
+			),
+		}
+	}
+	graph
+}
+
 /// Function to create an adjacency list from specified edges
 pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 	// initialize head pointer for all vertices
@@ -40,20 +87,18 @@ pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 		let eid = edge.id;
 
 		// 1. allocate a new node of adjacency list from `src` to `dest`
-		let mut new_node = BimNode {
+		let src_to_dest_node = BimNode {
 			dest,
 			eid,
-			next: None,
+			// point new node to the current head
+			next: Some(Box::new(graph_head[src].clone())),
 		};
 
-		// point new node to the current head
-		new_node.next = Some(Box::new(graph_head[src].clone()));
-
 		// point head pointer to the new node
-		graph_head[src] = new_node;
+		graph_head[src] = src_to_dest_node;
 
 		// 2. allocate a new node of adjacency list from `dest` to `src`
-		let new_node_dest_to_src = BimNode {
+		let dest_to_src_node = BimNode {
 			dest: src,
 			eid,
 			// point new node to the current head
@@ -61,7 +106,7 @@ pub fn graph_create(edges: &[BimEdge], node_count: usize) -> BimGraph {
 		};
 
 		// change head pointer to point to the new node
-		graph_head[dest] = new_node_dest_to_src;
+		graph_head[dest] = dest_to_src_node;
 	}
 
 	// allocate storage for the graph data structure

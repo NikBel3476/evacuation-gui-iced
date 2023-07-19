@@ -365,6 +365,72 @@ pub fn evac_moving_step_test_with_log_rust(
 	}
 }
 
+// pub fn evac_moving_step(
+// 	graph: &UnGraph<&BimZone, &BimTransit>,
+// 	zones: &mut [BimZone],
+// 	transits: &mut [BimTransit],
+// ) {
+// 	reset_zones(zones);
+// 	reset_transits(transits);
+//
+// 	let mut zones_to_process: Vec<BimZone> = vec![];
+//
+// 	let outside_id = graph.head.len() - 1;
+// 	let mut ptr = Some(Box::new(graph.head[outside_id].clone()));
+// 	let mut receiving_zone_id = outside_id;
+//
+// 	for _ in 0..zones.len() {
+// 		for _ in 0..zones[receiving_zone_id].outputs.len() {
+// 			if let Some(ptr_box) = ptr {
+// 				let mut transit = &mut transits[ptr_box.eid];
+//
+// 				if transit.is_visited || transit.is_blocked {
+// 					ptr = ptr_box.next;
+// 					continue;
+// 				}
+//
+// 				let giving_zone_id = ptr_box.dest;
+//
+// 				zones[receiving_zone_id].potential =
+// 					potential_element(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
+//
+// 				let moved_people =
+// 					part_people_flow(&zones[receiving_zone_id], &zones[giving_zone_id], transit);
+// 				zones[receiving_zone_id].number_of_people += moved_people;
+// 				zones[giving_zone_id].number_of_people -= moved_people;
+// 				transit.no_proceeding = moved_people;
+//
+// 				zones[giving_zone_id].is_visited = true;
+// 				transit.is_visited = true;
+//
+// 				if zones[giving_zone_id].outputs.len() > 1
+// 					&& !zones[giving_zone_id].is_blocked
+// 					&& !zones_to_process
+// 						.iter()
+// 						.any(|x| x.id == zones[giving_zone_id].id)
+// 				{
+// 					zones_to_process.push(zones[giving_zone_id].clone());
+// 				}
+//
+// 				ptr = ptr_box.next;
+// 			} else {
+// 				break;
+// 			}
+// 		}
+//
+// 		zones_to_process.sort_by(|a, b| a.potential.total_cmp(&b.potential));
+//
+// 		if !zones_to_process.is_empty() {
+// 			let deleted_zone = zones_to_process.remove(0);
+// 			receiving_zone_id = zones
+// 				.iter()
+// 				.position(|zone| deleted_zone.uuid.eq(&zone.uuid))
+// 				.unwrap_or_else(|| panic!("Zone not found!"));
+// 			ptr = Some(Box::new(graph.head[deleted_zone.id as usize].clone()));
+// 		}
+// 	}
+// }
+
 pub fn reset_zones(zones: &mut [BimZone]) {
 	for zone in zones {
 		zone.is_visited = false;
