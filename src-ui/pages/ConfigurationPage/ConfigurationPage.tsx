@@ -39,7 +39,7 @@ const ConfigurationPage: FC = () => {
 						<label htmlFor="bim_filenames" className="text-2xl">
 							Файлы цифровых моделей зданий
 						</label>
-						<Select options={config.files} />
+						<Select options={config.files.map(file => ({ key: file, value: file }))} />
 					</section>
 					<section className="mt-5">
 						<label htmlFor="logger_filename" className="text-2xl">

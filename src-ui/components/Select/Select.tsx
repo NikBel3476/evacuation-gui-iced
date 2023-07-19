@@ -3,7 +3,7 @@ import cn from 'classnames';
 
 interface SelectProps {
 	className?: string;
-	options: string[];
+	options: Array<{ key: string; value: string }>;
 	onChange?: (e: ChangeEvent<HTMLSelectElement>) => void;
 }
 
@@ -18,8 +18,8 @@ const Select: FC<SelectProps> = ({ className, options, onChange }) => {
 			onChange={onChange}
 		>
 			{options.map(option => (
-				<option key={option} value={option}>
-					{option}
+				<option key={option.key} value={option.value}>
+					{option.key}
 				</option>
 			))}
 		</select>

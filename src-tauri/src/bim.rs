@@ -1,6 +1,8 @@
 use std::io::Write;
 use std::time::Instant;
 
+use crate::bim::bim_output::bim_output_body_detailed;
+use crate::bim::bim_tools::EvacuationModelingResult;
 use bim_evac::{
 	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
 	set_density_max, set_density_min, set_modeling_step, set_speed_max, time_inc, time_reset,
@@ -14,9 +16,6 @@ use bim_output::{
 use bim_tools::{bim_tools_new_rust, Bim};
 use cli::CliParameters;
 use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
-
-use crate::bim::bim_output::bim_output_body_detailed;
-use crate::bim::bim_tools::EvacuationModelingResult;
 
 mod bim_cli;
 mod bim_evac;
@@ -213,8 +212,8 @@ pub fn run_evacuation_modeling(file: &str) -> EvacuationModelingResult {
 	fp_short
 		.write_all(
 			format!(
-					"{evacuation_time_m:.2},{number_of_people_inside_building:.2},{evacuated_people:.2}\n"
-				)
+				"{evacuation_time_m:.2},{number_of_people_inside_building:.2},{evacuated_people:.2}\n"
+			)
 			.as_bytes(),
 		)
 		.unwrap_or_else(|e| panic!("Failed to write fp_short to file. Error: {e}"));

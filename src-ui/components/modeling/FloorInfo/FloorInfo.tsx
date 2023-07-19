@@ -28,7 +28,11 @@ const FloorInfo: FC<FloorInfoProps> = ({ className, fileList, onSelectChange }) 
 			>
 				Main page
 			</Link>
-			<Select className="text-black" options={fileList} onChange={onSelectChange} />
+			<Select
+				className="text-black"
+				options={fileList.map(file => ({ key: file, value: file }))}
+				onChange={onSelectChange}
+			/>
 			<p className="text-lg">Этаж: {currentLevel}</p>
 			<h2 className="text-xl">Данные о помещении</h2>
 			<p>

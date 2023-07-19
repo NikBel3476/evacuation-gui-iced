@@ -1,4 +1,10 @@
-import React, { FC, MouseEventHandler, WheelEventHandler } from 'react';
+import React, {
+	FC,
+	MouseEventHandler,
+	useEffect,
+	useState,
+	WheelEventHandler
+} from 'react';
 import cn from 'classnames';
 import styles from './PeopleTraffic.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
@@ -11,10 +17,21 @@ import {
 	setBuildingElement
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
+import { FileEntry, readDir, BaseDirectory } from '@tauri-apps/api/fs';
 
 const PeopleTraffic: FC = _ => {
+	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
 	let app: App | null = null;
 	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		void loadBimFiles();
+	}, []);
+
+	const loadBimFiles = async () => {
+		const files = await readDir('resources', { dir: BaseDirectory.AppData });
+		setBimFiles(files);
+	};
 
 	const onBuildingViewMount = () => {
 		app = new App('field', 'canvas_container');
@@ -146,7 +163,7 @@ const PeopleTraffic: FC = _ => {
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo fileList={[]} />
+			<FloorInfo fileList={bimFiles.map(file => file.name ?? 'Undefined name')} />
 			<BuildingView
 				onMount={onBuildingViewMount}
 				onUnmount={onBuildingViewUnmount}
