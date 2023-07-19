@@ -64,6 +64,49 @@ I 23-02-03 18:01:09.770134 7182 main.c:138: Длительность эваку�
 I 23-02-03 18:01:09.770246 7182 main.c:139: Количество человек: в здании - 0.00 (в безопасной зоне - 774.63) чел.
 I 23-02-03 18:01:09.770252 7182 main.c:140: ---------------------------------------
 
+// ----------------------------- EvacuationC(branch: dev, commit: eecfa296f9b0fc8f8881f66b5befa940c9c51b8b) ----------------------------- //
+I 23-07-19 13:13:47.089574 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `two_levels.json`
+I 23-07-19 13:13:47.099574 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 85.80 с. (1.43 мин.)
+I 23-07-19 13:13:47.099574 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 104.49) чел.
+I 23-07-19 13:13:47.099574 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.099574 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `one_zone_one_exit.json`
+I 23-07-19 13:13:47.102577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 67.80 с. (1.13 мин.)
+I 23-07-19 13:13:47.102577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 71.25) чел.
+I 23-07-19 13:13:47.102577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.102577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `three_zone_three_transit.json`
+I 23-07-19 13:13:47.111577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 72.60 с. (1.21 мин.)
+I 23-07-19 13:13:47.111577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 80.92) чел.
+I 23-07-19 13:13:47.111577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.111577 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `building_test.json`
+I 23-07-19 13:13:47.120697 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 16.20 с. (0.27 мин.)
+I 23-07-19 13:13:47.120697 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 33.38) чел.
+I 23-07-19 13:13:47.120697 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.121701 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `example-one-exit.json`
+I 23-07-19 13:13:47.132701 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 10.20 с. (0.17 мин.)
+I 23-07-19 13:13:47.132701 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 8.37) чел.
+I 23-07-19 13:13:47.132701 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.132701 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `example-two-exits.json`
+I 23-07-19 13:13:47.147719 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 6.00 с. (0.10 мин.)
+I 23-07-19 13:13:47.147719 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 8.37) чел.
+I 23-07-19 13:13:47.147719 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.147719 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `b1-v2.1_with_corridors_v1.1.json`
+I 23-07-19 13:13:47.341664 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 64.20 с. (1.07 мин.)
+I 23-07-19 13:13:47.341664 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 53.76) чел.
+I 23-07-19 13:13:47.341664 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:47.342669 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `udsu_b1_L4_v2_190701.json`
+I 23-07-19 13:13:49.558972 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 522.00 с. (8.70 мин.)
+I 23-07-19 13:13:49.558972 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 774.63) чел.
+I 23-07-19 13:13:49.558972 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:13:49.559911 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `udsu_b1_L4_v1_190701.json`
+I 23-07-19 13:13:51.889679 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 522.00 с. (8.70 мин.)
+I 23-07-19 13:13:51.889679 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 774.63) чел.
+I 23-07-19 13:13:51.889679 5880 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+I 23-07-19 13:16:53.128582 11960 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:45: The file name of the used bim `udsu_b2_L4_v1_190701.json`
+I 23-07-19 13:16:54.514598 11960 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:136: Длительность эвакуации: 322.20 с. (5.37 мин.)
+I 23-07-19 13:16:54.514598 11960 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:137: Количество человек: в здании - 0.00 (в безопасной зоне - 733.68) чел.
+I 23-07-19 13:16:54.514598 11960 C:/Users/User/Documents/developments/C/EvacuationC_old/src/main.c:138: ---------------------------------------
+// note: udsu block 3,4,5 and 7 failed due to segfault
+
 // ----------------------------- After arraylist sort fix(c version) ----------------------------- //
 I 23-02-15 13:25:50.224279 8128 ../src/run.c:38: The file name of the used bim `..\result\two_levels.json`
 I 23-02-15 13:25:50.227799 8128 ../src/run.c:133: Длительность эвакуации: 85.80 с. (1.43 мин.)
