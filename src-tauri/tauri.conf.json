@@ -12,7 +12,13 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": true,
+      "fs": {
+        "all": true,
+        "scope": {
+          "allow": ["**"]
+        }
+      }
     },
     "bundle": {
       "active": true,
@@ -29,7 +35,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "evacutaion",
+      "identifier": "evacuation",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

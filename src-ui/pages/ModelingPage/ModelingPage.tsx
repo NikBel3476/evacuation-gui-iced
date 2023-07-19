@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { bimFiles } from '../../consts/bimFiles';
 import Select from '../../components/Select';
 import { runEvacuationModeling } from '../../rustCalls';
 import { EvacuationModelingResult } from '../../types/ModelingResult';
 import ModelingResultWidget from '../../components/ModelingResultWidget';
+import { useDropzone } from 'react-dropzone';
+import { BaseDirectory, readDir } from '@tauri-apps/api/fs';
 
 const ModelingPage = () => {
 	const [filePath, setFilePath] = useState<string>(Object.keys(bimFiles)[0]);
+	const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
 	const [evacuationModelingResult, setEvacuationModelingResult] =
 		useState<EvacuationModelingResult | null>(null);
 	const handleSelectFileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -15,12 +18,21 @@ const ModelingPage = () => {
 		setFilePath(filePath);
 	};
 
+	(async () => {
+		const files = await readDir('resources', { dir: BaseDirectory.AppData });
+		console.log(files);
+	})();
+
 	const handleRunEvacuationModelingButton = async (
 		e: React.MouseEvent<HTMLButtonElement>
 	) => {
 		const modelingResult = await runEvacuationModeling(filePath);
 		setEvacuationModelingResult(modelingResult);
 	};
+
+	useEffect(() => {
+		console.log(acceptedFiles);
+	}, [acceptedFiles]);
 
 	return (
 		<main>
@@ -51,6 +63,10 @@ const ModelingPage = () => {
 						modelingResult={evacuationModelingResult}
 					/>
 				)}
+				<div {...getRootProps({ className: 'dropzone' })}>
+					<input {...getInputProps()} />
+					<p>Drag 'n' drop some files here, or click to select files</p>
+				</div>
 			</section>
 		</main>
 	);
