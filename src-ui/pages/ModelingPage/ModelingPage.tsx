@@ -4,7 +4,6 @@ import Select from '../../components/Select';
 import { runEvacuationModeling } from '../../rustCalls';
 import { EvacuationModelingResult } from '../../types/ModelingResult';
 import ModelingResultWidget from '../../components/ModelingResultWidget';
-import { useDropzone } from 'react-dropzone';
 import { BaseDirectory, FileEntry, readDir } from '@tauri-apps/api/fs';
 import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
 import cn from 'classnames';
@@ -16,7 +15,6 @@ const ModelingPage = () => {
 	const [isFileDropHover, setIsFileDropHover] = useState<boolean>(false);
 	const [evacuationModelingResult, setEvacuationModelingResult] =
 		useState<EvacuationModelingResult | null>(null);
-	const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
 
 	useEffect(() => {
 		let unlistenWindowFileDrop: UnlistenFn | null = null;
@@ -101,17 +99,6 @@ const ModelingPage = () => {
 					>
 						На главную страницу
 					</Link>
-					{/*<div
-						{...getRootProps({
-							className:
-								'dropzone h-24 mt-4 flex justify-center items-center font-medium text-lg border-2 border-gray-500 rounded-md border-dashed hover:cursor-pointer'
-						})}
-					>
-						<input {...getInputProps()} />
-						<p className="text-center">
-							Перетащите файлы сюда или нажмите, чтобы выбрать
-						</p>
-					</div>*/}
 					<Select
 						className="text-black mt-4"
 						options={bimFiles.map(file => ({

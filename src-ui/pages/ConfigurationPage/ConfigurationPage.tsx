@@ -1,9 +1,10 @@
-import React, { ChangeEventHandler, FC, useEffect } from 'react';
+import React, { ChangeEventHandler, FC, MouseEventHandler, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { getConfig } from '../../store/actionCreators/getConfig';
 import { changeLoggerFile } from '../../store/slices/ConfigSlice';
 import Select from '../../components/Select';
+import { invoke } from '@tauri-apps/api';
 
 const ConfigurationPage: FC = () => {
 	const dispatch = useAppDispatch();
@@ -17,6 +18,15 @@ const ConfigurationPage: FC = () => {
 		dispatch(changeLoggerFile(e.target.value));
 	};
 
+	const handleSaveConfigButtonClick: MouseEventHandler<HTMLButtonElement> = _ => {
+		try {
+			void invoke('save_configuration', { configuration: config });
+			console.log('Configuration saved');
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
 	return (
 		<main className="pb-5">
 			<h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -28,7 +38,10 @@ const ConfigurationPage: FC = () => {
 			>
 				Main page
 			</Link>
-			<button className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 ml-5 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+			<button
+				className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 ml-5 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+				onClick={handleSaveConfigButtonClick}
+			>
 				Save
 			</button>
 			{isLoading && <h3>Configuration is loading...</h3>}

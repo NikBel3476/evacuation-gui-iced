@@ -16,6 +16,7 @@ fn main() {
 	tauri::Builder::default()
 		.invoke_handler(tauri::generate_handler![
 			read_config,
+			save_configuration,
 			open_configuration_window,
 			open_configuration_rescript_window,
 			open_people_traffic_window,
@@ -31,6 +32,21 @@ fn main() {
 #[tauri::command]
 fn read_config() -> Result<configuration::ScenarioCfg, String> {
 	configuration::load_cfg("../scenario.json")
+}
+
+#[tauri::command]
+fn save_configuration(
+	handle: AppHandle,
+	configuration: configuration::ScenarioCfg,
+) -> Result<String, String> {
+	if let Some(dir) = handle.path_resolver().app_data_dir() {
+		let app_data_dir_path = dir.join("configuration");
+		return match configuration::save_configuration(&app_data_dir_path, &configuration) {
+			Ok(_) => Ok(String::from(app_data_dir_path.to_str().unwrap_or(""))),
+			Err(error) => Err(format!("{error}")),
+		};
+	}
+	Err(String::from("Failed to get AppData directory"))
 }
 
 #[tauri::command]

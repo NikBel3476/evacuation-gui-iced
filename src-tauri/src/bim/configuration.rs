@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 use std::fs;
+use std::fs::File;
+use std::io::BufWriter;
 use std::path::Path;
 use uuid::Uuid;
 
@@ -96,4 +99,13 @@ pub fn load_cfg(path_to_file: &str) -> Result<ScenarioCfg, String> {
 		}
 		false => Err(format!("Не удалось найти указанный файл: {}", path_to_file)),
 	}
+}
+
+pub fn save_configuration<P: AsRef<Path>>(
+	path_to_file: P,
+	configuration: &ScenarioCfg,
+) -> Result<(), Box<dyn Error>> {
+	let writer = BufWriter::new(File::create(path_to_file)?);
+	serde_json::to_writer_pretty(writer, configuration)?;
+	Ok(())
 }
