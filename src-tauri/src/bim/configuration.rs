@@ -24,7 +24,6 @@ pub enum TransitionType {
 pub struct DistributionSpecial {
 	pub uuid: Vec<Uuid>,
 	pub density: f64,
-	#[serde(rename(deserialize = "_comment"))]
 	pub comment: String,
 }
 
@@ -32,7 +31,6 @@ pub struct DistributionSpecial {
 pub struct TransitionSpecial {
 	pub uuid: Vec<Uuid>,
 	pub width: f64,
-	#[serde(rename(deserialize = "_comment"))]
 	pub comment: String,
 }
 

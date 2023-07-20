@@ -7,6 +7,7 @@ import ModelingResultWidget from '../../components/ModelingResultWidget';
 import { BaseDirectory, FileEntry, readDir } from '@tauri-apps/api/fs';
 import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
 import cn from 'classnames';
+import styles from './ModelingPage.module.css';
 
 const ModelingPage = () => {
 	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
@@ -59,10 +60,6 @@ const ModelingPage = () => {
 			}
 		};
 	}, []);
-
-	useEffect(() => {
-		console.log(acceptedFiles);
-	}, [acceptedFiles]);
 
 	const loadFiles = async () => {
 		const files = await readDir('resources', { dir: BaseDirectory.AppData });
@@ -127,8 +124,9 @@ const ModelingPage = () => {
 			</main>
 			<div
 				className={cn(
-					'absolute inset-0 w-screen h-screen flex justify-center items-center bg-gray-300 bg-opacity-50 border-8 border-gray-500 border-dashed transition-opacity duration-300',
-					isFileDropHover ? 'opacity-100' : 'opacity-0'
+					styles.dropZone,
+					'absolute inset-0 w-screen h-screen flex justify-center items-center bg-gray-300 bg-opacity-50 border-8 border-gray-500 border-dashed',
+					isFileDropHover ? 'visible opacity-100' : 'invisible opacity-0'
 				)}
 			>
 				<p className="text-center text-gray-500 font-medium text-5xl">Добавить файлы</p>

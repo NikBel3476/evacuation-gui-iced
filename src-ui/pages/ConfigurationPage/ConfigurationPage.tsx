@@ -20,8 +20,38 @@ const ConfigurationPage: FC = () => {
 
 	const handleSaveConfigButtonClick: MouseEventHandler<HTMLButtonElement> = _ => {
 		try {
-			void invoke('save_configuration', { configuration: config });
-			console.log('Configuration saved');
+			if (config !== null) {
+				void invoke('save_configuration', {
+					configuration: {
+						bim: config.files,
+						logger_configure: config.logger_config,
+						distribution: {
+							type: config.distribution.distribution_type.replace(
+								/[A-Z]/g,
+								letter => `_${letter.toLowerCase()}`
+							).slice(1),
+							density: config.distribution.density,
+							special: config.distribution.special
+						},
+						transits: {
+							type: config.transition.transitions_type.replace(
+								/[A-Z]/g,
+								letter => `_${letter.toLowerCase()}`
+							).slice(1),
+							doorwayin: config.transition.doorway_in,
+							doorwayout: config.transition.doorway_out,
+							special: config.transition.special
+						},
+						modeling: {
+							step: config.modeling.step,
+							speed_max: config.modeling.max_speed,
+							density_min: config.modeling.min_density,
+							density_max: config.modeling.max_density
+						}
+					}
+				});
+				console.log('Configuration saved');
+			}
 		} catch (e) {
 			console.log(e);
 		}

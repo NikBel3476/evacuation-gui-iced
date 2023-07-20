@@ -40,7 +40,7 @@ fn save_configuration(
 	configuration: configuration::ScenarioCfg,
 ) -> Result<String, String> {
 	if let Some(dir) = handle.path_resolver().app_data_dir() {
-		let app_data_dir_path = dir.join("configuration");
+		let app_data_dir_path = dir.join("configuration.json");
 		return match configuration::save_configuration(&app_data_dir_path, &configuration) {
 			Ok(_) => Ok(String::from(app_data_dir_path.to_str().unwrap_or(""))),
 			Err(error) => Err(format!("{error}")),
