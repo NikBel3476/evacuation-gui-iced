@@ -6,17 +6,65 @@ import { EvacuationModelingResult } from '../../types/ModelingResult';
 import ModelingResultWidget from '../../components/ModelingResultWidget';
 import { useDropzone } from 'react-dropzone';
 import { BaseDirectory, FileEntry, readDir } from '@tauri-apps/api/fs';
+import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
+import cn from 'classnames';
 
 const ModelingPage = () => {
 	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
 	const [selectedFilePath, setSelectedFilePath] = useState<string>('');
-	const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isFileDropHover, setIsFileDropHover] = useState<boolean>(false);
 	const [evacuationModelingResult, setEvacuationModelingResult] =
 		useState<EvacuationModelingResult | null>(null);
-	const handleSelectFileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const filePath = e.target.value;
-		setSelectedFilePath(filePath);
-	};
+	const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
+
+	useEffect(() => {
+		let unlistenWindowFileDrop: UnlistenFn | null = null;
+		let unlistenWindowFileDropHover: UnlistenFn | null = null;
+		let unlistenWindowFileDropCancelled: UnlistenFn | null = null;
+
+		void (async () => {
+			unlistenWindowFileDrop = await listen<string>(
+				TauriEvent.WINDOW_FILE_DROP,
+				event => {
+					console.log(event);
+				}
+			);
+
+			unlistenWindowFileDropHover = await listen<string>(
+				TauriEvent.WINDOW_FILE_DROP_HOVER,
+				event => {
+					setIsFileDropHover(true);
+					console.log(event);
+				}
+			);
+
+			unlistenWindowFileDropCancelled = await listen<string>(
+				TauriEvent.WINDOW_FILE_DROP_CANCELLED,
+				event => {
+					setIsFileDropHover(false);
+					console.log(event);
+				}
+			);
+		})();
+
+		void loadFiles();
+		return () => {
+			if (unlistenWindowFileDrop) {
+				unlistenWindowFileDrop();
+			}
+			if (unlistenWindowFileDropHover) {
+				unlistenWindowFileDropHover();
+			}
+			if (unlistenWindowFileDropCancelled) {
+				unlistenWindowFileDropCancelled();
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		console.log(acceptedFiles);
+	}, [acceptedFiles]);
 
 	const loadFiles = async () => {
 		const files = await readDir('resources', { dir: BaseDirectory.AppData });
@@ -26,69 +74,79 @@ const ModelingPage = () => {
 		}
 	};
 
-	useEffect(() => {
-		void loadFiles();
-	}, []);
-
-	useEffect(() => {
-		console.log(acceptedFiles);
-	}, [acceptedFiles]);
+	const handleSelectFileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const filePath = e.target.value;
+		setSelectedFilePath(filePath);
+	};
 
 	const handleRunEvacuationModelingButton = async (
 		e: React.MouseEvent<HTMLButtonElement>
 	) => {
+		setIsLoading(true);
 		const modelingResult = await runEvacuationModeling(selectedFilePath);
+		setIsLoading(false);
 		setEvacuationModelingResult(modelingResult);
 	};
 
-	useEffect(() => {
-		console.log(acceptedFiles);
-	}, [acceptedFiles]);
-
 	return (
-		<main>
-			<h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-				Страница моделирования
-			</h1>
-			<section className="mt-6 mx-5">
-				<Link
-					className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-					to="/"
-				>
-					На главную страницу
-				</Link>
-				<div
-					{...getRootProps({
-						className:
-							'dropzone h-24 mt-4 flex justify-center items-center font-medium text-lg border-2 border-gray-500 rounded-md border-dashed hover:cursor-pointer'
-					})}
-				>
-					<input {...getInputProps()} />
-					<p className="text-center">Перетащите файлы сюда или нажмите, чтобы выбрать</p>
-				</div>
-				<Select
-					className="text-black mt-4"
-					options={bimFiles.map(file => ({
-						key: file.name ?? 'Undefined name',
-						value: file.path
-					}))}
-					onChange={handleSelectFileChange}
-				/>
-				<button
-					className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 mt-4 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-300"
-					onClick={handleRunEvacuationModelingButton}
-					disabled={selectedFilePath === ''}
-				>
-					Старт
-				</button>
-				{evacuationModelingResult && (
-					<ModelingResultWidget
-						className="mt-2"
-						modelingResult={evacuationModelingResult}
+		<>
+			<main>
+				<h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+					Страница моделирования
+				</h1>
+				<section className="mt-6 mx-5">
+					<Link
+						className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+						to="/"
+					>
+						На главную страницу
+					</Link>
+					{/*<div
+						{...getRootProps({
+							className:
+								'dropzone h-24 mt-4 flex justify-center items-center font-medium text-lg border-2 border-gray-500 rounded-md border-dashed hover:cursor-pointer'
+						})}
+					>
+						<input {...getInputProps()} />
+						<p className="text-center">
+							Перетащите файлы сюда или нажмите, чтобы выбрать
+						</p>
+					</div>*/}
+					<Select
+						className="text-black mt-4"
+						options={bimFiles.map(file => ({
+							key: file.name ?? 'Undefined name',
+							value: file.path
+						}))}
+						onChange={handleSelectFileChange}
 					/>
+					<button
+						className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 mt-4 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-300"
+						onClick={handleRunEvacuationModelingButton}
+						disabled={selectedFilePath === ''}
+					>
+						Старт
+					</button>
+					<div className="mt-2">
+						{isLoading ? (
+							<p>Loading...</p>
+						) : (
+							evacuationModelingResult && (
+								<ModelingResultWidget modelingResult={evacuationModelingResult} />
+							)
+						)}
+					</div>
+				</section>
+			</main>
+			<div
+				className={cn(
+					'absolute inset-0 w-screen h-screen flex justify-center items-center bg-gray-300 bg-opacity-50 border-8 border-gray-500 border-dashed transition-opacity duration-300',
+					isFileDropHover ? 'opacity-100' : 'opacity-0'
 				)}
-			</section>
-		</main>
+			>
+				<p className="text-center text-gray-500 font-medium text-5xl">Добавить файлы</p>
+			</div>
+		</>
 	);
 };
 
