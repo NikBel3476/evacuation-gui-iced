@@ -1,13 +1,22 @@
-import React, { ChangeEventHandler, FC, MouseEventHandler, useEffect } from 'react';
+import React, {
+	ChangeEventHandler,
+	FC,
+	MouseEventHandler,
+	useEffect,
+	useState
+} from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { getConfig } from '../../store/actionCreators/getConfig';
 import { changeLoggerFile } from '../../store/slices/ConfigSlice';
 import Select from '../../components/Select';
 import { invoke } from '@tauri-apps/api';
+import cn from 'classnames';
 
 const ConfigurationPage: FC = () => {
 	const dispatch = useAppDispatch();
+	const [isConfigSaving, setIsConfigSaving] = useState<boolean>(false);
+	const [configSavingError, setConfigSavingError] = useState<string>('');
 	const { config, isLoading, error } = useAppSelector(state => state.configReducer);
 
 	useEffect(() => {
@@ -18,14 +27,19 @@ const ConfigurationPage: FC = () => {
 		dispatch(changeLoggerFile(e.target.value));
 	};
 
-	const handleSaveConfigButtonClick: MouseEventHandler<HTMLButtonElement> = _ => {
-		try {
-			if (config !== null) {
-				void invoke('save_configuration', { configuration: config });
-				console.log('Configuration saved');
+	const handleSaveConfigButtonClick: MouseEventHandler<HTMLButtonElement> = async _ => {
+		if (config !== null) {
+			try {
+				setConfigSavingError('');
+				setIsConfigSaving(true);
+				await invoke('save_configuration', { configuration: config });
+			} catch (e) {
+				setConfigSavingError(
+					typeof e === 'string' ? e : 'Ошибка сохранения конфигурации'
+				);
+			} finally {
+				setIsConfigSaving(false);
 			}
-		} catch (e) {
-			console.log(e);
 		}
 	};
 
@@ -34,20 +48,28 @@ const ConfigurationPage: FC = () => {
 			<h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
 				Configuration page
 			</h1>
-			<Link
-				className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 ml-5 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-				to="/"
-			>
-				Main page
-			</Link>
-			<button
-				className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 ml-5 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-				onClick={handleSaveConfigButtonClick}
-			>
-				Save
-			</button>
+			<div className="mt-4 mx-5">
+				<Link
+					className="w-28 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+					to="/"
+				>
+					Main page
+				</Link>
+				<button
+					className={cn(
+						'w-28 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 ml-5 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-300'
+					)}
+					onClick={handleSaveConfigButtonClick}
+					disabled={isConfigSaving}
+				>
+					{isConfigSaving ? 'Saving...' : 'Save'}
+				</button>
+				{Boolean(configSavingError) && (
+					<p className="mt-2 text-red-600">{configSavingError}</p>
+				)}
+			</div>
 			{isLoading && <h3>Configuration is loading...</h3>}
-			{error && <h3>{error}</h3>}
+			{Boolean(error) && <h3>{error}</h3>}
 			{config !== null && (
 				<div className="ml-5">
 					<section className="mt-5">
