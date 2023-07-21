@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "bim": [
+  "bimFiles": [
     "../res/two_levels.json",
     "../res/one_zone_one_exit.json",
     "../res/three_zone_three_transit.json",
@@ -16,7 +16,7 @@
     "../res/udsu_b5_L4_v1_200102.json",
     "../res/udsu_b7_L8_v1_190701.json"
   ],
-  "logger_configure": "../logger.conf",
+  "loggerCfg": "../logger.conf",
   "distribution": {
     "type": "uniform",
     "density": 1,
@@ -30,10 +30,10 @@
       }
     ]
   },
-  "transits": {
-    "type": "from_bim",
-    "doorwayin": 0,
-    "doorwayout": 0,
+  "transitionParameters": {
+    "type": "fromBim",
+    "doorwayIn": 0,
+    "doorwayOut": 0,
     "special": [
       {
         "uuid": [
@@ -44,10 +44,10 @@
       }
     ]
   },
-  "modeling": {
+  "modelingParameters": {
     "step": 0.01,
-    "speed_max": 100,
-    "density_min": 0.1,
-    "density_max": 5
+    "maxSpeed": 100,
+    "maxDensity": 5,
+    "minDensity": 0.1
   }
 }

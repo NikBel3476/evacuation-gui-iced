@@ -21,35 +21,7 @@ const ConfigurationPage: FC = () => {
 	const handleSaveConfigButtonClick: MouseEventHandler<HTMLButtonElement> = _ => {
 		try {
 			if (config !== null) {
-				void invoke('save_configuration', {
-					configuration: {
-						bim: config.files,
-						logger_configure: config.logger_config,
-						distribution: {
-							type: config.distribution.distribution_type.replace(
-								/[A-Z]/g,
-								letter => `_${letter.toLowerCase()}`
-							).slice(1),
-							density: config.distribution.density,
-							special: config.distribution.special
-						},
-						transits: {
-							type: config.transition.transitions_type.replace(
-								/[A-Z]/g,
-								letter => `_${letter.toLowerCase()}`
-							).slice(1),
-							doorwayin: config.transition.doorway_in,
-							doorwayout: config.transition.doorway_out,
-							special: config.transition.special
-						},
-						modeling: {
-							step: config.modeling.step,
-							speed_max: config.modeling.max_speed,
-							density_min: config.modeling.min_density,
-							density_max: config.modeling.max_density
-						}
-					}
-				});
+				void invoke('save_configuration', { configuration: config });
 				console.log('Configuration saved');
 			}
 		} catch (e) {
@@ -82,14 +54,14 @@ const ConfigurationPage: FC = () => {
 						<label htmlFor="bim_filenames" className="text-2xl">
 							Файлы цифровых моделей зданий
 						</label>
-						<Select options={config.files.map(file => ({ key: file, value: file }))} />
+						<Select options={config.bimFiles.map(file => ({ key: file, value: file }))} />
 					</section>
 					<section className="mt-5">
 						<label htmlFor="logger_filename" className="text-2xl">
 							Файл конфигурации логирования
 						</label>
 						<input
-							value={config.logger_config}
+							value={config.loggerCfg}
 							onChange={handleLoggerFilenameInputChange}
 							type="text"
 							name="logger_filename"
@@ -103,7 +75,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="distribution_type">Тип:</label>
 							<input
-								value={config.distribution.distribution_type}
+								value={config.distribution.type}
 								onChange={() => {}}
 								placeholder="distribution_type"
 								type="text"
@@ -185,7 +157,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="transition_type">Тип:</label>
 							<input
-								value={config.transition.transitions_type}
+								value={config.transitionParameters.type}
 								onChange={() => {}}
 								placeholder="transition_type"
 								type="text"
@@ -198,7 +170,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="transition_doorway_in">Doorway in:</label>
 							<input
-								value={config.transition.doorway_in}
+								value={config.transitionParameters.doorwayIn}
 								onChange={() => {}}
 								placeholder="transition_doorway_in"
 								type="text"
@@ -211,7 +183,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="transition_doorway_out">Doorway out:</label>
 							<input
-								value={config.transition.doorway_out}
+								value={config.transitionParameters.doorwayOut}
 								onChange={() => {}}
 								placeholder="transition_doorway_out"
 								type="text"
@@ -223,7 +195,7 @@ const ConfigurationPage: FC = () => {
 						</div>
 						<div className="mt-2">
 							<ul className="ml-4 list-decimal list-outside">
-								{config.transition.special.map(special => (
+								{config.transitionParameters.special.map(special => (
 									<li key={special.uuid.toString()}>
 										<div>
 											<label
@@ -279,7 +251,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="modeling_step">Шаг:</label>
 							<input
-								value={config.modeling.step}
+								value={config.modelingParameters.step}
 								onChange={() => {}}
 								placeholder="modeling_step"
 								type="text"
@@ -292,7 +264,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="max_speed">Максимальная скорость:</label>
 							<input
-								value={config.modeling.max_speed}
+								value={config.modelingParameters.maxSpeed}
 								onChange={() => {}}
 								placeholder="max_speed"
 								type="text"
@@ -305,7 +277,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="max_density">Максимальная плотность:</label>
 							<input
-								value={config.modeling.max_density}
+								value={config.modelingParameters.maxDensity}
 								onChange={() => {}}
 								placeholder="max_density"
 								type="text"
@@ -318,7 +290,7 @@ const ConfigurationPage: FC = () => {
 						<div className="mt-2">
 							<label htmlFor="min_density">Минимальная плотность:</label>
 							<input
-								value={config.modeling.min_density}
+								value={config.modelingParameters.minDensity}
 								onChange={() => {}}
 								placeholder="min_density"
 								type="text"

@@ -7,20 +7,21 @@ use std::path::Path;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
-#[serde(rename_all(deserialize = "snake_case"))]
+#[serde(rename_all = "camelCase")]
 pub enum DistributionType {
 	FromBim,
 	Uniform,
 }
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
-#[serde(rename_all(deserialize = "snake_case"))]
+#[serde(rename_all = "camelCase")]
 pub enum TransitionType {
 	FromBim,
 	Users,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DistributionSpecial {
 	pub uuid: Vec<Uuid>,
 	pub density: f64,
@@ -28,6 +29,7 @@ pub struct DistributionSpecial {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TransitionSpecial {
 	pub uuid: Vec<Uuid>,
 	pub width: f64,
@@ -35,45 +37,40 @@ pub struct TransitionSpecial {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Distribution {
-	#[serde(rename(deserialize = "type"))]
-	pub distribution_type: DistributionType,
+	pub r#type: DistributionType,
 	pub density: f64,
 	pub special: Vec<DistributionSpecial>,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Transition {
-	#[serde(rename(deserialize = "type"))]
-	pub transitions_type: TransitionType,
-	#[serde(rename(deserialize = "doorwayin"))]
+	pub r#type: TransitionType,
 	pub doorway_in: f64,
-	#[serde(rename(deserialize = "doorwayout"))]
 	pub doorway_out: f64,
 	pub special: Vec<TransitionSpecial>,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Modeling {
 	pub step: f64,
-	#[serde(rename(deserialize = "speed_max"))]
 	pub max_speed: f64,
-	#[serde(rename(deserialize = "density_max"))]
 	pub max_density: f64,
-	#[serde(rename(deserialize = "density_min"))]
 	pub min_density: f64,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ScenarioCfg {
-	#[serde(rename(deserialize = "bim"))]
-	pub files: Vec<String>,
-	#[serde(rename(deserialize = "logger_configure"))]
-	pub logger_config: String,
+	pub version: String,
+	pub bim_files: Vec<String>,
+	pub logger_cfg: String,
 	pub distribution: Distribution,
-	#[serde(rename(deserialize = "transits"))]
-	pub transition: Transition,
-	pub modeling: Modeling,
+	pub transition_parameters: Transition,
+	pub modeling_parameters: Modeling,
 }
 
 pub fn load_cfg(path_to_file: &str) -> Result<ScenarioCfg, String> {

@@ -4,23 +4,24 @@ import { TransitionType } from '../enums/TransitionType';
 import { SpecialTransition } from './SpecialTransition';
 
 export interface ScenarioConfiguration {
-	files: string[];
-	logger_config: string;
+	version: string;
+	bimFiles: string[];
+	loggerCfg: string;
 	distribution: {
-		distribution_type: DistributionType;
+		type: DistributionType;
 		density: number;
 		special: SpecialDistribution[];
 	};
-	transition: {
-		transitions_type: TransitionType;
-		doorway_in: number;
-		doorway_out: number;
+	transitionParameters: {
+		type: TransitionType;
+		doorwayIn: number;
+		doorwayOut: number;
 		special: SpecialTransition[];
 	};
-	modeling: {
+	modelingParameters: {
 		step: number;
-		max_speed: number;
-		max_density: number;
-		min_density: number;
+		maxSpeed: number;
+		maxDensity: number;
+		minDensity: number;
 	};
 }

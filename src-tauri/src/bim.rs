@@ -41,7 +41,7 @@ pub fn run_rust() {
 
 	let start = Instant::now();
 	// TODO: add the logger
-	for file in &scenario_configuration.files {
+	for file in &scenario_configuration.bim_files {
 		let filename = bim_basename_rust(file);
 		let log_filename = bim_basename_rust("log.txt");
 
@@ -237,7 +237,7 @@ pub fn run_rust_old() {
 
 	let start = Instant::now();
 	// TODO: add the logger
-	for file in &scenario_configuration.files {
+	for file in &scenario_configuration.bim_files {
 		let filename = bim_basename_rust(file);
 		let log_filename = bim_basename_rust("log.txt");
 
@@ -330,20 +330,20 @@ pub fn run_rust_old() {
 
 pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &ScenarioCfg) {
 	for transition in &mut bim.transits {
-		if scenario_configuration.transition.transitions_type == TransitionType::Users {
+		if scenario_configuration.transition_parameters.r#type == TransitionType::Users {
 			match transition.sign {
 				BimElementSign::DoorWayIn => {
-					transition.width = scenario_configuration.transition.doorway_in
+					transition.width = scenario_configuration.transition_parameters.doorway_in
 				}
 				BimElementSign::DoorWayOut => {
-					transition.width = scenario_configuration.transition.doorway_out
+					transition.width = scenario_configuration.transition_parameters.doorway_out
 				}
 				_ => {}
 			}
 		}
 
 		// A special set up the transit width of item of bim
-		for special in &scenario_configuration.transition.special {
+		for special in &scenario_configuration.transition_parameters.special {
 			for uuid in &special.uuid {
 				if transition.uuid.eq(uuid) {
 					transition.width = special.width;
@@ -355,20 +355,20 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 	// in c code bim->transits is a pointers to bim->levels[_]->transits so necessary to update bim->levels[_]->transits
 	for level in &mut bim.levels {
 		for transition in &mut level.transits {
-			if scenario_configuration.transition.transitions_type == TransitionType::Users {
+			if scenario_configuration.transition_parameters.r#type == TransitionType::Users {
 				match transition.sign {
 					BimElementSign::DoorWayIn => {
-						transition.width = scenario_configuration.transition.doorway_in
+						transition.width = scenario_configuration.transition_parameters.doorway_in
 					}
 					BimElementSign::DoorWayOut => {
-						transition.width = scenario_configuration.transition.doorway_out
+						transition.width = scenario_configuration.transition_parameters.doorway_out
 					}
 					_ => {}
 				}
 			}
 
 			// A special set up the transit width of item of bim
-			for special in &scenario_configuration.transition.special {
+			for special in &scenario_configuration.transition_parameters.special {
 				for uuid in &special.uuid {
 					if transition.uuid.eq(uuid) {
 						transition.width = special.width;
@@ -383,7 +383,7 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 			continue;
 		}
 
-		if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
+		if scenario_configuration.distribution.r#type == DistributionType::Uniform {
 			zone.number_of_people = zone.area * scenario_configuration.distribution.density;
 		}
 
@@ -404,7 +404,7 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 				continue;
 			}
 
-			if scenario_configuration.distribution.distribution_type == DistributionType::Uniform {
+			if scenario_configuration.distribution.r#type == DistributionType::Uniform {
 				zone.number_of_people = zone.area * scenario_configuration.distribution.density;
 			}
 
@@ -419,13 +419,13 @@ pub fn applying_scenario_bim_params(bim: &mut Bim, scenario_configuration: &Scen
 		}
 	}
 
-	set_modeling_step(scenario_configuration.modeling.step);
-	set_speed_max(scenario_configuration.modeling.max_speed);
-	set_density_max(scenario_configuration.modeling.max_density);
-	set_density_min(scenario_configuration.modeling.min_density);
+	set_modeling_step(scenario_configuration.modeling_parameters.step);
+	set_speed_max(scenario_configuration.modeling_parameters.max_speed);
+	set_density_max(scenario_configuration.modeling_parameters.max_density);
+	set_density_min(scenario_configuration.modeling_parameters.min_density);
 
-	bim.evacuation_modeling_step = scenario_configuration.modeling.step;
-	bim.evacuation_modeling_max_speed = scenario_configuration.modeling.max_speed;
+	bim.evacuation_modeling_step = scenario_configuration.modeling_parameters.step;
+	bim.evacuation_modeling_max_speed = scenario_configuration.modeling_parameters.max_speed;
 }
 
 fn run_modeling(bim: &mut Bim, on_loop_iteration: &mut dyn FnMut(&Bim)) {
@@ -491,10 +491,11 @@ mod tests {
 	#[fixture]
 	fn scenario_configuration() -> ScenarioCfg {
 		ScenarioCfg {
-			files: vec![],
-			logger_config: String::from(""),
+			version: String::new(),
+			bim_files: vec![],
+			logger_cfg: String::new(),
 			distribution: Distribution {
-				distribution_type: DistributionType::Uniform,
+				r#type: DistributionType::Uniform,
 				density: 0.1,
 				special: vec![DistributionSpecial {
 					uuid: vec![uuid!("87c49613-44a7-4f3f-82e0-fb4a9ca2f46d")],
@@ -502,8 +503,8 @@ mod tests {
 					comment: String::new(),
 				}],
 			},
-			transition: Transition {
-				transitions_type: TransitionType::FromBim,
+			transition_parameters: Transition {
+				r#type: TransitionType::FromBim,
 				doorway_in: 0.0,
 				doorway_out: 0.0,
 				special: vec![TransitionSpecial {
@@ -512,7 +513,7 @@ mod tests {
 					comment: String::new(),
 				}],
 			},
-			modeling: Modeling {
+			modeling_parameters: Modeling {
 				step: 0.01,
 				max_speed: 100.0,
 				min_density: 0.1,
