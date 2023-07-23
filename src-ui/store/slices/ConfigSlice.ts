@@ -20,7 +20,7 @@ export const configSlice = createSlice({
 	reducers: {
 		changeLoggerFile: (state, action: PayloadAction<string>) => {
 			if (state.config) {
-				state.config.logger_config = action.payload;
+				state.config.loggerCfg = action.payload;
 			}
 		}
 	},
