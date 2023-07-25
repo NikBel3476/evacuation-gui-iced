@@ -14,7 +14,6 @@ function getPoint(el) {
 		arr.push(points[i].x * scale);
 		arr.push(points[i].y * scale);
 	}
-	console.log(arr);
 	return arr;
 }
 
@@ -59,7 +58,6 @@ function calculateArea(coords) {
 			coords[(i + 1) % coords.length].y
 		];
 
-		console.log(coords[0].x);
 		area += x1 * y2 - x2 * y1;
 	}
 
@@ -129,9 +127,7 @@ function App() {
 		//let Points = getPoint(elem);
 		//console.log(Points);
 		let area = calculateArea(elem.XY[0].points);
-		console.log(area);
 		div.innerHTML = ` id: ${elem.Id}  <br> sign: ${elem.Sign} <br> Area: ${area}`;
-		console.log(div);
 	}
 
 	const [scale, setState] = useState({
@@ -243,6 +239,7 @@ function App() {
 				</Layer>
 				<Layer>
 					{rs.map(
+						// eslint-disable-next-line no-console
 						room => console.log()
 						//   for (;;) {
 						//     <Circle

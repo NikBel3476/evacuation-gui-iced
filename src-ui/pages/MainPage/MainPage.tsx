@@ -23,15 +23,11 @@ const MainPage: FC = () => {
 	};
 
 	const handleBimStartButtonClick = () => {
-		void invoke('bim_start').then(() => {
-			console.log('completed');
-		});
+		void invoke('bim_start');
 	};
 
 	const handleRunPythonButtonClick = () => {
-		void invoke('python_start').then(() => {
-			console.log('python started');
-		});
+		void invoke('python_start');
 	};
 
 	return (

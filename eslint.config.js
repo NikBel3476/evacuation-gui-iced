@@ -13,8 +13,8 @@ export default [
 		ignores: [
 			'dist/',
 			'**/target/',
-			'*.bs.js',
-			'*.gen.ts*',
+			'**/*.bs.js',
+			'**/*.gen.ts*',
 			'src-ui/peopleTraffic/js/vendor',
 			'coverage/',
 			'eslint.config.js',
