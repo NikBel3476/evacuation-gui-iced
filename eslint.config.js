@@ -18,6 +18,7 @@ export default [
 			'**/*.gen.ts*',
 			'src-ui/peopleTraffic/js/vendor',
 			'coverage/',
+			'test/',
 			'eslint.config.js',
 			'vite.config.ts',
 			'cypress.config.ts',
@@ -73,6 +74,7 @@ export default [
 		}
 	},
 	{
+		files: ['**/*.{ts,tsx}'],
 		plugins: {
 			'@typescript-eslint': typescriptEslint
 		},
