@@ -66,6 +66,10 @@ jobs:
       - name: Install app web dependencies
         run: npm ci # Change this to npm, yarn or pnpm.
 
+      - name: Run webdriverio tests (Ubuntu and Windows)
+        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'windows')
+        run: npm run test:wdio
+
       - name: Check formatting
         run: npm run format:check:all
 
@@ -91,10 +95,6 @@ jobs:
         with:
           command: xtask
           args: coverage
-
-      - name: Run webdriverio tests (Ubuntu and Windows)
-        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'windows')
-        run: npm run test:wdio
 
       - name: Run cypress tests (ubuntu)
         uses: cypress-io/github-action@v5
