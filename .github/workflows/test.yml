@@ -46,12 +46,13 @@ jobs:
           command: install
           args: grcov
 
-      - name: Install tauri-driver (Ubuntu and Windows)
-        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'windows')
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: tauri-driver
+      # needs to webdriverio tests
+      # - name: Install tauri-driver (Ubuntu and Windows)
+      #   if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'windows')
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: tauri-driver
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
