@@ -48,8 +48,14 @@ jobs:
         with:
           key: ${{ matrix.platform }}
 
-      - name: Install grcov
-        run: cargo install grcov
+      # - name: Install grcov
+      #   run: cargo install grcov
+
+        - name: Install grcov and tauri-driver
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: grcov tauri-driver
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
