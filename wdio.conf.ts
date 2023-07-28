@@ -5,16 +5,18 @@ import { spawn, spawnSync } from 'child_process';
 
 // keep track of the `tauri-driver` child process
 let tauriDriver;
+const appExecutableName = process.platform === 'win32' ? 'evacuation.exe' : 'evacuation';
+const tauriDriverExecuatbleName =
+	process.platform === 'win32' ? 'tauri-driver.exe' : 'tauri-driver';
 
 export const config: Options.Testrunner = {
 	specs: ['./test/specs/**/*.{js,ts}'],
 	maxInstances: 1,
-	port: 4445,
 	capabilities: [
 		{
 			maxInstances: 1,
 			'tauri:options': {
-				application: './target/release/evacuation'
+				application: './target/release/' + appExecutableName
 			}
 		}
 	],
@@ -31,7 +33,7 @@ export const config: Options.Testrunner = {
 	// ensure we are running `tauri-driver` before the session starts so that we can proxy the webdriver requests
 	beforeSession: () =>
 		(tauriDriver = spawn(
-			path.resolve(os.homedir(), '.cargo', 'bin', 'tauri-driver'),
+			path.resolve(os.homedir(), '.cargo', 'bin', tauriDriverExecuatbleName),
 			[],
 			{ stdio: [null, process.stdout, process.stderr] }
 		)),

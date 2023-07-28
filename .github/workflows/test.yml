@@ -27,7 +27,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf \
-          libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+          libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb \
+          webkit2gtk-driver
+
+      # - name: Setup Edge WebDriver
+      #   if: contains(matrix.platform, 'windows')
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest https://msedgedriver.azureedge.net/115.0.1901.188/edgedriver_win64.zip -OutFile C:\edgedriver_win64.zip
+      #     Expand-Archive C:\edgedriver_win64.zip -DestinationPath C:\edgedriver_win64
+      #     $env:Path += ';C:\edgedriver_win64'
 
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
@@ -76,6 +85,9 @@ jobs:
         with:
           command: xtask
           args: coverage
+
+      - name: Run webdriverio tests
+        run: npm run test:wdio
 
       - name: Run cypress tests (ubuntu)
         uses: cypress-io/github-action@v5
