@@ -11,6 +11,7 @@ const tauriDriverExecuatbleName =
 
 export const config: Options.Testrunner = {
 	specs: ['./test/specs/**/*.{js,ts}'],
+	hostname: '127.0.0.1',
 	maxInstances: 1,
 	capabilities: [
 		{
