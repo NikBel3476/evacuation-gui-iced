@@ -75,7 +75,7 @@ jobs:
 
       - name: Run webdriverio tests (Ubuntu and Windows)
         if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'windows')
-        run: npm run test:wdio
+        run: npm run build && npm run test:wdio # TODO: remove build command
 
       - name: Check formatting
         run: npm run format:check:all
