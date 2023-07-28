@@ -51,7 +51,7 @@ jobs:
       # - name: Install grcov
       #   run: cargo install grcov
 
-        - name: Install grcov and tauri-driver
+      - name: Install grcov and tauri-driver
         uses: actions-rs/cargo@v1
         with:
           command: install
