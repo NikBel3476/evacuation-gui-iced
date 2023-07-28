@@ -86,7 +86,8 @@ jobs:
           command: xtask
           args: coverage
 
-      - name: Run webdriverio tests
+      - name: Run webdriverio tests (Ubuntu and Windows)
+        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'windows')
         run: npm run test:wdio
 
       - name: Run cypress tests (ubuntu)
