@@ -11,6 +11,7 @@ const tauriDriverExecuatbleName =
 
 export const config: Options.Testrunner = {
 	specs: ['./test/specs/**/*.{js,ts}'],
+	hostname: '127.0.0.1',
 	maxInstances: 1,
 	capabilities: [
 		{
@@ -18,6 +19,12 @@ export const config: Options.Testrunner = {
 			'tauri:options': {
 				application: './target/release/' + appExecutableName
 			}
+			// 'ms:edgeOptions': {
+			// 	args: ['--headless']
+			// },
+			// 'moz:firefoxOptions': {
+			// 	args: ['-headless']
+			// }
 		}
 	],
 	reporters: ['spec'],
