@@ -1,6 +1,6 @@
 import React, { FC, MouseEventHandler } from 'react';
 import cn from 'classnames';
-import styles from '../../../pages/PeopleTraffic/PeopleTraffic.module.css';
+import styles from './ControlPanel.module.css';
 import {
 	ArrowDownIcon,
 	ArrowUpIcon,
@@ -22,7 +22,7 @@ const ControlPanel: FC<ControlPanelProps> = ({
 	onSpeedDownButtonClick
 }) => {
 	return (
-		<aside className={cn(styles.footer, 'bg-sky-400')}>
+		<aside className={cn(styles.container, 'bg-sky-400')}>
 			<div className="grid grid-cols-4 grid-rows-1 gap-x-4 justify-items-center">
 				<div
 					className="p-1 rounded-full bg-indigo-600 cursor-pointer"

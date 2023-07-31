@@ -27,7 +27,6 @@ export default [
 		]
 	},
 	reactJsxRuntime,
-	// TODO: append `reactHooksRecommended`
 	// TODO: append `standardWithTypescript`
 	{
 		languageOptions: {

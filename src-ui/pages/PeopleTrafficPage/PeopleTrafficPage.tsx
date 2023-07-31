@@ -6,7 +6,7 @@ import React, {
 	WheelEventHandler
 } from 'react';
 import cn from 'classnames';
-import styles from './PeopleTraffic.module.css';
+import styles from './PeopleTrafficPage.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
 import BuildingView from '../../components/modeling/BuildingView';
 import ControlPanel from '../../components/modeling/ControlPanel';
@@ -19,7 +19,7 @@ import {
 import { useAppDispatch } from '../../hooks/redux';
 import { FileEntry, readDir, BaseDirectory } from '@tauri-apps/api/fs';
 
-const PeopleTraffic: FC = _ => {
+const PeopleTrafficPage: FC = _ => {
 	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
 	let app: App | null = null;
 	const dispatch = useAppDispatch();
@@ -104,7 +104,8 @@ const PeopleTraffic: FC = _ => {
 		}
 	};
 
-	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = _ => {
+	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = event => {
+		event.preventDefault();
 		if (app) {
 			app.canMove = true;
 		}
@@ -184,4 +185,4 @@ const PeopleTraffic: FC = _ => {
 	);
 };
 
-export default PeopleTraffic;
+export default PeopleTrafficPage;

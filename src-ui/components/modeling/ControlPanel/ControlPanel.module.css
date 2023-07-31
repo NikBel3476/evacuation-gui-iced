@@ -1,1 +1,10 @@
-/* stylelint-disable */
+.container {
+	padding: 0.5rem 1rem;
+	grid-column: span 2 / span 2;
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: max-content repeat(3, 1fr);
+	justify-content: space-between;
+	justify-items: center;
+	align-items: center;
+}
