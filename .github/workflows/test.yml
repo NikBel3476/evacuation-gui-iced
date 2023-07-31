@@ -72,16 +72,16 @@ jobs:
       - name: Lint CSS
         run: npm run lint:css
 
-      - name: Run web tests
-        run: npm run test
+      - name: Run web tests and get coverage
+        run: npm run coverage
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Rust tests
-        run: cargo test
+#      - name: Run Rust tests
+#        run: cargo test
 
       - name: Run xtask coverage
         uses: actions-rs/cargo@v1
@@ -114,4 +114,4 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage/*.lcov
+          files: coverage/*.lcov,coverageUi/*.info

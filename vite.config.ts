@@ -49,8 +49,11 @@ export default defineConfig({
 		setupFiles: 'src-ui/setupTests.ts',
 		coverage: {
 			all: true,
+			reporter: ['lcov'],
+			reportsDirectory: 'coverageUi',
 			exclude: [
 				'coverage/**',
+				'coverageUi/**',
 				'dist/**',
 				'packages/*/test{,s}/**',
 				'**/*.d.ts',
@@ -60,11 +63,9 @@ export default defineConfig({
 				'**/*{.,-}test.{js,cjs,mjs,ts,tsx,jsx}',
 				'**/*{.,-}spec.{js,cjs,mjs,ts,tsx,jsx}',
 				'**/__tests__/**',
-				'**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress}.config.*',
+				'**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tailwind,postcss,eslint}.config.*',
 				'**/.{eslint,mocha,prettier}rc.{js,cjs,yml}',
-				'vite.config.ts',
-				'tailwind.config.cjs',
-				'postcss.config.cjs',
+				'wdio.conf.ts',
 				'**/target/**'
 			]
 		}
