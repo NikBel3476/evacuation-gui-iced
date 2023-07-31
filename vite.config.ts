@@ -47,6 +47,14 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		setupFiles: 'src-ui/setupTests.ts',
+		deps: {
+			inline: ['vitest-canvas-mock']
+		},
+		environmentOptions: {
+			jsdom: {
+				resources: 'usable'
+			}
+		},
 		coverage: {
 			all: true,
 			reporter: ['lcov'],

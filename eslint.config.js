@@ -98,7 +98,8 @@ export default [
 			'@typescript-eslint/consistent-type-imports': [
 				'error',
 				{
-					prefer: 'no-type-imports'
+					prefer: 'type-imports',
+					fixStyle: 'separate-type-imports'
 				}
 			],
 			'@typescript-eslint/explicit-function-return-type': [
