@@ -1,4 +1,5 @@
 import { defineConfig } from 'cypress';
+import createBundler from '@bahmutov/cypress-esbuild-preprocessor';
 
 export default defineConfig({
 	e2e: {
@@ -6,6 +7,7 @@ export default defineConfig({
 		video: false,
 		setupNodeEvents(on, config) {
 			// implement node event listeners here
+			on('file:preprocessor', createBundler());
 		}
 	}
 });
