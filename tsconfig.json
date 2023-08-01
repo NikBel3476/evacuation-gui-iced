@@ -30,7 +30,8 @@
     "types": ["vitest/globals"]
   },
   "include": [
-    "src-ui"
+    "src-ui",
+    "stories"
   ],
   "references": [
     {

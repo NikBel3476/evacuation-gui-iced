@@ -5,6 +5,7 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import cypress from 'eslint-plugin-cypress';
 import reactHooks from 'eslint-plugin-react-hooks';
+import storybook from 'eslint-plugin-storybook';
 
 export default [
 	{
@@ -82,7 +83,7 @@ export default [
 			parserOptions: {
 				ecmaVersion: 'latest',
 				sourceType: 'module',
-				project: 'tsconfig.json'
+				project: './tsconfig.json'
 			}
 		},
 		rules: {
@@ -233,6 +234,39 @@ export default [
 					endOfLine: 'auto'
 				}
 			]
+		}
+	},
+	{
+		plugins: {
+			storybook
+		},
+		files: ['*.stories.@(ts|tsx|js|jsx|mjs|cjs)', '*.story.@(ts|tsx|js|jsx|mjs|cjs)'],
+		rules: {
+			// plugin:storybook/recommended
+			'import/no-anonymous-default-export': 'off',
+			'storybook/await-interactions': 'error',
+			'storybook/context-in-play-function': 'error',
+			'storybook/default-exports': 'error',
+			'storybook/hierarchy-separator': 'warn',
+			'storybook/no-redundant-story-name': 'warn',
+			'storybook/prefer-pascal-case': 'warn',
+			'storybook/story-exports': 'error',
+			'storybook/use-storybook-expect': 'error',
+			'storybook/use-storybook-testing-library': 'error',
+			// plugin:storybook/csf
+			'storybook/csf-component': 'warn',
+			// plugin:storybook/csf-strict
+			'storybook/no-stories-of': 'error',
+			'storybook/no-title-property-in-meta': 'error'
+		}
+	},
+	{
+		files: ['.storybook/main.@(js|cjs|mjs|ts)'],
+		plugins: {
+			storybook
+		},
+		rules: {
+			'storybook/no-uninstalled-addons': 'error'
 		}
 	},
 	{
