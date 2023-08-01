@@ -1,17 +1,11 @@
-import React, {
-	ChangeEvent,
-	MouseEventHandler,
-	useCallback,
-	useEffect,
-	useState,
-	WheelEventHandler
-} from 'react';
+import type { ChangeEvent, MouseEventHandler, WheelEventHandler } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Container, Graphics, Stage } from '@pixi/react';
-import { Graphics as PixiGraphics } from '@pixi/graphics';
+import type { Graphics as PixiGraphics } from '@pixi/graphics';
 import timeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from '../../BuildingView2D/application/view/View';
 import { Point as PixiPoint } from 'pixi.js';
-import { Point } from '../../BuildingView2D/application/Interfaces/Building';
+import type { Point } from '../../BuildingView2D/application/Interfaces/Building';
 import { Logic } from '../../BuildingView2D/application/logic/Logic';
 import {
 	decrementCurrentLevel,
@@ -28,10 +22,10 @@ import cn from 'classnames';
 import styles from './ModelingViewPage.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
 import ControlPanel from '../../components/modeling/ControlPanel';
-import { TimeData } from '../../BuildingView2D/application/Interfaces/TimeData';
+import type { TimeData } from '../../BuildingView2D/application/Interfaces/TimeData';
 import { getConfig } from '../../store/actionCreators/getConfig';
 import { bimFiles } from '../../consts/bimFiles';
-import { BimJson } from '../../interfaces/BimJson';
+import type { BimJson } from '../../interfaces/BimJson';
 
 const ModelingViewPage = () => {
 	const [buildingData, setBuildingData] = useState<BimJson>(

@@ -26,7 +26,8 @@
           "classnameTransform": "camelCase"
         }
       }
-    ]
+    ],
+    "types": ["vitest/globals"]
   },
   "include": [
     "src-ui"

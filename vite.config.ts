@@ -47,22 +47,29 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		setupFiles: 'src-ui/setupTests.ts',
-		deps: {
-			inline: ['vitest-canvas-mock']
-		},
-		environmentOptions: {
-			jsdom: {
-				resources: 'usable'
-			}
-		},
+		exclude: [
+			'coverage/**',
+			'coverageUi/**',
+			'**/node_modules/**',
+			'**/dist/**',
+			'**/.{idea,git,cache,output,temp}/**',
+			'cypress/**',
+			'**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tailwind,postcss,eslint}.config.*',
+			'**/.{eslint,mocha,prettier}rc.{js,cjs,yml}',
+			'wdio.conf.ts',
+			'**/target/**'
+		],
 		coverage: {
 			all: true,
+			provider: 'v8',
 			reporter: ['lcov'],
 			reportsDirectory: 'coverageUi',
 			exclude: [
 				'coverage/**',
 				'coverageUi/**',
-				'dist/**',
+				'**/node_modules/**',
+				'**/dist/**',
+				'**/.{idea,git,cache,output,temp}/**',
 				'packages/*/test{,s}/**',
 				'**/*.d.ts',
 				'cypress/**',

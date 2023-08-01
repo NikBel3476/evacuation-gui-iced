@@ -1,10 +1,5 @@
-import React, {
-	FC,
-	MouseEventHandler,
-	useEffect,
-	useState,
-	WheelEventHandler
-} from 'react';
+import type { FC, MouseEventHandler, WheelEventHandler } from 'react';
+import React, { useEffect, useState } from 'react';
 import cn from 'classnames';
 import styles from './PeopleTrafficPage.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
@@ -17,7 +12,8 @@ import {
 	setBuildingElement
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
-import { FileEntry, readDir, BaseDirectory } from '@tauri-apps/api/fs';
+import type { FileEntry } from '@tauri-apps/api/fs';
+import { readDir, BaseDirectory } from '@tauri-apps/api/fs';
 
 const PeopleTrafficPage: FC = _ => {
 	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
