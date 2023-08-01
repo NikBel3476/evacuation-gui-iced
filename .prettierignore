@@ -17,4 +17,5 @@ src-ui/peopleTraffic/js/vendor/
 **/*.gen.tsx
 **/*.json
 **/*.md
+**/*.mdx
 **/*.yml

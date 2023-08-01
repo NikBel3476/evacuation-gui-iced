@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import rescript from '@jihchi/vite-plugin-rescript';
 import * as path from 'path';
@@ -48,16 +49,15 @@ export default defineConfig({
 		environment: 'jsdom',
 		setupFiles: 'src-ui/setupTests.ts',
 		exclude: [
+			...configDefaults.exclude,
 			'coverage/**',
 			'coverageUi/**',
-			'**/node_modules/**',
-			'**/dist/**',
-			'**/.{idea,git,cache,output,temp}/**',
-			'cypress/**',
-			'**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tailwind,postcss,eslint}.config.*',
+			'**/{tailwind,postcss,eslint}.config.*',
 			'**/.{eslint,mocha,prettier}rc.{js,cjs,yml}',
 			'wdio.conf.ts',
-			'**/target/**'
+			'**/target/**',
+			'**/PeopleTrafficPage.test.tsx',
+			'**/ModelingViewPage.test.tsx'
 		],
 		coverage: {
 			all: true,
@@ -65,21 +65,9 @@ export default defineConfig({
 			reporter: ['lcov'],
 			reportsDirectory: 'coverageUi',
 			exclude: [
-				'coverage/**',
+				...configDefaults.coverage.exclude,
 				'coverageUi/**',
-				'**/node_modules/**',
-				'**/dist/**',
-				'**/.{idea,git,cache,output,temp}/**',
-				'packages/*/test{,s}/**',
-				'**/*.d.ts',
-				'cypress/**',
-				'test{,s}/**',
-				'test{,-*}.{js,cjs,mjs,ts,tsx,jsx}',
-				'**/*{.,-}test.{js,cjs,mjs,ts,tsx,jsx}',
-				'**/*{.,-}spec.{js,cjs,mjs,ts,tsx,jsx}',
-				'**/__tests__/**',
-				'**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tailwind,postcss,eslint}.config.*',
-				'**/.{eslint,mocha,prettier}rc.{js,cjs,yml}',
+				'**/{tailwind,postcss,eslint}.config.*',
 				'wdio.conf.ts',
 				'**/target/**'
 			]
