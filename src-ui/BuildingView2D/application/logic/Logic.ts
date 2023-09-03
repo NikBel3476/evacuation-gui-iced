@@ -163,8 +163,8 @@ export class Logic {
 		const centerXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
 
 		const peopleCount = Math.floor(density);
-		const peopleXY = Array<Point>(peopleCount + 1);
-		for (let i = 0; i <= peopleCount; i++) {
+		const peopleXY = Array<Point>(peopleCount);
+		for (let i = 0; i < peopleCount; i++) {
 			let randX = this.mathem.getRandomArbitrary(
 				centerXY.x - centerXY.x / 2 + minXY.x,
 				centerXY.x + centerXY.x / 2 + minXY.x
@@ -207,8 +207,8 @@ export class Logic {
 		const centerXY = { x: diagonalXY.x / 2, y: diagonalXY.y / 2 };
 
 		const peopleCount = Math.floor(density);
-		const peopleXY = Array<Point>(peopleCount + 1);
-		for (let i = 0; i <= peopleCount; i++) {
+		const peopleXY = Array<Point>(peopleCount);
+		for (let i = 0; i < peopleCount; i++) {
 			let randX = Mathem.getRandomArbitrary(
 				centerXY.x - centerXY.x / 2 + minXY.x,
 				centerXY.x + centerXY.x / 2 + minXY.x

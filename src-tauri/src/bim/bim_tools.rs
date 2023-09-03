@@ -114,12 +114,39 @@ pub struct EvacuationModelingResult {
 	pub time_in_seconds: f64,
 	#[serde(skip)]
 	pub people_distribution_stats: Vec<DistributionState>,
+	#[serde(skip)]
+	pub distribution_by_time_steps: DistributionByTimeSteps,
 }
 
 #[derive(Serialize)]
 pub struct DistributionState {
 	pub time_in_minutes: f64,
 	pub distribution: Vec<f64>,
+}
+
+#[derive(Serialize)]
+pub struct DistributionByTimeSteps {
+	pub items: Vec<ItemTimeStepData>,
+}
+
+#[derive(Serialize)]
+pub struct ItemTimeStepData {
+	// pub doors: Vec<DoorTimeStepData>,
+	pub rooms: Vec<RoomTimeStepData>,
+	pub time: f64,
+}
+
+#[derive(Serialize)]
+pub struct DoorTimeStepData {
+	pub from: Uuid,
+	pub nfrom: f64,
+	pub uuid: Uuid,
+}
+
+#[derive(Serialize)]
+pub struct RoomTimeStepData {
+	pub uuid: Uuid,
+	pub density: f64,
 }
 
 impl Bim {
@@ -149,11 +176,18 @@ impl Bim {
 		let remainder = 0.0; // Количество человек, которое может остаться в зд. для остановки цикла
 		let mut people_distribution_stats: Vec<DistributionState> =
 			vec![self.distributions_statistics()];
+		let mut distribution_by_time_steps = DistributionByTimeSteps {
+			items: vec![self.items_statistics()],
+		};
 		loop {
 			evac_moving_step_test_with_log_rust(&graph, &mut self.zones, &mut self.transits);
 			self.increment_time();
 			// bim_output_body(&bim, get_time_m(), &mut fp_detail);
 			people_distribution_stats.push(self.distributions_statistics());
+
+			distribution_by_time_steps
+				.items
+				.push(self.items_statistics());
 
 			if self.number_of_people_in_building() <= remainder {
 				break;
@@ -165,6 +199,7 @@ impl Bim {
 			number_of_evacuated_people: self.zones[self.zones.len() - 1].number_of_people,
 			time_in_seconds: self.get_time_s(),
 			people_distribution_stats,
+			distribution_by_time_steps,
 		}
 	}
 
@@ -180,6 +215,20 @@ impl Bim {
 		DistributionState {
 			time_in_minutes: self.evacuation_time_in_minutes,
 			distribution: distribution_stats,
+		}
+	}
+
+	fn items_statistics(&self) -> ItemTimeStepData {
+		ItemTimeStepData {
+			time: self.evacuation_time_in_minutes * 60.0,
+			rooms: self
+				.zones
+				.iter()
+				.map(|zone| RoomTimeStepData {
+					density: zone.number_of_people,
+					uuid: zone.uuid.clone(),
+				})
+				.collect(),
 		}
 	}
 

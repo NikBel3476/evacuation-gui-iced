@@ -51,6 +51,7 @@ pub fn run_rust() {
 		let output_short =
 			bim_create_file_name_rust(&filename, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX);
 		let log = bim_create_file_name_rust(&log_filename, "_rust", ".txt");
+		let time_data_path = bim_create_file_name_rust(&filename, "_time_data", ".json");
 
 		let mut fp_detail =
 			std::fs::File::create(&output_detail).expect("Error opening the output file");
@@ -63,6 +64,8 @@ pub fn run_rust() {
 				.expect("Error opening the log file"),
 			false => std::fs::File::create(&log).expect("Error create the log file"),
 		};
+		let mut time_data_file =
+			std::fs::File::create(&time_data_path).expect("Error opening time data file");
 
 		let current_time = chrono::Local::now()
 			.format("%Y-%m-%d %H:%M:%S.%6f")
@@ -84,6 +87,15 @@ pub fn run_rust() {
 		let modeling_result = bim.run_modeling();
 
 		bim_output_body_detailed(&modeling_result.people_distribution_stats, &mut fp_detail);
+
+		time_data_file
+			.write_all(
+				serde_json::to_string_pretty(&modeling_result.distribution_by_time_steps)
+					.expect("Error time data serialization")
+					.as_bytes(),
+			)
+			.expect("Failed to write time data");
+		time_data_file.flush().expect("Failed flush time data file");
 
 		let number_of_people_inside_building = modeling_result.number_of_people_inside_building;
 		let evacuation_time_m = modeling_result.time_in_seconds / 60.0;
@@ -148,6 +160,7 @@ pub fn run_evacuation_modeling(file: &str) -> EvacuationModelingResult {
 		bim_create_file_name_rust(&filename, OUTPUT_DETAIL_FILE_RUST, OUTPUT_SUFFIX);
 	let output_short = bim_create_file_name_rust(&filename, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX);
 	let log = bim_create_file_name_rust(&log_filename, "_rust", ".txt");
+	let time_data_path = bim_create_file_name_rust(&filename, "", ".json");
 
 	let mut fp_detail =
 		std::fs::File::create(&output_detail).expect("Error opening the output file");
@@ -159,6 +172,8 @@ pub fn run_evacuation_modeling(file: &str) -> EvacuationModelingResult {
 			.expect("Error opening the log file"),
 		false => std::fs::File::create(&log).expect("Error create the log file"),
 	};
+	let mut time_data_file =
+		std::fs::File::create(&time_data_path).expect("Error opening time data file");
 
 	let current_time = chrono::Local::now()
 		.format("%Y-%m-%d %H:%M:%S.%6f")
@@ -180,6 +195,15 @@ pub fn run_evacuation_modeling(file: &str) -> EvacuationModelingResult {
 	let modeling_result = bim.run_modeling();
 
 	bim_output_body_detailed(&modeling_result.people_distribution_stats, &mut fp_detail);
+
+	time_data_file
+		.write_all(
+			serde_json::to_string_pretty(&modeling_result.distribution_by_time_steps)
+				.expect("Error time data serialization")
+				.as_bytes(),
+		)
+		.expect("Failed to write time data");
+	time_data_file.flush().expect("Failed flush time data file");
 
 	let number_of_people_inside_building = modeling_result.number_of_people_inside_building;
 	let evacuation_time_m = modeling_result.time_in_seconds / 60.0;
