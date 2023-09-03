@@ -90,7 +90,7 @@ pub fn run_rust() {
 
 		time_data_file
 			.write_all(
-				serde_json::to_string_pretty(&modeling_result.distribution_by_time_steps)
+				serde_json::to_string(&modeling_result.distribution_by_time_steps)
 					.expect("Error time data serialization")
 					.as_bytes(),
 			)

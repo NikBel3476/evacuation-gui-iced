@@ -4,7 +4,7 @@ import { Building } from '../Interfaces/Building';
 export class Server {
 	data: Building;
 
-	constructor() {
-		this.data = data;
+	constructor(buildingData?: Building) {
+		this.data = buildingData ? buildingData : data;
 	}
 }

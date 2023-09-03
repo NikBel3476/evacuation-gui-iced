@@ -28,9 +28,9 @@ export class Logic {
 	choiceBuild: BuildingElement | null = null;
 	scale: number;
 	mathem: Mathem;
+	timeData: TimeData = timeData;
 	private peopleCoordinate: Array<{ uuid: string; XY: Point[] }> = [];
 	private readonly server: Server;
-	private readonly timeData: TimeData = timeData;
 
 	constructor({ view, ui, data, mathem, server }: LogicConstructorParams) {
 		this.view = view;

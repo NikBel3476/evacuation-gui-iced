@@ -9,14 +9,17 @@ import { App } from '../../BuildingView2D/application/app';
 import {
 	decrementCurrentLevel,
 	incrementCurrentLevel,
-	setBuildingElement
+	setBuildingElement,
+	setCurrentLevel
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
 import type { FileEntry } from '@tauri-apps/api/fs';
 import { readDir, BaseDirectory } from '@tauri-apps/api/fs';
+import { bimFiles, timeDataFiles } from '../../consts/bimFiles';
+import { Building } from '../../BuildingView2D/application/Interfaces/Building';
 
 const PeopleTrafficPage: FC = _ => {
-	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
+	const [bimFileEntries, setBimFileEntries] = useState<FileEntry[]>([]);
 	let app: App | null = null;
 	const dispatch = useAppDispatch();
 
@@ -26,7 +29,7 @@ const PeopleTrafficPage: FC = _ => {
 
 	const loadBimFiles = async () => {
 		const files = await readDir('resources', { dir: BaseDirectory.AppData });
-		setBimFiles(files);
+		setBimFileEntries(files);
 	};
 
 	const onBuildingViewMount = () => {
@@ -38,6 +41,26 @@ const PeopleTrafficPage: FC = _ => {
 	const onBuildingViewUnmount = () => {
 		app?.stopRendering();
 		window.removeEventListener('keydown', handleWindowKeydown);
+	};
+
+	const handleSelectFileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const buildingData = bimFiles[`../res/${e.target.value}`];
+		if (app && Boolean(buildingData)) {
+			// FIXME: handle state when timeData is undefined
+			const timeData = timeDataFiles[`../res/${e.target.value}`];
+			console.log(timeData);
+			if (timeData) {
+				app.logic.timeData = timeData;
+			}
+
+			app.logic.level = 0;
+			dispatch(setCurrentLevel(0));
+			app.server.data = buildingData as Building;
+			app.logic.struct = buildingData as Building;
+			app.logic.updateBuildsInCamera();
+			app.logic.updatePeopleInBuilds();
+			app.logic.updatePeopleInCamera();
+		}
 	};
 
 	const handleWindowKeydown = (event: KeyboardEvent) => {
@@ -160,7 +183,10 @@ const PeopleTrafficPage: FC = _ => {
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo fileList={bimFiles.map(file => file.name ?? 'Undefined name')} />
+			<FloorInfo
+				fileList={bimFileEntries.map(file => file.name ?? 'Undefined name')}
+				onSelectChange={handleSelectFileChange}
+			/>
 			<BuildingView
 				onMount={onBuildingViewMount}
 				onUnmount={onBuildingViewUnmount}
