@@ -1,5 +1,5 @@
 import type { FC, MouseEventHandler, WheelEventHandler } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import cn from 'classnames';
 import styles from './PeopleTrafficPage.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
@@ -14,44 +14,63 @@ import {
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
 import type { FileEntry } from '@tauri-apps/api/fs';
-import { readDir, BaseDirectory } from '@tauri-apps/api/fs';
+import { readDir, BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
 import { bimFiles, timeDataFiles } from '../../consts/bimFiles';
 import { Building } from '../../BuildingView2D/application/Interfaces/Building';
+import { TimeData } from '../../peopleTraffic/js/application/Interfaces/TimeData';
+
+let app: App | null = null;
 
 const PeopleTrafficPage: FC = _ => {
 	const [bimFileEntries, setBimFileEntries] = useState<FileEntry[]>([]);
-	let app: App | null = null;
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		void loadBimFiles();
+		void load();
 	}, []);
 
+	const load = async () => {
+		void await loadBimFiles();
+		void await loadTimeData();
+	}
+
 	const loadBimFiles = async () => {
-		const files = await readDir('resources', { dir: BaseDirectory.AppData });
-		setBimFileEntries(files);
+
 	};
 
-	const onBuildingViewMount = () => {
-		app = new App('field', 'canvas_container');
+	const loadTimeData = async () => {
+
+	}
+
+	const onBuildingViewMount = useCallback(async () => {
+		const files = await readDir('resources', { dir: BaseDirectory.AppData });
+		setBimFileEntries(files.filter(fileEntry => fileEntry.path.endsWith('.json')));
+		const buildingData = await readTextFile(files[2].path);
+		// const timeData = await readTextFile(files[2].path);
+		app = new App('field', 'canvas_container', JSON.parse(buildingData));
 		app.startRendering();
 		window.addEventListener('keydown', handleWindowKeydown);
-	};
+	}, []);
 
-	const onBuildingViewUnmount = () => {
+	const onBuildingViewUnmount = useCallback(() => {
 		app?.stopRendering();
 		window.removeEventListener('keydown', handleWindowKeydown);
-	};
+	}, []);
 
-	const handleSelectFileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const buildingData = bimFiles[`../res/${e.target.value}`];
+	const handleSelectFileChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+		// const buildingData = bimFiles[`../res/${e.target.value}`];
+		console.log(bimFileEntries);
+		const fileEntry = bimFileEntries.find(fileEntry => fileEntry.name === e.target.value);
+		console.log(fileEntry);
+		const buildingData = JSON.parse(await readTextFile(fileEntry?.path ?? ''));
+		console.log(buildingData);
 		if (app && Boolean(buildingData)) {
+			console.log('update');
 			// FIXME: handle state when timeData is undefined
-			const timeData = timeDataFiles[`../res/${e.target.value}`];
-			console.log(timeData);
-			if (timeData) {
-				app.logic.timeData = timeData;
-			}
+			// const timeData = timeDataFiles[`../res/${e.target.value}`];
+			// if (timeData) {
+			// 	app.logic.timeData = JSON.parse(timeData) as TimeData;
+			// }
 
 			app.logic.level = 0;
 			dispatch(setCurrentLevel(0));
@@ -92,7 +111,7 @@ const PeopleTrafficPage: FC = _ => {
 		}
 	};
 
-	const handleCanvasDoubleClick: MouseEventHandler<HTMLCanvasElement> = event => {
+	const handleCanvasDoubleClick: MouseEventHandler<HTMLCanvasElement> = useCallback(event => {
 		app?.logic.toChoiceBuild(event);
 		if (app?.logic.choiceBuild) {
 			dispatch(
@@ -106,9 +125,9 @@ const PeopleTrafficPage: FC = _ => {
 				})
 			);
 		}
-	};
+	}, []);
 
-	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
+	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = useCallback(event => {
 		if (app) {
 			switch (Math.sign(event.deltaY)) {
 				case -1: // Увеличить zoom
@@ -121,32 +140,32 @@ const PeopleTrafficPage: FC = _ => {
 			app.logic.updateBuildsInCamera();
 			app.logic.updatePeopleInCamera();
 		}
-	};
+	}, []);
 
-	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = event => {
+	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = useCallback(event => {
 		event.preventDefault();
 		if (app) {
 			app.canMove = true;
 		}
-	};
+	}, []);
 
-	const handleCanvasMouseUp: MouseEventHandler<HTMLCanvasElement> = _ => {
+	const handleCanvasMouseUp: MouseEventHandler<HTMLCanvasElement> = useCallback(_ => {
 		if (app) {
 			app.canMove = false;
 		}
-	};
+	}, []);
 
-	const handleCanvasMouseOut: MouseEventHandler<HTMLCanvasElement> = _ => {
+	const handleCanvasMouseOut: MouseEventHandler<HTMLCanvasElement> = useCallback(_ => {
 		if (app) {
 			app.canMove = false;
 		}
-	};
+	}, []);
 
-	const handleCanvasMouseMove: MouseEventHandler<HTMLCanvasElement> = event => {
+	const handleCanvasMouseMove: MouseEventHandler<HTMLCanvasElement> = useCallback(event => {
 		if (app?.canMove === true) {
 			app.logic.mouseMove(event);
 		}
-	};
+	}, []);
 
 	const handlePlayButtonClick: MouseEventHandler = _ => {
 		if (app?.timerTimeDataUpdatePause === true) {

@@ -41,4 +41,4 @@ const BuildingView: FC<BuildingViewProps> = ({
 	);
 };
 
-export default BuildingView;
+export default React.memo(BuildingView);

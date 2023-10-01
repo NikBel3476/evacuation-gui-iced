@@ -4,7 +4,7 @@ import { UI } from './ui/UI.js';
 import { Mathem } from './mathem/Mathem.js';
 import { Logic } from './logic/Logic.js';
 import { Canvas } from './canvas/Canvas.js';
-import { BuildingElement, Point } from './Interfaces/Building';
+import { BuildingElement, Point, Building } from './Interfaces/Building';
 import { GIFEncoder } from '../../peopleTraffic/js/vendor/toGif/GIFEncoder';
 import { VideoRecorder } from '../VideoRecorder/VideoRecorder';
 
@@ -35,10 +35,11 @@ export class App {
 
 	constructor(
 		public canvasId: string,
-		public canvasContainerId: string
+		public canvasContainerId: string,
+		buildingData: Building
 	) {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
-		this.server = new Server();
+		this.server = new Server(buildingData);
 		this.canvas = new Canvas({ canvasId, canvasContainerId });
 		this.mathem = new Mathem();
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
