@@ -4,7 +4,7 @@ import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
-import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
+// import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { Server } from '../server/Server';
 
 interface LogicConstructorParams {
@@ -17,6 +17,7 @@ interface LogicConstructorParams {
 		scale: number;
 		activeBuilds: BuildingElement[];
 	};
+	timeData: TimeData;
 }
 
 export class Logic {
@@ -28,11 +29,11 @@ export class Logic {
 	choiceBuild: BuildingElement | null = null;
 	scale: number;
 	mathem: Mathem;
-	timeData: TimeData = timeData;
+	timeData: TimeData;
 	private peopleCoordinate: Array<{ uuid: string; XY: Point[] }> = [];
 	private readonly server: Server;
 
-	constructor({ view, ui, data, mathem, server }: LogicConstructorParams) {
+	constructor({ view, ui, data, mathem, server, timeData }: LogicConstructorParams) {
 		this.view = view;
 		this.ui = ui;
 		this.data = data;
@@ -42,6 +43,7 @@ export class Logic {
 		this.scale = this.data.scale;
 
 		this.mathem = mathem;
+		this.timeData = timeData;
 	}
 
 	/** ЛОГИКА VIEW **/

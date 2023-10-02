@@ -7,6 +7,7 @@ import { Canvas } from './canvas/Canvas.js';
 import { BuildingElement, Point, Building } from './Interfaces/Building';
 import { GIFEncoder } from '../../peopleTraffic/js/vendor/toGif/GIFEncoder';
 import { VideoRecorder } from '../VideoRecorder/VideoRecorder';
+import { TimeData } from './Interfaces/TimeData';
 
 export class App {
 	server: Server;
@@ -36,7 +37,8 @@ export class App {
 	constructor(
 		public canvasId: string,
 		public canvasContainerId: string,
-		buildingData: Building
+		buildingData: Building,
+		timeData: TimeData
 	) {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
 		this.server = new Server(buildingData);
@@ -63,7 +65,8 @@ export class App {
 			ui: this.ui,
 			data: this.data,
 			mathem: this.mathem,
-			server: this.server
+			server: this.server,
+			timeData
 		});
 		// @ts-expect-error written in js
 		this.encoder = new GIFEncoder();

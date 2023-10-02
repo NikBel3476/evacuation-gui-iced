@@ -112,9 +112,9 @@ pub struct EvacuationModelingResult {
 	pub number_of_people_inside_building: f64,
 	pub number_of_evacuated_people: f64,
 	pub time_in_seconds: f64,
-	#[serde(skip)]
+	// #[serde(skip)]
 	pub people_distribution_stats: Vec<DistributionState>,
-	#[serde(skip)]
+	// #[serde(skip)]
 	pub distribution_by_time_steps: DistributionByTimeSteps,
 }
 

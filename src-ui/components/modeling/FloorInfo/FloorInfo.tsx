@@ -2,14 +2,21 @@ import React, { ChangeEvent, FC } from 'react';
 import { useAppSelector } from '../../../hooks/redux';
 import { Link } from 'react-router-dom';
 import Select from '../../Select';
+import Button from '../../Button';
 
 interface FloorInfoProps {
 	className?: string;
 	fileList: string[];
 	onSelectChange?: (e: ChangeEvent<HTMLSelectElement>) => void;
+	onOpenFile?: () => void;
 }
 
-const FloorInfo: FC<FloorInfoProps> = ({ className, fileList, onSelectChange }) => {
+const FloorInfo: FC<FloorInfoProps> = ({
+	className,
+	fileList,
+	onSelectChange,
+	onOpenFile
+}) => {
 	const { currentLevel, buildingElement } = useAppSelector(
 		state => state.buildingViewReducer
 	);
@@ -28,6 +35,7 @@ const FloorInfo: FC<FloorInfoProps> = ({ className, fileList, onSelectChange }) 
 			>
 				Main page
 			</Link>
+			<Button onClick={onOpenFile}>Открыть файл</Button>
 			<Select
 				className="text-black"
 				options={fileList.map(file => ({ key: file, value: file }))}

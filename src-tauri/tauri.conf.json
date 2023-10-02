@@ -18,6 +18,9 @@
         "scope": {
           "allow": ["**"]
         }
+      },
+      "dialog": {
+        "all": true
       }
     },
     "bundle": {
