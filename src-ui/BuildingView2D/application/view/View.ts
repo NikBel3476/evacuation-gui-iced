@@ -44,10 +44,10 @@ export class View {
 	}
 
 	// Отрисовка комнаты
-	drawBuild(build: BuildingElement) {
+	drawBuild(build: BuildingElement, color?: { r: number; g: number; b: number }) {
 		this.canvas.beginPath();
 		this.drawBox(build.XY[0].points);
-		const RGB = 'rgb(255,255,255)';
+		const RGB = color ? `rgb(${color.r}, ${color.g}, ${color.b}` : 'rgb(255,255,255)';
 		this.canvas.fill(RGB);
 		this.canvas.closePath();
 	}
@@ -96,7 +96,20 @@ export class View {
 	// Отрисовка всего
 	render() {
 		this.canvas.clear();
-		this.data.activeBuilds.forEach(build => this.drawBuild(build));
+		this.data.activeBuilds.forEach(build => {
+			let color = { r: 255, g: 255, b: 255 };
+			if (build.Sign === 'Stairway') {
+				color = { r: 49, g: 152, b: 0 };
+			}
+			if (
+				build.Sign === 'DoorWay' ||
+				build.Sign === 'DoorWayOut' ||
+				build.Sign === 'DoorWayInt'
+			) {
+				color = { r: 227, g: 237, b: 31 };
+			}
+			this.drawBuild(build, color);
+		});
 		this.activePeople.forEach(people => this.drawPeople(people, this.data.activeBuilds));
 		this.canvas.print();
 	}

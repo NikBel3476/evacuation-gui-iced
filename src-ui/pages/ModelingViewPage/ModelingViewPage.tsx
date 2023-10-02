@@ -151,10 +151,7 @@ const ModelingViewPage = () => {
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo
-				fileList={Object.keys(bimFiles)}
-				onSelectChange={handleSelectFileChange}
-			/>
+			<FloorInfo />
 			<div className="w-full h-full overflow-hidden">
 				<Stage
 					id="canvas"

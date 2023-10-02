@@ -4,7 +4,6 @@ import { FC } from 'react';
 import styles from './MainPage.module.css';
 import RouterLink from '../../components/RouterLink';
 import Button from '../../components/Button/Button';
-import { open } from '@tauri-apps/api/dialog';
 
 const MainPage: FC = () => {
 	const handleOpenConfigurationButtonClick = () => {

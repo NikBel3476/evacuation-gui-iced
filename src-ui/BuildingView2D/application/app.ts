@@ -38,7 +38,8 @@ export class App {
 		public canvasId: string,
 		public canvasContainerId: string,
 		buildingData: Building,
-		timeData: TimeData
+		timeData: TimeData,
+		onModelingTick?: (numberOfPeople: number, numberOfEvacuatedPeople: number) => void
 	) {
 		// Инициализация настроек, сервера, инструментария канвас и модуля отрисовки
 		this.server = new Server(buildingData);
@@ -66,10 +67,13 @@ export class App {
 			data: this.data,
 			mathem: this.mathem,
 			server: this.server,
-			timeData
+			timeData,
+			onModelingTick
 		});
 		// @ts-expect-error written in js
 		this.encoder = new GIFEncoder();
+
+		this.onModelingTick = onModelingTick;
 
 		// Инициализация первичных настроек
 		this.init();
@@ -124,10 +128,11 @@ export class App {
 
 	updateTimeData() {
 		if (!this.timerTimeDataUpdatePause) {
-			this.ui.evacuationTimeInSec++;
+			this.ui.evacuationTimeInSec++; // FIXME: modeling may haven't step equal 1 sec
 			this.logic.updatePeopleInBuilds();
 			this.logic.updatePeopleInCamera();
 			this.logic.updateNumberOfPeopleInsideBuildingLabel();
+
 			this.gifNewFrame();
 		}
 

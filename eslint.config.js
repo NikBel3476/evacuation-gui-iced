@@ -6,6 +6,7 @@ import typescriptParser from '@typescript-eslint/parser';
 import cypress from 'eslint-plugin-cypress';
 import reactHooks from 'eslint-plugin-react-hooks';
 import storybook from 'eslint-plugin-storybook';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default [
 	{
@@ -285,5 +286,6 @@ export default [
 			'cypress/no-async-tests': 'error',
 			'cypress/unsafe-to-chain-command': 'error'
 		}
-	}
+	},
+	eslintConfigPrettier
 ];

@@ -1,4 +1,5 @@
-import React, { FC, MouseEventHandler } from 'react';
+import type { FC, MouseEventHandler } from 'react';
+import React from 'react';
 import cn from 'classnames';
 import styles from './ControlPanel.module.css';
 import {
@@ -7,6 +8,7 @@ import {
 	PauseIcon,
 	PlayIcon
 } from '@heroicons/react/24/solid';
+import { useAppSelector } from '../../../hooks/redux';
 
 interface ControlPanelProps {
 	onPlayButtonClick: MouseEventHandler;
@@ -21,6 +23,10 @@ const ControlPanel: FC<ControlPanelProps> = ({
 	onSpeedUpButtonClick,
 	onSpeedDownButtonClick
 }) => {
+	const { numberOfPeopleInsideBuilding, numberOfPeopleOutsideBuilding } = useAppSelector(
+		state => state.buildingViewReducer
+	);
+
 	return (
 		<aside className={cn(styles.container, 'bg-sky-400')}>
 			<div className="grid grid-cols-4 grid-rows-1 gap-x-4 justify-items-center">
@@ -56,12 +62,14 @@ const ControlPanel: FC<ControlPanelProps> = ({
 			</div>
 			<div>
 				<p>
-					Человек в здании: <span id="people_inside_building"></span>
+					Человек в здании:{' '}
+					<span id="people_inside_building">{numberOfPeopleInsideBuilding}</span>
 				</p>
 			</div>
 			<div>
 				<p>
-					Человек вышло: <span id="people_outside_building"></span>
+					Человек вышло:{' '}
+					<span id="people_outside_building">{numberOfPeopleOutsideBuilding}</span>
 				</p>
 			</div>
 		</aside>

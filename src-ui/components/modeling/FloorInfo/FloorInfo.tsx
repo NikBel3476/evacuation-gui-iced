@@ -1,22 +1,15 @@
-import React, { ChangeEvent, FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useAppSelector } from '../../../hooks/redux';
 import { Link } from 'react-router-dom';
-import Select from '../../Select';
 import Button from '../../Button';
 
 interface FloorInfoProps {
 	className?: string;
-	fileList: string[];
-	onSelectChange?: (e: ChangeEvent<HTMLSelectElement>) => void;
 	onOpenFile?: () => void;
 }
 
-const FloorInfo: FC<FloorInfoProps> = ({
-	className,
-	fileList,
-	onSelectChange,
-	onOpenFile
-}) => {
+const FloorInfo: FC<FloorInfoProps> = ({ className, onOpenFile }) => {
 	const { currentLevel, buildingElement } = useAppSelector(
 		state => state.buildingViewReducer
 	);
@@ -24,9 +17,7 @@ const FloorInfo: FC<FloorInfoProps> = ({
 	return (
 		<aside
 			className={
-				'p-4 bg-sky-400 grid grid-cols-1 gap-y-2 content-start' +
-					' ' +
-					String(className) ?? ''
+				'p-4 bg-sky-400 grid grid-cols-1 gap-y-2 content-start' + ' ' + String(className)
 			}
 		>
 			<Link
@@ -36,12 +27,7 @@ const FloorInfo: FC<FloorInfoProps> = ({
 				Main page
 			</Link>
 			<Button onClick={onOpenFile}>Открыть файл</Button>
-			<Select
-				className="text-black"
-				options={fileList.map(file => ({ key: file, value: file }))}
-				onChange={onSelectChange}
-			/>
-			<p className="text-lg">Этаж: {currentLevel}</p>
+			<p className="text-lg">Этаж: {currentLevel + 1}</p>
 			<h2 className="text-xl">Данные о помещении</h2>
 			<p>
 				<span className="block">Уровень этажа:</span>

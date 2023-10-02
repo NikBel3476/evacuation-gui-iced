@@ -9,52 +9,53 @@ import { App } from '../../BuildingView2D/application/app';
 import {
 	decrementCurrentLevel,
 	incrementCurrentLevel,
+	setBim,
 	setBuildingElement,
-	setCurrentLevel
+	setCurrentLevel,
+	setElementNumberOfPeople,
+	setPeopleInsideBuilding,
+	setPeopleOutsideBuilding
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch } from '../../hooks/redux';
 import type { FileEntry } from '@tauri-apps/api/fs';
 import { readDir, BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
-import { bimFiles, timeDataFiles } from '../../consts/bimFiles';
 import { Building } from '../../BuildingView2D/application/Interfaces/Building';
-import { TimeData } from '../../peopleTraffic/js/application/Interfaces/TimeData';
 import { open } from '@tauri-apps/api/dialog';
 import { runEvacuationModeling } from '../../rustCalls';
+import { bimFiles } from '../../consts/bimFiles';
 
 let app: App | null = null;
 
-const PeopleTrafficPage: FC = _ => {
+const PeopleTrafficPage = _ => {
 	const [bimFileEntries, setBimFileEntries] = useState<FileEntry[]>([]);
 	const dispatch = useAppDispatch();
+	const [bimFileIsLoading, setBimFileIsLoading] = useState<boolean>(true);
 
-	useEffect(() => {
-		void load();
-	}, []);
-
-	const load = async () => {
-		void (await loadBimFiles());
-		void (await loadTimeData());
+	const onModelingTick = (numberOfPeople: number, numberOfEvacuatedPeople: number) => {
+		if (app) {
+			// console.log(numberOfPeople, numberOfEvacuatedPeople);
+			dispatch(setElementNumberOfPeople(app.logic.totalNumberOfPeople()));
+			dispatch(setPeopleInsideBuilding(numberOfPeople));
+			dispatch(setPeopleOutsideBuilding(numberOfEvacuatedPeople));
+		}
 	};
-
-	const loadBimFiles = async () => {};
-
-	const loadTimeData = async () => {};
 
 	const onBuildingViewMount = useCallback(async () => {
 		const files = await readDir('resources', { dir: BaseDirectory.AppData });
 		setBimFileEntries(files.filter(fileEntry => fileEntry.path.endsWith('.json')));
 		const bimFile = files[2].path;
 		const buildingData = await readTextFile(bimFile);
-		// const timeData = await readTextFile(files[2].path);
 		const modelingResult = await runEvacuationModeling(bimFile);
 		app = new App(
 			'field',
 			'canvas_container',
 			JSON.parse(buildingData),
-			modelingResult.distribution_by_time_steps
+			modelingResult.distribution_by_time_steps,
+			onModelingTick
 		);
 		app.startRendering();
 		window.addEventListener('keydown', handleWindowKeydown);
+		setBimFileIsLoading(false);
 	}, []);
 
 	const onBuildingViewUnmount = useCallback(() => {
@@ -69,25 +70,33 @@ const PeopleTrafficPage: FC = _ => {
 			title: 'Open BIM file',
 			filters: [{ name: 'BIM json', extensions: ['json'] }]
 		});
+		setBimFileIsLoading(true);
 		const filePath = filePaths instanceof Array ? filePaths[0] : filePaths ?? '';
-		const buildingData = JSON.parse(await readTextFile(filePath));
+		const buildingData = JSON.parse(await readTextFile(filePath)) as Building;
 		if (app && Boolean(buildingData)) {
 			const modelingResult = await runEvacuationModeling(filePath);
 			app.logic.level = 0;
 			app.logic.timeData = modelingResult.distribution_by_time_steps;
-			dispatch(setCurrentLevel(0));
-			app.server.data = buildingData as Building;
-			app.logic.struct = buildingData as Building;
+			app.server.data = buildingData;
+			app.logic.struct = buildingData;
 			app.logic.updateBuildsInCamera();
 			app.logic.updatePeopleInBuilds();
 			app.logic.updatePeopleInCamera();
+			void dispatch(setCurrentLevel(0));
+			dispatch(setPeopleInsideBuilding(app.logic.totalNumberOfPeople()));
+			dispatch(setPeopleOutsideBuilding(0));
+			// void dispatch(setBim(buildingData));
 		}
+		setBimFileIsLoading(false);
 	};
 
 	const handleSelectFileChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
 		// const buildingData = bimFiles[`../res/${e.target.value}`];
+		setBimFileIsLoading(true);
 		const fileEntry = bimFileEntries.find(fileEntry => fileEntry.name === e.target.value);
-		const buildingData = JSON.parse(await readTextFile(fileEntry?.path ?? ''));
+		const buildingData = JSON.parse(
+			await readTextFile(fileEntry?.path ?? '')
+		) as Building;
 		if (app && Boolean(buildingData)) {
 			// FIXME: handle state when timeData is undefined
 			// const timeData = timeDataFiles[`../res/${e.target.value}`];
@@ -97,12 +106,13 @@ const PeopleTrafficPage: FC = _ => {
 
 			app.logic.level = 0;
 			dispatch(setCurrentLevel(0));
-			app.server.data = buildingData as Building;
-			app.logic.struct = buildingData as Building;
+			app.server.data = buildingData;
+			app.logic.struct = buildingData;
 			app.logic.updateBuildsInCamera();
 			app.logic.updatePeopleInBuilds();
 			app.logic.updatePeopleInCamera();
 		}
+		setBimFileIsLoading(false);
 	};
 
 	const handleWindowKeydown = (event: KeyboardEvent) => {
@@ -234,11 +244,23 @@ const PeopleTrafficPage: FC = _ => {
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo
-				fileList={bimFileEntries.map(file => file.name ?? 'Undefined name')}
-				onSelectChange={handleSelectFileChange}
-				onOpenFile={handleOpenFile}
-			/>
+			<FloorInfo onOpenFile={handleOpenFile} />
+			{/*{bimFileIsLoading ? (
+				<div className="flex items-center justify-center">
+					<span className="text-black text-3xl">Загрузка...</span>
+				</div>
+			) : (
+				<BuildingView
+					onMount={onBuildingViewMount}
+					onUnmount={onBuildingViewUnmount}
+					onCanvasDoubleClick={handleCanvasDoubleClick}
+					onCanvasWheel={handleCanvasWheel}
+					onCanvasMouseDown={handleCanvasMouseDown}
+					onCanvasMouseUp={handleCanvasMouseUp}
+					onCanvasMouseOut={handleCanvasMouseOut}
+					onCanvasMouseMove={handleCanvasMouseMove}
+				/>
+			)}*/}
 			<BuildingView
 				onMount={onBuildingViewMount}
 				onUnmount={onBuildingViewUnmount}

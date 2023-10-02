@@ -4,7 +4,6 @@ import { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
 import { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
 import { TimeData } from '../Interfaces/TimeData';
-// import timeData from '../../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { Server } from '../server/Server';
 
 interface LogicConstructorParams {
@@ -18,6 +17,7 @@ interface LogicConstructorParams {
 		activeBuilds: BuildingElement[];
 	};
 	timeData: TimeData;
+	onModelingTick?: (numberOfPeople: number, numberOfEvacuatedPeople: number) => void;
 }
 
 export class Logic {
@@ -25,15 +25,28 @@ export class Logic {
 	ui: UI;
 	data: LogicConstructorParams['data'];
 	struct: Building;
-	level: number = 0;
+	level = 0;
 	choiceBuild: BuildingElement | null = null;
 	scale: number;
 	mathem: Mathem;
 	timeData: TimeData;
-	private peopleCoordinate: Array<{ uuid: string; XY: Point[] }> = [];
+	private peopleCoordinate: { uuid: string; XY: Point[] }[] = [];
 	private readonly server: Server;
 
-	constructor({ view, ui, data, mathem, server, timeData }: LogicConstructorParams) {
+	private onModelingTick?: (
+		numberOfPeople: number,
+		numberOfEvacuatedPeople: number
+	) => void;
+
+	constructor({
+		view,
+		ui,
+		data,
+		mathem,
+		server,
+		timeData,
+		onModelingTick
+	}: LogicConstructorParams) {
 		this.view = view;
 		this.ui = ui;
 		this.data = data;
@@ -44,6 +57,17 @@ export class Logic {
 
 		this.mathem = mathem;
 		this.timeData = timeData;
+
+		this.onModelingTick = onModelingTick;
+	}
+
+	totalNumberOfPeople(): number {
+		return Math.floor(
+			this.timeData.items[0].rooms.reduce(
+				(numberOfPeople, room) => numberOfPeople + room.density,
+				0
+			)
+		);
 	}
 
 	/** ЛОГИКА VIEW **/
@@ -75,7 +99,13 @@ export class Logic {
 
 		if (rooms) {
 			const numberOfPeopleInsideBuilding = Math.floor(
-				rooms.reduce((totalDensity, room) => totalDensity + room.density, 0)
+				rooms
+					.filter(room => room.uuid !== '00000000-0000-0000-0000-000000000000')
+					.reduce((totalDensity, room) => totalDensity + room.density, 0)
+			);
+
+			const numberOfPeopleOutsideBuilding = Math.floor(
+				this.totalNumberOfPeople() - numberOfPeopleInsideBuilding
 			);
 
 			if (this.ui.numberOfPeopleInsideBuilding !== 0) {
@@ -84,6 +114,9 @@ export class Logic {
 			}
 
 			this.ui.numberOfPeopleInsideBuilding = numberOfPeopleInsideBuilding;
+
+			if (this.onModelingTick)
+				this.onModelingTick(numberOfPeopleInsideBuilding, numberOfPeopleOutsideBuilding);
 		} else {
 			this.ui.numberOfPeopleInsideBuilding = 0;
 		}
