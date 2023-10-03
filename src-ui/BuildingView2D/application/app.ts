@@ -4,10 +4,17 @@ import { UI } from './ui/UI.js';
 import { Mathem } from './mathem/Mathem.js';
 import { Logic } from './logic/Logic.js';
 import { Canvas } from './canvas/Canvas.js';
-import { BuildingElement, Point, Building } from './Interfaces/Building';
+import type { BuildingElement, Point, Building } from './Interfaces/Building';
 import { GIFEncoder } from '../../peopleTraffic/js/vendor/toGif/GIFEncoder';
 import { VideoRecorder } from '../VideoRecorder/VideoRecorder';
-import { TimeData } from './Interfaces/TimeData';
+import type { TimeData, TimeState } from './Interfaces/TimeData';
+
+function* timeDataGenerator(timeData: TimeData) {
+	for (const timeState of timeData.items) {
+		yield timeState;
+	}
+	return timeData.items[timeData.items.length - 1];
+}
 
 export class App {
 	server: Server;
@@ -25,14 +32,16 @@ export class App {
 	ui: UI;
 	logic: Logic;
 	encoder;
-	timerTimeDataUpdatePause: boolean = true;
-	isGifStop: boolean = false;
-	canMove: boolean = false;
+	timerTimeDataUpdatePause = true;
+	isGifStop = false;
+	canMove = false;
 	private renderLoopId: number | null = null;
 	private timerTimeDataUpdateId: number | null = null;
-	private fps: number = 0;
-	private fpsOut: number = 0;
+	private fps = 0;
+	private fpsOut = 0;
 	private timestamp: number = performance.now();
+	private nextTimeState: Generator;
+	private currentTimeState: TimeState;
 
 	constructor(
 		public canvasId: string,
@@ -72,8 +81,8 @@ export class App {
 		});
 		// @ts-expect-error written in js
 		this.encoder = new GIFEncoder();
-
-		this.onModelingTick = onModelingTick;
+		this.nextTimeState = timeDataGenerator(timeData);
+		this.currentTimeState = this.nextTimeState.next().value;
 
 		// Инициализация первичных настроек
 		this.init();
@@ -127,6 +136,11 @@ export class App {
 	}
 
 	updateTimeData() {
+		// try {
+		// 	this.currentTimeState = this.nextTimeState.next();
+		// } catch (e) {
+		// 	console.log(e);
+		// }
 		if (!this.timerTimeDataUpdatePause) {
 			this.ui.evacuationTimeInSec++; // FIXME: modeling may haven't step equal 1 sec
 			this.logic.updatePeopleInBuilds();

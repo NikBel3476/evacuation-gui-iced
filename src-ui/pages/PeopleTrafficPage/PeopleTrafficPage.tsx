@@ -1,5 +1,5 @@
-import type { FC, MouseEventHandler, WheelEventHandler } from 'react';
-import React, { useEffect, useState, useCallback } from 'react';
+import type { MouseEventHandler, WheelEventHandler } from 'react';
+import React, { useState, useCallback } from 'react';
 import cn from 'classnames';
 import styles from './PeopleTrafficPage.module.css';
 import FloorInfo from '../../components/modeling/FloorInfo';
@@ -22,18 +22,16 @@ import { readDir, BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
 import { Building } from '../../BuildingView2D/application/Interfaces/Building';
 import { open } from '@tauri-apps/api/dialog';
 import { runEvacuationModeling } from '../../rustCalls';
-import { bimFiles } from '../../consts/bimFiles';
 
 let app: App | null = null;
 
-const PeopleTrafficPage = _ => {
+const PeopleTrafficPage = () => {
 	const [bimFileEntries, setBimFileEntries] = useState<FileEntry[]>([]);
 	const dispatch = useAppDispatch();
 	const [bimFileIsLoading, setBimFileIsLoading] = useState<boolean>(true);
 
 	const onModelingTick = (numberOfPeople: number, numberOfEvacuatedPeople: number) => {
 		if (app) {
-			// console.log(numberOfPeople, numberOfEvacuatedPeople);
 			dispatch(setElementNumberOfPeople(app.logic.totalNumberOfPeople()));
 			dispatch(setPeopleInsideBuilding(numberOfPeople));
 			dispatch(setPeopleOutsideBuilding(numberOfEvacuatedPeople));
@@ -82,6 +80,7 @@ const PeopleTrafficPage = _ => {
 			app.logic.updateBuildsInCamera();
 			app.logic.updatePeopleInBuilds();
 			app.logic.updatePeopleInCamera();
+			app.ui.evacuationTimeInSec = 0;
 			void dispatch(setCurrentLevel(0));
 			dispatch(setPeopleInsideBuilding(app.logic.totalNumberOfPeople()));
 			dispatch(setPeopleOutsideBuilding(0));

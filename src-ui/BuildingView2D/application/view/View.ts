@@ -98,15 +98,17 @@ export class View {
 		this.canvas.clear();
 		this.data.activeBuilds.forEach(build => {
 			let color = { r: 255, g: 255, b: 255 };
-			if (build.Sign === 'Stairway') {
-				color = { r: 49, g: 152, b: 0 };
-			}
-			if (
-				build.Sign === 'DoorWay' ||
-				build.Sign === 'DoorWayOut' ||
-				build.Sign === 'DoorWayInt'
-			) {
-				color = { r: 227, g: 237, b: 31 };
+			switch (build.Sign) {
+				case 'Staircase':
+					color = { r: 49, g: 152, b: 0 };
+					break;
+				case 'DoorWay':
+				case 'DoorWayInt':
+					color = { r: 227, g: 237, b: 31 };
+					break;
+				case 'DoorWayOut':
+					color = { r: 40, g: 0, b: 255 };
+					break;
 			}
 			this.drawBuild(build, color);
 		});
