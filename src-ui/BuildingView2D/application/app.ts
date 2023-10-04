@@ -9,11 +9,10 @@ import { GIFEncoder } from '../../peopleTraffic/js/vendor/toGif/GIFEncoder';
 import { VideoRecorder } from '../VideoRecorder/VideoRecorder';
 import type { TimeData, TimeState } from './Interfaces/TimeData';
 
-function* timeDataGenerator(timeData: TimeData) {
+function* timeDataIterator(timeData: TimeData): Generator<TimeState, undefined> {
 	for (const timeState of timeData.items) {
 		yield timeState;
 	}
-	return timeData.items[timeData.items.length - 1];
 }
 
 export class App {
@@ -40,8 +39,8 @@ export class App {
 	private fps = 0;
 	private fpsOut = 0;
 	private timestamp: number = performance.now();
-	private nextTimeState: Generator;
-	private currentTimeState: TimeState;
+	private nextTimeState: Generator<TimeState, undefined>;
+	private currentTimeState: IteratorResult<TimeState, undefined>;
 
 	constructor(
 		public canvasId: string,
@@ -55,6 +54,8 @@ export class App {
 		this.canvas = new Canvas({ canvasId, canvasContainerId });
 		this.mathem = new Mathem();
 		this.videoRecorder = new VideoRecorder(this.canvas.canvas);
+		this.nextTimeState = timeDataIterator(timeData);
+		this.currentTimeState = this.nextTimeState.next();
 		this.data = {
 			cameraXY: { x: 0, y: 0 },
 			scale: 20,
@@ -77,12 +78,11 @@ export class App {
 			mathem: this.mathem,
 			server: this.server,
 			timeData,
-			onModelingTick
+			onModelingTick,
+			currentTimeState: this.currentTimeState.value
 		});
-		// @ts-expect-error written in js
+		// @ts-expect-error
 		this.encoder = new GIFEncoder();
-		this.nextTimeState = timeDataGenerator(timeData);
-		this.currentTimeState = this.nextTimeState.next().value;
 
 		// Инициализация первичных настроек
 		this.init();
@@ -136,13 +136,14 @@ export class App {
 	}
 
 	updateTimeData() {
-		// try {
-		// 	this.currentTimeState = this.nextTimeState.next();
-		// } catch (e) {
-		// 	console.log(e);
-		// }
+		if (!Boolean(this.currentTimeState.done)) {
+			const nextTimeState = this.nextTimeState.next();
+			this.currentTimeState = nextTimeState;
+			this.logic.currentTimeState = nextTimeState.value;
+		}
 		if (!this.timerTimeDataUpdatePause) {
-			this.ui.evacuationTimeInSec++; // FIXME: modeling may haven't step equal 1 sec
+			this.ui.evacuationTimeInSec =
+				this.currentTimeState.value?.time ?? this.ui.evacuationTimeInSec;
 			this.logic.updatePeopleInBuilds();
 			this.logic.updatePeopleInCamera();
 			this.logic.updateNumberOfPeopleInsideBuildingLabel();

@@ -1,10 +1,10 @@
-import React from 'react';
-import { View } from '../view/View';
-import { UI } from '../ui/UI';
+import type React from 'react';
+import type { View } from '../view/View';
+import type { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
-import { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
-import { TimeData } from '../Interfaces/TimeData';
-import { Server } from '../server/Server';
+import type { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
+import type { TimeData, TimeState } from '../Interfaces/TimeData';
+import type { Server } from '../server/Server';
 
 interface LogicConstructorParams {
 	view: View;
@@ -18,6 +18,7 @@ interface LogicConstructorParams {
 	};
 	timeData: TimeData;
 	onModelingTick?: (numberOfPeople: number, numberOfEvacuatedPeople: number) => void;
+	currentTimeState?: TimeState;
 }
 
 export class Logic {
@@ -30,6 +31,7 @@ export class Logic {
 	scale: number;
 	mathem: Mathem;
 	timeData: TimeData;
+	currentTimeState?: TimeState;
 	private peopleCoordinate: { uuid: string; XY: Point[] }[] = [];
 	private readonly server: Server;
 
@@ -45,7 +47,8 @@ export class Logic {
 		mathem,
 		server,
 		timeData,
-		onModelingTick
+		onModelingTick,
+		currentTimeState
 	}: LogicConstructorParams) {
 		this.view = view;
 		this.ui = ui;
@@ -57,6 +60,7 @@ export class Logic {
 
 		this.mathem = mathem;
 		this.timeData = timeData;
+		this.currentTimeState = currentTimeState;
 
 		this.onModelingTick = onModelingTick;
 	}
@@ -93,9 +97,7 @@ export class Logic {
 	}
 
 	updateNumberOfPeopleInsideBuildingLabel(): void {
-		const rooms = this.timeData.items.find(
-			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
-		)?.rooms;
+		const rooms = this.currentTimeState?.rooms;
 
 		if (rooms) {
 			const numberOfPeopleInsideBuilding = Math.floor(
@@ -135,9 +137,7 @@ export class Logic {
 	}
 
 	updatePeopleInBuilds(): void {
-		const rooms = this.timeData.items.find(
-			dateTime => this.ui.evacuationTimeInSec === Math.floor(dateTime.time)
-		)?.rooms;
+		const rooms = this.currentTimeState?.rooms;
 
 		this.peopleCoordinate = [];
 		if (rooms) {

@@ -1,5 +1,5 @@
-import { Mathem } from '../mathem/Mathem';
-import { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
+import type { Mathem } from '../mathem/Mathem';
+import type { VideoRecorder } from '../../VideoRecorder/VideoRecorder';
 
 interface UIConstructorParams {
 	mathem: Mathem;
@@ -12,7 +12,7 @@ export class UI {
 	private readonly movingTimeHTML: HTMLElement;
 	private readonly numberOfPeopleInsideHTML: HTMLElement;
 	private readonly numberOfPeopleOutsideHTML: HTMLElement;
-	private _evacuationTimeInSec: number = 0;
+	private _evacuationTimeInSec = 0;
 
 	get evacuationTimeInSec(): typeof this._evacuationTimeInSec {
 		return this._evacuationTimeInSec;
@@ -20,7 +20,7 @@ export class UI {
 
 	set evacuationTimeInSec(time: typeof this._evacuationTimeInSec) {
 		this._evacuationTimeInSec = time;
-		this.movingTimeHTML.textContent = String(this._evacuationTimeInSec);
+		this.movingTimeHTML.textContent = this._evacuationTimeInSec.toFixed(1);
 	}
 
 	private _numberOfPeopleInsideBuilding: number = 0;
@@ -38,7 +38,7 @@ export class UI {
 		);
 	}
 
-	private _numberOfPeopleOutsideBuilding: number = 0;
+	private _numberOfPeopleOutsideBuilding = 0;
 
 	get numberOfPeopleOutsideBuilding(): typeof this._numberOfPeopleOutsideBuilding {
 		return this._numberOfPeopleOutsideBuilding;
