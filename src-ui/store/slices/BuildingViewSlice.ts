@@ -1,9 +1,12 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BuildingElement } from '../../interfaces/BuildingElement';
-import { BimJson } from '../../interfaces/BimJson';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import type { BuildingElement } from '../../interfaces/BuildingElement';
+import type { BimJson } from '../../interfaces/BimJson';
+
+type BuildingElementExtended = BuildingElement & { length: number; width: number };
 
 interface BuildingViewState {
-	buildingElement: BuildingElement | null;
+	buildingElement: BuildingElementExtended | null;
 	currentLevel: number;
 	scale: number;
 	evacuationTime: number;
@@ -25,7 +28,7 @@ export const buildingViewSlice = createSlice({
 	name: 'floor',
 	initialState,
 	reducers: {
-		setBuildingElement: (state, action: PayloadAction<BuildingElement>) => {
+		setBuildingElement: (state, action: PayloadAction<BuildingElementExtended>) => {
 			state.buildingElement = {
 				...action.payload
 			};

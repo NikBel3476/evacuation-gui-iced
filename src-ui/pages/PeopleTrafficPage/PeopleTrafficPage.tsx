@@ -152,6 +152,15 @@ const PeopleTrafficPage = () => {
 		event => {
 			app?.logic.toChoiceBuild(event);
 			if (app?.logic.choiceBuild) {
+				// TODO: it's working only with rooms that have rectangular shape
+				const length = Math.abs(
+					app.logic.choiceBuild.XY[0].points[0].x -
+						app.logic.choiceBuild.XY[0].points[2].x
+				);
+				const width = Math.abs(
+					app.logic.choiceBuild.XY[0].points[0].y -
+						app.logic.choiceBuild.XY[0].points[2].y
+				);
 				dispatch(
 					setBuildingElement({
 						id: app.logic.choiceBuild.Id,
@@ -159,7 +168,9 @@ const PeopleTrafficPage = () => {
 						name: app.logic.choiceBuild.Name,
 						type: app.logic.choiceBuild.Sign,
 						level: app.logic.struct.Level[app.logic.level].ZLevel,
-						numberOfPeople: app.logic.getPeopleCountInChoiceRoom()
+						numberOfPeople: app.logic.getPeopleCountInChoiceRoom(),
+						length,
+						width
 					})
 				);
 			}

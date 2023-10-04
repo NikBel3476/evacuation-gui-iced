@@ -53,6 +53,14 @@ const FloorInfo: FC<FloorInfoProps> = ({ className, onOpenFile }) => {
 				<span className="block">Площадь:</span>
 				{buildingElement !== null && <span>{buildingElement.area} м^2</span>}
 			</p>
+			<p>
+				<span className="block">Длина:</span>
+				{buildingElement?.length.toFixed(1)}
+			</p>
+			<p>
+				<span className="block">Ширина:</span>
+				{buildingElement?.width.toFixed(1)}
+			</p>
 		</aside>
 	);
 };
