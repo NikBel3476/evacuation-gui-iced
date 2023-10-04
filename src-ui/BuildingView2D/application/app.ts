@@ -98,6 +98,12 @@ export class App {
 		this.gifInit(1000); // Инициализация настроек
 	}
 
+	setTimeData(timeData: TimeData) {
+		this.nextTimeState = timeDataIterator(timeData);
+		this.currentTimeState = this.nextTimeState.next();
+		this.logic.currentTimeState = this.currentTimeState.value;
+	}
+
 	startRendering() {
 		this.fps++;
 		const currentTimestamp = performance.now();

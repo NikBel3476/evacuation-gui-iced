@@ -72,9 +72,14 @@ const PeopleTrafficPage = () => {
 		const filePath = filePaths instanceof Array ? filePaths[0] : filePaths ?? '';
 		const buildingData = JSON.parse(await readTextFile(filePath)) as Building;
 		if (app && Boolean(buildingData)) {
-			const modelingResult = await runEvacuationModeling(filePath);
+			try {
+				const modelingResult = await runEvacuationModeling(filePath);
+				app.logic.timeData = modelingResult.distribution_by_time_steps;
+				app.setTimeData(modelingResult.distribution_by_time_steps);
+			} catch (e) {
+				console.log(e);
+			}
 			app.logic.level = 0;
-			app.logic.timeData = modelingResult.distribution_by_time_steps;
 			app.server.data = buildingData;
 			app.logic.struct = buildingData;
 			app.logic.updateBuildsInCamera();
