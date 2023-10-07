@@ -21,3 +21,18 @@ body {
 .config {
 	display: none;
 }
+
+div#stats {
+	position: fixed;
+	top: 0;
+	right: 0;
+	z-index: 500;
+	/*width: 100px;*/
+	/*height: 50px;*/
+	user-select: none;
+}
+
+div#stats > canvas {
+	/*width: 100px;*/
+	/*height: 50px;*/
+}

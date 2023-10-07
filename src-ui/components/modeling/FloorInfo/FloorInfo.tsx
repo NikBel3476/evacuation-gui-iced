@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, MouseEventHandler } from 'react';
 import React from 'react';
 import { useAppSelector } from '../../../hooks/redux';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,7 @@ import Button from '../../Button';
 
 interface FloorInfoProps {
 	className?: string;
-	onOpenFile?: () => void;
+	onOpenFile: MouseEventHandler;
 }
 
 const FloorInfo: FC<FloorInfoProps> = ({ className, onOpenFile }) => {

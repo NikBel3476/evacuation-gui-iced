@@ -26,8 +26,12 @@ import type { TimeData } from '../../BuildingView2D/application/Interfaces/TimeD
 import { getConfig } from '../../store/actionCreators/getConfig';
 import { bimFiles } from '../../consts/bimFiles';
 import type { BimJson } from '../../interfaces/BimJson';
+import { open } from '@tauri-apps/api/dialog';
+import { readTextFile } from '@tauri-apps/api/fs';
+import Stats from '../../components/PIXI/Stats';
 
 const ModelingViewPage = () => {
+	const [buildingDataIsLoading, setBuildingDataIsLoading] = useState<boolean>(false);
 	const [buildingData, setBuildingData] = useState<BimJson>(
 		bimFiles[Object.keys(bimFiles)[0]]
 	);
@@ -59,6 +63,8 @@ const ModelingViewPage = () => {
 		};
 	}, [buildingData]);
 
+	const loadBuildingData = () => {};
+
 	const draw = useCallback(
 		(g: PixiGraphics) => {
 			g.clear();
@@ -67,6 +73,23 @@ const ModelingViewPage = () => {
 		},
 		[currentLevel, peopleCoordinates, buildingData]
 	);
+
+	const handleOpenFile = async () => {
+		const filePaths = await open({
+			directory: false,
+			multiple: false,
+			title: 'Open BIM file',
+			filters: [{ name: 'BIM json', extensions: ['json'] }]
+		});
+		setBuildingDataIsLoading(true);
+		const filePath = filePaths instanceof Array ? filePaths[0] : filePaths;
+		if (filePath !== null) {
+			const buildingData = JSON.parse(await readTextFile(filePath)) as BimJson;
+			dispatch(setCurrentLevel(0));
+			setBuildingData(buildingData);
+			dispatch(setBim(buildingData));
+		}
+	};
 
 	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
 		switch (Math.sign(event.deltaY)) {
@@ -144,14 +167,14 @@ const ModelingViewPage = () => {
 	};
 
 	const handleSelectFileChange = (e: ChangeEvent<HTMLSelectElement>) => {
-		void dispatch(setCurrentLevel(0));
+		dispatch(setCurrentLevel(0));
 		setBuildingData(bimFiles[e.target.value]);
-		void dispatch(setBim(bimFiles[e.target.value]));
+		dispatch(setBim(bimFiles[e.target.value]));
 	};
 
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
-			<FloorInfo />
+			<FloorInfo onOpenFile={handleOpenFile} />
 			<div className="w-full h-full overflow-hidden">
 				<Stage
 					id="canvas"
@@ -164,6 +187,7 @@ const ModelingViewPage = () => {
 					onMouseUp={handleCanvasMouseUp}
 					onMouseOut={handleCanvasMouseOut}
 				>
+					<Stats />
 					<Container scale={scale} x={anchorCoordinates.x} y={anchorCoordinates.y}>
 						<Graphics draw={draw} />
 					</Container>
