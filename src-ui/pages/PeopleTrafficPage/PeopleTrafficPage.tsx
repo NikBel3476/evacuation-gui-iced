@@ -77,7 +77,7 @@ const PeopleTrafficPage = () => {
 				app.logic.timeData = modelingResult.distribution_by_time_steps;
 				app.setTimeData(modelingResult.distribution_by_time_steps);
 			} catch (e) {
-				console.log(e);
+				console.error(e);
 			}
 			app.logic.level = 0;
 			app.server.data = buildingData;

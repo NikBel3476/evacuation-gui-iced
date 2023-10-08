@@ -2,6 +2,7 @@ import { Canvas } from '../canvas/Canvas';
 import { Mathem } from '../mathem/Mathem';
 import { BuildingElement, Point } from '../Interfaces/Building';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
+import { ColorSource } from 'pixi.js';
 
 interface ViewConstructorParams {
 	canvas: Canvas;
@@ -52,9 +53,13 @@ export class View {
 		this.canvas.closePath();
 	}
 
-	static drawBuildingRoomPixi(g: PixiGraphics, points: Point[]) {
+	static drawBuildingRoomPixi(
+		g: PixiGraphics,
+		points: Point[],
+		color?: ColorSource = 0xffffff
+	) {
 		g.moveTo(points[0].x, points[0].y);
-		g.beginFill(0xffffff);
+		g.beginFill(color);
 		g.lineStyle(0.1, 0x000000, 1);
 		points.slice(1).forEach(point => {
 			g.lineTo(point.x, point.y);
@@ -64,7 +69,20 @@ export class View {
 
 	static drawBuildingRoomsPixi(g: PixiGraphics, buildings: BuildingElement[]) {
 		buildings.forEach(building => {
-			View.drawBuildingRoomPixi(g, building.XY[0].points);
+			let color = 'rgb(255, 255, 255)';
+			switch (building.Sign) {
+				case 'Staircase':
+					color = 'rgb(49, 152, 0)';
+					break;
+				case 'DoorWay':
+				case 'DoorWayInt':
+					color = 'rgb(227, 237, 31)';
+					break;
+				case 'DoorWayOut':
+					color = 'rgb(40, 0, 255)';
+					break;
+			}
+			View.drawBuildingRoomPixi(g, building.XY[0].points, color);
 		});
 	}
 

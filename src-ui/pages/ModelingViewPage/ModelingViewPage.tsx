@@ -29,14 +29,18 @@ import type { BimJson } from '../../interfaces/BimJson';
 import { open } from '@tauri-apps/api/dialog';
 import { readTextFile } from '@tauri-apps/api/fs';
 import Stats from '../../components/PIXI/Stats';
+import { runEvacuationModeling } from '../../rustCalls';
 
 const ModelingViewPage = () => {
 	const [buildingDataIsLoading, setBuildingDataIsLoading] = useState<boolean>(false);
 	const [buildingData, setBuildingData] = useState<BimJson>(
 		bimFiles[Object.keys(bimFiles)[0]]
 	);
+	const [showStats, setShowStats] = useState<boolean>(true);
 
-	const evacuationTimeData = timeData as TimeData;
+	const [evacuationTimeData, setEvacuationTimeData] = useState<TimeData>(
+		timeData as TimeData
+	);
 	const { currentLevel, scale } = useAppSelector(state => state.buildingViewReducer);
 	const dispatch = useAppDispatch();
 	const [canMove, setCanMove] = useState<boolean>(false);
@@ -48,6 +52,9 @@ const ModelingViewPage = () => {
 			buildingData.Level[currentLevel],
 			evacuationTimeData.items
 		)
+	);
+	const [modelingResult, setModelingResult] = useState<EvacuationModelingResult | null>(
+		null
 	);
 
 	useEffect(() => {
@@ -85,10 +92,22 @@ const ModelingViewPage = () => {
 		const filePath = filePaths instanceof Array ? filePaths[0] : filePaths;
 		if (filePath !== null) {
 			const buildingData = JSON.parse(await readTextFile(filePath)) as BimJson;
-			dispatch(setCurrentLevel(0));
-			setBuildingData(buildingData);
-			dispatch(setBim(buildingData));
+			try {
+				const modelingResult = await runEvacuationModeling(filePath);
+				setModelingResult(modelingResult);
+				const peopleCoordinates = Logic.generatePeopleCoordinates(
+					buildingData.Level[currentLevel],
+					modelingResult.distribution_by_time_steps.items
+				);
+				dispatch(setCurrentLevel(0));
+				setBuildingData(buildingData);
+				dispatch(setBim(buildingData));
+				setPeopleCoordinates(peopleCoordinates);
+			} catch (e) {
+				console.error(e);
+			}
 		}
+		setBuildingDataIsLoading(false);
 	};
 
 	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
@@ -102,7 +121,10 @@ const ModelingViewPage = () => {
 		}
 	};
 
-	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = _ => {
+	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = (
+		e: React.MouseEvent<HTMLCanvaselement>
+	) => {
+		e.preventDefault();
 		setCanMove(true);
 	};
 
@@ -128,7 +150,7 @@ const ModelingViewPage = () => {
 		} = store.getState();
 		switch (event.key) {
 			case 'ArrowUp':
-				if (currentLevel < buildingData.Level.length - 1) {
+				if (currentLevel < buildingData.Level.length - 1 && modelingResult) {
 					dispatch(incrementCurrentLevel());
 					const {
 						buildingViewReducer: { currentLevel: updatedLevel }
@@ -136,13 +158,13 @@ const ModelingViewPage = () => {
 					setPeopleCoordinates(
 						Logic.generatePeopleCoordinates(
 							buildingData.Level[updatedLevel],
-							evacuationTimeData.items
+							modelingResult.distribution_by_time_steps.items
 						)
 					);
 				}
 				break;
 			case 'ArrowDown':
-				if (currentLevel > 0) {
+				if (currentLevel > 0 && modelingResult) {
 					dispatch(decrementCurrentLevel());
 					const {
 						buildingViewReducer: { currentLevel: updatedLevel }
@@ -150,7 +172,7 @@ const ModelingViewPage = () => {
 					setPeopleCoordinates(
 						Logic.generatePeopleCoordinates(
 							buildingData.Level[updatedLevel],
-							evacuationTimeData.items
+							modelingResult.distribution_by_time_steps.items
 						)
 					);
 				}
@@ -165,6 +187,8 @@ const ModelingViewPage = () => {
 				break;
 		}
 	};
+
+	const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {};
 
 	const handleSelectFileChange = (e: ChangeEvent<HTMLSelectElement>) => {
 		dispatch(setCurrentLevel(0));
@@ -186,6 +210,7 @@ const ModelingViewPage = () => {
 					onMouseDown={handleCanvasMouseDown}
 					onMouseUp={handleCanvasMouseUp}
 					onMouseOut={handleCanvasMouseOut}
+					onDoubleClick={handleDoubleClick}
 				>
 					<Stats />
 					<Container scale={scale} x={anchorCoordinates.x} y={anchorCoordinates.y}>
