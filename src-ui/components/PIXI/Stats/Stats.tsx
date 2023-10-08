@@ -11,6 +11,10 @@ const Stats = () => {
 		const stats = addStats(document, pixiApp);
 		const ticker = Ticker.shared;
 		ticker.add(stats.update, stats, UPDATE_PRIORITY.UTILITY);
+		return () => {
+			document.getElementById('stats')?.remove();
+			ticker.remove();
+		};
 	}, []);
 
 	return <></>;

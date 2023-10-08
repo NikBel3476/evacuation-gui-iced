@@ -86,7 +86,7 @@ const PeopleTrafficPage = () => {
 			app.logic.updatePeopleInBuilds();
 			app.logic.updatePeopleInCamera();
 			app.ui.evacuationTimeInSec = 0;
-			void dispatch(setCurrentLevel(0));
+			dispatch(setCurrentLevel(0));
 			dispatch(setPeopleInsideBuilding(app.logic.totalNumberOfPeople()));
 			dispatch(setPeopleOutsideBuilding(0));
 			// void dispatch(setBim(buildingData));

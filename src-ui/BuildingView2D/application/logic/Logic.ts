@@ -74,6 +74,15 @@ export class Logic {
 		);
 	}
 
+	static totalNumberOfPeople(timeData: TimeData): number {
+		return Math.floor(
+			timeData.items[0].rooms.reduce(
+				(numberOfPeople, room) => numberOfPeople + room.density,
+				0
+			)
+		);
+	}
+
 	/** ЛОГИКА VIEW **/
 
 	// Проверка объектов находятся ли они в камере

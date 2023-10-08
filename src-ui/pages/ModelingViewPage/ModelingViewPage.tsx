@@ -14,6 +14,8 @@ import {
 	incrementScale,
 	setBim,
 	setCurrentLevel,
+	setPeopleInsideBuilding,
+	setPeopleOutsideBuilding,
 	setScale
 } from '../../store/slices/BuildingViewSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
@@ -33,11 +35,11 @@ import { runEvacuationModeling } from '../../rustCalls';
 
 const ModelingViewPage = () => {
 	const [buildingDataIsLoading, setBuildingDataIsLoading] = useState<boolean>(false);
-	const [buildingData, setBuildingData] = useState<BimJson>(
+	const [buildingData, setBuildingData] = useState<BimJson /*| null*/>(
 		bimFiles[Object.keys(bimFiles)[0]]
+		// null
 	);
 	const [showStats, setShowStats] = useState<boolean>(true);
-
 	const [evacuationTimeData, setEvacuationTimeData] = useState<TimeData>(
 		timeData as TimeData
 	);
@@ -48,10 +50,11 @@ const ModelingViewPage = () => {
 		new PixiPoint(0, 0)
 	);
 	const [peopleCoordinates, setPeopleCoordinates] = useState<Point[]>(
-		Logic.generatePeopleCoordinates(
+		/*Logic.generatePeopleCoordinates(
 			buildingData.Level[currentLevel],
 			evacuationTimeData.items
-		)
+		)*/
+		[]
 	);
 	const [modelingResult, setModelingResult] = useState<EvacuationModelingResult | null>(
 		null
@@ -59,8 +62,9 @@ const ModelingViewPage = () => {
 
 	useEffect(() => {
 		dispatch(setScale(8));
-		void dispatch(getConfig());
-	}, [dispatch]);
+		dispatch(getConfig());
+		// openFileDialog();
+	}, []);
 
 	// FIXME: resolve access to state in window events
 	useEffect(() => {
@@ -72,16 +76,7 @@ const ModelingViewPage = () => {
 
 	const loadBuildingData = () => {};
 
-	const draw = useCallback(
-		(g: PixiGraphics) => {
-			g.clear();
-			View.drawBuildingRoomsPixi(g, buildingData.Level[currentLevel].BuildElement);
-			View.drawPeople(g, peopleCoordinates);
-		},
-		[currentLevel, peopleCoordinates, buildingData]
-	);
-
-	const handleOpenFile = async () => {
+	const openFileDialog = async () => {
 		const filePaths = await open({
 			directory: false,
 			multiple: false,
@@ -100,14 +95,33 @@ const ModelingViewPage = () => {
 					modelingResult.distribution_by_time_steps.items
 				);
 				dispatch(setCurrentLevel(0));
-				setBuildingData(buildingData);
+				setBuildingData(buildingData); // TODO: use buildingData from redux
 				dispatch(setBim(buildingData));
 				setPeopleCoordinates(peopleCoordinates);
+				dispatch(setPeopleOutsideBuilding(0));
+				dispatch(
+					setPeopleInsideBuilding(
+						Logic.totalNumberOfPeople(modelingResult.distribution_by_time_steps)
+					)
+				);
 			} catch (e) {
 				console.error(e);
 			}
 		}
 		setBuildingDataIsLoading(false);
+	};
+
+	const draw = useCallback(
+		(g: PixiGraphics) => {
+			g.clear();
+			View.drawBuildingRoomsPixi(g, buildingData.Level[currentLevel].BuildElement);
+			View.drawPeople(g, peopleCoordinates);
+		},
+		[currentLevel, peopleCoordinates, buildingData]
+	);
+
+	const handleOpenFile = async () => {
+		await openFileDialog();
 	};
 
 	const handleCanvasWheel: WheelEventHandler<HTMLCanvasElement> = event => {
@@ -218,6 +232,31 @@ const ModelingViewPage = () => {
 					</Container>
 				</Stage>
 			</div>
+			{/*{buildingData && !buildingDataIsLoading ? (
+				<div className="w-full h-full overflow-hidden">
+					<Stage
+						id="canvas"
+						width={window.innerWidth}
+						height={window.innerHeight}
+						options={{ backgroundColor: 0xffffff, antialias: true }}
+						onWheel={handleCanvasWheel}
+						onMouseMove={handleCanvasMouseMove}
+						onMouseDown={handleCanvasMouseDown}
+						onMouseUp={handleCanvasMouseUp}
+						onMouseOut={handleCanvasMouseOut}
+						onDoubleClick={handleDoubleClick}
+					>
+						<Stats />
+						<Container scale={scale} x={anchorCoordinates.x} y={anchorCoordinates.y}>
+							<Graphics draw={draw} />
+						</Container>
+					</Stage>
+				</div>
+			) : (
+				<div className="flex justify-center items-center">
+					<span className="text-black text-3xl">Загрузка...</span>
+				</div>
+			)}*/}
 			<ControlPanel
 				onPlayButtonClick={() => {}}
 				onPauseButtonClick={() => {}}
