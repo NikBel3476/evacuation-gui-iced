@@ -30,8 +30,18 @@ import { bimFiles } from '../../consts/bimFiles';
 import type { BimJson } from '../../interfaces/BimJson';
 import { open } from '@tauri-apps/api/dialog';
 import { readTextFile } from '@tauri-apps/api/fs';
-import Stats from '../../components/PIXI/Stats';
 import { runEvacuationModeling } from '../../rustCalls';
+import type { EvacuationModelingResult } from '../../types/ModelingResult';
+
+// const app = new Application({
+// 	view: document.getElementById('canvas-pixi'),
+// 	width: window.innerWidth,
+// 	height: window.innerHeight,
+// 	backgroundColor: 0xffffff,
+// 	antialias: true
+// });
+// const root = createRoot(app.stage);
+// root.render(<Text text="Allo" x={150} y={100} />);
 
 const ModelingViewPage = () => {
 	const [buildingDataIsLoading, setBuildingDataIsLoading] = useState<boolean>(false);
@@ -62,7 +72,7 @@ const ModelingViewPage = () => {
 
 	useEffect(() => {
 		dispatch(setScale(8));
-		dispatch(getConfig());
+		void dispatch(getConfig());
 		// openFileDialog();
 	}, []);
 
@@ -136,7 +146,7 @@ const ModelingViewPage = () => {
 	};
 
 	const handleCanvasMouseDown: MouseEventHandler<HTMLCanvasElement> = (
-		e: React.MouseEvent<HTMLCanvaselement>
+		e: React.MouseEvent<HTMLCanvasElement>
 	) => {
 		e.preventDefault();
 		setCanMove(true);
@@ -226,7 +236,7 @@ const ModelingViewPage = () => {
 					onMouseOut={handleCanvasMouseOut}
 					onDoubleClick={handleDoubleClick}
 				>
-					<Stats />
+					{/*<Stats />*/}
 					<Container scale={scale} x={anchorCoordinates.x} y={anchorCoordinates.y}>
 						<Graphics draw={draw} />
 					</Container>

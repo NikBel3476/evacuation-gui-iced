@@ -1,10 +1,5 @@
-import React, {
-	ChangeEventHandler,
-	FC,
-	MouseEventHandler,
-	useEffect,
-	useState
-} from 'react';
+import type { ChangeEventHandler, FC, MouseEventHandler } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { getConfig } from '../../store/actionCreators/getConfig';
