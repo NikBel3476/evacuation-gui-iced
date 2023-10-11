@@ -83,6 +83,23 @@ export class Mathem {
 		return c;
 	}
 
+	// Проверка на пересечение
+	static isInPoly(x: number, y: number, xp: number[], yp: number[]): number {
+		const npol = xp.length;
+		let j = npol - 1;
+		let c = 0;
+		for (let i = 0; i < npol; i++) {
+			if (
+				((yp[i] <= y && y < yp[j]) || (yp[j] <= y && y < yp[i])) &&
+				x > ((xp[j] - xp[i]) * (y - yp[i])) / (yp[j] - yp[i]) + xp[i]
+			) {
+				c++;
+			}
+			j = i;
+		}
+		return c;
+	}
+
 	static inPolygon(x: number, y: number, xp: number[], yp: number[]): number {
 		const npol = xp.length;
 		let j = npol - 1;

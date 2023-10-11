@@ -2,7 +2,7 @@ import { Canvas } from '../canvas/Canvas';
 import { Mathem } from '../mathem/Mathem';
 import { BuildingElement, Point } from '../Interfaces/Building';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
-import { ColorSource } from 'pixi.js';
+import { ColorSource, Polygon } from 'pixi.js';
 
 interface ViewConstructorParams {
 	canvas: Canvas;
@@ -61,9 +61,12 @@ export class View {
 		g.moveTo(points[0].x, points[0].y);
 		g.beginFill(color);
 		g.lineStyle(0.1, 0x000000, 1);
-		points.slice(1).forEach(point => {
-			g.lineTo(point.x, point.y);
-		});
+		const polygon = new Polygon(points.slice(1));
+		g.drawShape(polygon);
+		// g.drawPolygon(points.slice(1));
+		// points.slice(1).forEach(point => {
+		// 	g.lineTo(point.x, point.y);
+		// });
 		g.endFill();
 	}
 

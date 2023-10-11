@@ -5,6 +5,7 @@ import { Mathem } from '../mathem/Mathem';
 import type { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
 import type { TimeData, TimeState } from '../Interfaces/TimeData';
 import type { Server } from '../server/Server';
+import { BimJson } from '../../../interfaces/BimJson';
 
 interface LogicConstructorParams {
 	view: View;
@@ -320,6 +321,37 @@ export class Logic {
 				const intersection = this.mathem.inPoly(mouseX, mouseY, arrayX, arrayY);
 				return Boolean(intersection & 1);
 			}) ?? null;
+	}
+
+	static findBuildingElementByCoordinates(
+		buildingData: BimJson,
+		coordinates: Point,
+		scale: number
+	): BuildingElement | null {
+		console.log(coordinates);
+		console.log(buildingData);
+		buildingData.Level.forEach(level => {
+			level.BuildElement.forEach(buildingElement => {
+				const arrayX = Array(buildingElement.XY[0].points.length - 1);
+				const arrayY = Array(buildingElement.XY[0].points.length - 1);
+				buildingElement.XY[0].points.slice(0, -1).forEach((point, i) => {
+					arrayX[i] = point.x * scale;
+					arrayY[i] = point.y * scale;
+				});
+
+				const intersection = Mathem.isInPoly(
+					coordinates.x,
+					coordinates.y,
+					arrayX,
+					arrayY
+				);
+
+				if (Boolean(intersection & 1)) {
+					return buildingElement;
+				}
+			});
+		});
+		return null;
 	}
 
 	toInitialCoordination(): void {
