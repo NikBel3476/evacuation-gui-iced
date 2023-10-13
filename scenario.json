@@ -19,13 +19,13 @@
   "loggerCfg": "../logger.conf",
   "distribution": {
     "type": "uniform",
-    "density": 0.1,
+    "density": 1.0,
     "special": [
       {
         "uuid": [
           "87c49613-44a7-4f3f-82e0-fb4a9ca2f46d"
         ],
-        "density": 0.1,
+        "density": 1.0,
         "comment": "The uuid is Room_1 by three_zone_three_transit"
       }
     ]

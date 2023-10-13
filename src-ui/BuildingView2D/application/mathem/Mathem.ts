@@ -12,6 +12,15 @@ export class Mathem {
 		);
 	}
 
+	static calculateBuildArea(build: BuildingElement): number {
+		const topLeftPoint = build.XY[0].points[0];
+		const downRightPoint = build.XY[0].points[2];
+		return (
+			Math.abs(topLeftPoint.x - downRightPoint.x) *
+			Math.abs(topLeftPoint.y - downRightPoint.y)
+		);
+	}
+
 	calculateDensity(build: BuildingElement & { NumPeople: number }): number {
 		return build.NumPeople / this.calculateBuildArea(build);
 	}

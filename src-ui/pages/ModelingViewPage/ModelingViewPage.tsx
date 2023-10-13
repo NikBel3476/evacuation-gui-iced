@@ -1,10 +1,10 @@
 import type { ChangeEvent, MouseEventHandler, WheelEventHandler } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Container, Graphics, Sprite, Stage, Text } from '@pixi/react';
+import { Container, Graphics, Stage } from '@pixi/react';
 import type { Graphics as PixiGraphics } from '@pixi/graphics';
 import timeData from '../../peopleTraffic/udsu_b1_L4_v2_190701_mv_csv.json';
 import { View } from '../../BuildingView2D/application/view/View';
-import { Point as PixiPoint, Polygon, Rectangle } from 'pixi.js';
+import { Point as PixiPoint } from 'pixi.js';
 import type { Point } from '../../BuildingView2D/application/Interfaces/Building';
 import { Logic } from '../../BuildingView2D/application/logic/Logic';
 import {
@@ -13,6 +13,7 @@ import {
 	incrementCurrentLevel,
 	incrementScale,
 	setBim,
+	setBuildingElement,
 	setCurrentLevel,
 	setPeopleInsideBuilding,
 	setPeopleOutsideBuilding,
@@ -33,8 +34,7 @@ import { readTextFile } from '@tauri-apps/api/fs';
 import { runEvacuationModeling } from '../../rustCalls';
 import type { EvacuationModelingResult } from '../../types/ModelingResult';
 import { BuildElementJson } from '../../interfaces/BuildElementJson';
-import { BlurFilter } from 'pixi.js';
-import bunnyImg from './bunny.png';
+import { Mathem } from '../../BuildingView2D/application/mathem/Mathem';
 
 // const app = new Application({
 // 	view: document.getElementById('canvas-pixi'),
@@ -47,7 +47,6 @@ import bunnyImg from './bunny.png';
 // root.render(<Text text="Allo" x={150} y={100} />);
 
 const ModelingViewPage = () => {
-	useMemo(() => new BlurFilter(0), []);
 	const [buildingDataIsLoading, setBuildingDataIsLoading] = useState<boolean>(false);
 	const [buildingData, setBuildingData] = useState<BimJson /*| null*/>(
 		bimFiles[Object.keys(bimFiles)[0]]
@@ -125,36 +124,31 @@ const ModelingViewPage = () => {
 		setBuildingDataIsLoading(false);
 	};
 
-	const draw = useCallback(
+	const drawPeople = useCallback(
 		(g: PixiGraphics) => {
 			g.clear();
-			// View.drawBuildingRoomsPixi(g, buildingData.Level[currentLevel].BuildElement);
 			View.drawPeople(g, peopleCoordinates);
-			g.interactive = true;
-			g.onmouseenter = e => {
-				console.log(e);
-			};
 		},
 		[currentLevel, peopleCoordinates, buildingData]
 	);
 
 	const drawBuildingElement = useCallback(
 		(g: PixiGraphics, buildingElement: BuildElementJson) => {
-			// g.clear();
-			// View.drawBuildingRoomsPixi(g, buildingData.Level[currentLevel].BuildElement);
-			g.beginFill('0x000000');
-			const polygon = new Polygon(buildingElement.XY[0].points.slice(1));
-			g.drawShape(polygon);
-			// g.hitArea = polygon;
-			// g.interactive = true;
-			// g.cursor = 'pointer';
-			// g.eventMode = 'static';
-			// g.onclick = () => {
-			// 	console.log(buildingElement);
-			// };
-			// g.onmousedown = () => {
-			// 	console.log(buildingElement);
-			// };
+			let color = 'rgb(255, 255, 255)';
+			switch (buildingElement.Sign) {
+				case 'Staircase':
+					color = 'rgb(49, 152, 0)';
+					break;
+				case 'DoorWay':
+				case 'DoorWayInt':
+					color = 'rgb(227, 237, 31)';
+					break;
+				case 'DoorWayOut':
+					color = 'rgb(40, 0, 255)';
+					break;
+			}
+			g.clear();
+			View.drawBuildingRoomPixi(g, buildingElement.XY[0].points, color);
 			g.endFill();
 		},
 		[]
@@ -242,146 +236,64 @@ const ModelingViewPage = () => {
 		}
 	};
 
-	const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-		// console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-		// console.log(anchorCoordinates);
-		console.log(
-			Logic.findBuildingElementByCoordinates(
-				buildingData,
-				new PixiPoint(e.nativeEvent.offsetX, e.nativeEvent.offsetY),
-				scale
-			)
-		);
-	};
-
 	const handleSelectFileChange = (e: ChangeEvent<HTMLSelectElement>) => {
 		dispatch(setCurrentLevel(0));
 		setBuildingData(bimFiles[e.target.value]);
 		dispatch(setBim(bimFiles[e.target.value]));
 	};
 
+	const handleBuildingElementPointerDown = buildingElement => {
+		const length = Math.abs(
+			buildingElement.XY[0].points[0].x - buildingElement.XY[0].points[2].x
+		);
+		const width = Math.abs(
+			buildingElement.XY[0].points[0].y - buildingElement.XY[0].points[2].y
+		);
+		dispatch(
+			setBuildingElement({
+				area: Math.floor(Mathem.calculateBuildArea(buildingElement)),
+				level: currentLevel,
+				type: buildingElement.Sign,
+				name: buildingElement.Name,
+				id: buildingElement.Id,
+				numberOfPeople: 0,
+				length,
+				width
+			})
+		);
+	};
+
 	return (
 		<main className={cn(styles.container, 'text-sm font-medium text-white')}>
 			<FloorInfo onOpenFile={handleOpenFile} />
-			<div className="w-full h-full overflow-hidden">
-				<Stage
-					id="canvas"
-					width={window.innerWidth}
-					height={window.innerHeight}
-					options={{
-						backgroundColor: 0xffffff,
-						antialias: true
-						// eventMode: 'static'
-						// eventFeatures: {
-						// 	click: true,
-						// 	move: true,
-						// 	wheel: true
-						// }
-					}}
-					// onWheel={handleCanvasWheel}
-					// onMouseMove={handleCanvasMouseMove}
-					// onMouseDown={handleCanvasMouseDown}
-					// onMouseUp={handleCanvasMouseUp}
-					// onMouseOut={handleCanvasMouseOut}
-					// onDoubleClick={handleDoubleClick}
-				>
-					{/*<Stats />*/}
-					{/*<Container scale={scale} x={anchorCoordinates.x} y={anchorCoordinates.y}>
-						<Graphics draw={draw} />
-						{buildingData.Level[currentLevel].BuildElement.map(buildingElement => (
-							<Graphics
-								key={buildingElement.Id}
-								draw={g => drawBuildingElement(g, buildingElement)}
-								onpointerdown={() => {
-									console.log(buildingElement);
-								}}
-								interactive={true}
-								eventMode={'passive'}
-								on={'mousedown'}
-							/>
-						))}
-					</Container>*/}
-					{/*{buildingData.Level[currentLevel].BuildElement.map(buildingElement => (
-						<Graphics
-							scale={scale}
-							key={buildingElement.Id}
-							draw={g => drawBuildingElement(g, buildingElement)}
-							interactive={true}
-							eventMode="static"
-							cursor="pointer"
-						/>
-					))}*/}
-					<Sprite
-						image={bunnyImg}
-						x={200}
-						y={200}
-						width={100}
-						height={100}
-						interactive={true}
-						eventMode={'static'}
-						cursor={'pointer'}
-						onpointerdown={() => console.log('allo')}
-						pointerdown={() => console.log('allo')}
-						onmousedown={() => console.log('hello')}
-						mousedown={() => console.log('hello')}
-					/>
-					{/*<Graphics
-						// cursor="pointer"
-						interactive={true}
-						// eventMode={'static'}
-						// hitArea={new Rectangle(0, 0, 100, 100)}
-						x={0}
-						y={0}
-						width={100}
-						height={100}
-						// onclick={() => {
-						// 	console.log('ON CLICKING!!');
-						// }}
-						draw={g => {
-							g.clear();
-							g.lineStyle(4, 0x000000);
-							g.beginFill(0xff0000);
-							g.drawRect(0, 0, 100, 100);
-							g.endFill();
-						}}
-						onmousemove={() => {
-							console.log('onmousemove called');
-						}}
-						// draw={g => {
-						// 	g.beginFill(0x000000);
-						// 	g.drawRect(50, 50, 100, 100);
-						// 	g.cursor = 'pointer';
-						// }}
-					/>*/}
-					{/*<Text
-						text="hello"
-						x={150}
-						y={150}
-						cursor="pointer"
-						// eventMode="static"
-						interactive={true}
-						onpointerdown={() => console.log('click')}
-						pointerdown={() => console.log('click')}
-					/>*/}
-				</Stage>
-			</div>
-			{/*{buildingData && !buildingDataIsLoading ? (
+			{buildingData && !buildingDataIsLoading ? (
 				<div className="w-full h-full overflow-hidden">
 					<Stage
 						id="canvas"
 						width={window.innerWidth}
 						height={window.innerHeight}
-						options={{ backgroundColor: 0xffffff, antialias: true }}
+						options={{
+							backgroundColor: 0xffffff,
+							antialias: true
+						}}
 						onWheel={handleCanvasWheel}
 						onMouseMove={handleCanvasMouseMove}
 						onMouseDown={handleCanvasMouseDown}
 						onMouseUp={handleCanvasMouseUp}
 						onMouseOut={handleCanvasMouseOut}
-						onDoubleClick={handleDoubleClick}
 					>
-						<Stats />
+						{/*<Stats />*/}
 						<Container scale={scale} x={anchorCoordinates.x} y={anchorCoordinates.y}>
-							<Graphics draw={draw} />
+							{buildingData.Level[currentLevel].BuildElement.map(buildingElement => (
+								<Graphics
+									key={buildingElement.Id}
+									draw={g => drawBuildingElement(g, buildingElement)}
+									eventMode="static"
+									cursor="pointer"
+									onpointerdown={() => handleBuildingElementPointerDown(buildingElement)}
+								/>
+							))}
+							<Graphics draw={drawPeople} />
 						</Container>
 					</Stage>
 				</div>
@@ -389,7 +301,7 @@ const ModelingViewPage = () => {
 				<div className="flex justify-center items-center">
 					<span className="text-black text-3xl">Загрузка...</span>
 				</div>
-			)}*/}
+			)}
 			<ControlPanel
 				onPlayButtonClick={() => {}}
 				onPauseButtonClick={() => {}}
