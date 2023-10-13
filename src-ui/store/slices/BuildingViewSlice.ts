@@ -2,6 +2,8 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import type { BuildingElement } from '../../interfaces/BuildingElement';
 import type { BimJson } from '../../interfaces/BimJson';
+import type { TimeData } from '../../BuildingView2D/application/Interfaces/TimeData';
+import { Point } from 'pixi.js';
 
 type BuildingElementExtended = BuildingElement & { length: number; width: number };
 
@@ -13,6 +15,8 @@ interface BuildingViewState {
 	numberOfPeopleInsideBuilding: number;
 	numberOfPeopleOutsideBuilding: number;
 	bim?: BimJson;
+	timeData?: TimeData;
+	anchorCoordinates: Point;
 }
 
 const initialState: BuildingViewState = {
@@ -21,7 +25,8 @@ const initialState: BuildingViewState = {
 	scale: 1,
 	evacuationTime: 0,
 	numberOfPeopleInsideBuilding: 0,
-	numberOfPeopleOutsideBuilding: 0
+	numberOfPeopleOutsideBuilding: 0,
+	anchorCoordinates: new Point(0, 0)
 };
 
 export const buildingViewSlice = createSlice({
@@ -98,6 +103,12 @@ export const buildingViewSlice = createSlice({
 		},
 		setBim: (state, action: PayloadAction<BimJson>) => {
 			state.bim = action.payload;
+		},
+		setTimeData: (state, action: PayloadAction<TimeData>) => {
+			state.timeData = action.payload;
+		},
+		setAnchorCoordinates: (state, action: PayloadAction<Point>) => {
+			state.anchorCoordinates = action.payload;
 		}
 	}
 });
@@ -121,7 +132,9 @@ export const {
 	incrementEvacuationTime,
 	setPeopleInsideBuilding,
 	setPeopleOutsideBuilding,
-	setBim
+	setBim,
+	setTimeData,
+	setAnchorCoordinates
 } = buildingViewSlice.actions;
 
 export default buildingViewSlice.reducer;

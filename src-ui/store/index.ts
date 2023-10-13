@@ -9,7 +9,12 @@ const rootReducer = combineReducers({
 });
 
 export const store = configureStore({
-	reducer: rootReducer
+	reducer: rootReducer,
+	middleware: getDefaultMiddleware =>
+		getDefaultMiddleware({
+			immutableCheck: false,
+			serializableCheck: false
+		})
 });
 
 setupListeners(store.dispatch);

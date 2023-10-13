@@ -13,15 +13,15 @@ import { useAppSelector } from '../../../hooks/redux';
 interface ControlPanelProps {
 	onPlayButtonClick: MouseEventHandler;
 	onPauseButtonClick: MouseEventHandler;
-	onSpeedUpButtonClick: MouseEventHandler;
-	onSpeedDownButtonClick: MouseEventHandler;
+	onIncrementLevelButtonClick: MouseEventHandler;
+	onDecrementLevelButtonClick: MouseEventHandler;
 }
 
 const ControlPanel: FC<ControlPanelProps> = ({
 	onPlayButtonClick,
 	onPauseButtonClick,
-	onSpeedUpButtonClick,
-	onSpeedDownButtonClick
+	onIncrementLevelButtonClick,
+	onDecrementLevelButtonClick
 }) => {
 	const { numberOfPeopleInsideBuilding, numberOfPeopleOutsideBuilding } = useAppSelector(
 		state => state.buildingViewReducer
@@ -44,13 +44,13 @@ const ControlPanel: FC<ControlPanelProps> = ({
 				</div>
 				<div
 					className="p-1 rounded-full bg-indigo-600 cursor-pointer"
-					onClick={onSpeedDownButtonClick}
+					onClick={onDecrementLevelButtonClick}
 				>
 					<ArrowDownIcon className="h-6 w-6 fill-amber-50" />
 				</div>
 				<div
 					className="p-1 rounded-full bg-indigo-600 cursor-pointer"
-					onClick={onSpeedUpButtonClick}
+					onClick={onIncrementLevelButtonClick}
 				>
 					<ArrowUpIcon className="h-6 w-6 fill-amber-50" />
 				</div>

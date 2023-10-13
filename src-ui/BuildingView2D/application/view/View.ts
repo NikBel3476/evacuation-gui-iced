@@ -63,10 +63,6 @@ export class View {
 		g.lineStyle(0.1, 0x000000, 1);
 		const polygon = new Polygon(points.slice(1));
 		g.drawShape(polygon);
-		// g.drawPolygon(points.slice(1));
-		// points.slice(1).forEach(point => {
-		// 	g.lineTo(point.x, point.y);
-		// });
 		g.endFill();
 	}
 

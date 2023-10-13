@@ -289,8 +289,8 @@ const PeopleTrafficPage = () => {
 			<ControlPanel
 				onPlayButtonClick={handlePlayButtonClick}
 				onPauseButtonClick={handlePauseButtonClick}
-				onSpeedUpButtonClick={handleSpeedUpButtonClick}
-				onSpeedDownButtonClick={handleSpeedDownButtonClick}
+				onIncrementLevelButtonClick={handleSpeedUpButtonClick}
+				onDecrementLevelButtonClick={handleSpeedDownButtonClick}
 			/>
 		</main>
 	);
