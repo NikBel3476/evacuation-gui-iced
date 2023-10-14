@@ -11,19 +11,22 @@ interface BuildingViewState {
 	buildingElement: BuildingElementExtended | null;
 	currentLevel: number;
 	scale: number;
-	evacuationTime: number;
+	evacuationTimeInSec: number;
+	evacuationTimeStep: number;
 	numberOfPeopleInsideBuilding: number;
 	numberOfPeopleOutsideBuilding: number;
 	bim?: BimJson;
 	timeData?: TimeData;
 	anchorCoordinates: Point;
+	modelingTimerId?: number;
 }
 
 const initialState: BuildingViewState = {
 	buildingElement: null,
 	currentLevel: 0,
 	scale: 1,
-	evacuationTime: 0,
+	evacuationTimeInSec: 0,
+	evacuationTimeStep: 0,
 	numberOfPeopleInsideBuilding: 0,
 	numberOfPeopleOutsideBuilding: 0,
 	anchorCoordinates: new Point(0, 0)
@@ -92,8 +95,14 @@ export const buildingViewSlice = createSlice({
 		decrementScaleBy: (state, action: PayloadAction<number>) => {
 			state.scale -= action.payload;
 		},
-		incrementEvacuationTime: state => {
-			state.evacuationTime++;
+		incrementEvacuationTimeStep: state => {
+			state.evacuationTimeStep++;
+		},
+		setEvacuationTimeInSec: (state, action: PayloadAction<number>) => {
+			state.evacuationTimeInSec = action.payload;
+		},
+		setEvacuationTimeStep: (state, action: PayloadAction<number>) => {
+			state.evacuationTimeStep = action.payload;
 		},
 		setPeopleInsideBuilding: (state, action: PayloadAction<number>) => {
 			state.numberOfPeopleInsideBuilding = action.payload;
@@ -109,6 +118,15 @@ export const buildingViewSlice = createSlice({
 		},
 		setAnchorCoordinates: (state, action: PayloadAction<Point>) => {
 			state.anchorCoordinates = action.payload;
+		},
+		setModelingTimerId: (state, action: PayloadAction<number>) => {
+			state.modelingTimerId = action.payload;
+		},
+		setModelingStep: (state, action: PayloadAction<number>) => {
+			state.evacuationTimeStep = action.payload;
+		},
+		incrementModelingStep: state => {
+			state.evacuationTimeStep++;
 		}
 	}
 });
@@ -129,12 +147,17 @@ export const {
 	incrementScaleBy,
 	decrementScale,
 	decrementScaleBy,
-	incrementEvacuationTime,
+	setEvacuationTimeInSec,
+	incrementEvacuationTimeStep,
+	setEvacuationTimeStep,
 	setPeopleInsideBuilding,
 	setPeopleOutsideBuilding,
 	setBim,
 	setTimeData,
-	setAnchorCoordinates
+	setAnchorCoordinates,
+	setModelingTimerId,
+	incrementModelingStep,
+	setModelingStep
 } = buildingViewSlice.actions;
 
 export default buildingViewSlice.reducer;

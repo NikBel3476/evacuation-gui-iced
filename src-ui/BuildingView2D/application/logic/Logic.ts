@@ -3,9 +3,9 @@ import type { View } from '../view/View';
 import type { UI } from '../ui/UI';
 import { Mathem } from '../mathem/Mathem';
 import type { Building, BuildingElement, Level, Point } from '../Interfaces/Building';
-import type { TimeData, TimeState } from '../Interfaces/TimeData';
+import type { RoomTimeState, TimeData, TimeState } from '../Interfaces/TimeData';
 import type { Server } from '../server/Server';
-import { BimJson } from '../../../interfaces/BimJson';
+import type { BimJson } from '../../../interfaces/BimJson';
 
 interface LogicConstructorParams {
 	view: View;
@@ -76,11 +76,9 @@ export class Logic {
 	}
 
 	static totalNumberOfPeople(timeData: TimeData): number {
-		return Math.floor(
-			timeData.items[0].rooms.reduce(
-				(numberOfPeople, room) => numberOfPeople + room.density,
-				0
-			)
+		return timeData.items[0].rooms.reduce(
+			(numberOfPeople, room) => numberOfPeople + room.density,
+			0
 		);
 	}
 
@@ -166,21 +164,20 @@ export class Logic {
 		}
 	}
 
-	static generatePeopleCoordinates(level: Level, timeData: TimeData['items']): Point[] {
-		const rooms = timeData.find(dateTime => Math.floor(dateTime.time) === 0)?.rooms;
-
+	static generatePeopleCoordinates(
+		level: Level,
+		roomsTimeState: RoomTimeState[]
+	): Point[] {
 		const peopleCoordinates: Point[] = [];
-		if (rooms) {
-			level.BuildElement.forEach(buildingElement =>
-				rooms.forEach(room => {
-					if (room.uuid === buildingElement.Id) {
-						peopleCoordinates.push(
-							...Logic.genPeopleCoordinate(buildingElement, room.density)
-						);
-					}
-				})
-			);
-		}
+		level.BuildElement.forEach(buildingElement =>
+			roomsTimeState.forEach(room => {
+				if (room.uuid === buildingElement.Id) {
+					peopleCoordinates.push(
+						...Logic.genPeopleCoordinate(buildingElement, room.density)
+					);
+				}
+			})
+		);
 		return peopleCoordinates;
 	}
 

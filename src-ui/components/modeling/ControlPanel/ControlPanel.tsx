@@ -23,9 +23,11 @@ const ControlPanel: FC<ControlPanelProps> = ({
 	onIncrementLevelButtonClick,
 	onDecrementLevelButtonClick
 }) => {
-	const { numberOfPeopleInsideBuilding, numberOfPeopleOutsideBuilding } = useAppSelector(
-		state => state.buildingViewReducer
-	);
+	const {
+		numberOfPeopleInsideBuilding,
+		numberOfPeopleOutsideBuilding,
+		evacuationTimeInSec
+	} = useAppSelector(state => state.buildingViewReducer);
 
 	return (
 		<aside className={cn(styles.container, 'bg-sky-400')}>
@@ -57,7 +59,8 @@ const ControlPanel: FC<ControlPanelProps> = ({
 			</div>
 			<div>
 				<p>
-					Длительность движения, сек: <span id="evacuation_time_label"></span>
+					Длительность движения, сек:{' '}
+					<span id="evacuation_time_label">{evacuationTimeInSec.toFixed(1)}</span>
 				</p>
 			</div>
 			<div>

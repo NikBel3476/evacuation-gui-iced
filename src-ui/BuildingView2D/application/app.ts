@@ -59,7 +59,6 @@ export class App {
 		this.data = {
 			cameraXY: { x: 0, y: 0 },
 			scale: 20,
-
 			activeBuilds: []
 		};
 		this.view = new View({

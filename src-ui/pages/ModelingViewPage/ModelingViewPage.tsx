@@ -9,11 +9,15 @@ import {
 	decrementCurrentLevel,
 	decrementScale,
 	incrementCurrentLevel,
+	incrementModelingStep,
 	incrementScale,
 	setAnchorCoordinates,
 	setBim,
 	setBuildingElement,
 	setCurrentLevel,
+	setEvacuationTimeInSec,
+	setModelingStep,
+	setModelingTimerId,
 	setPeopleInsideBuilding,
 	setPeopleOutsideBuilding,
 	setScale,
@@ -35,9 +39,15 @@ import { Mathem } from '../../BuildingView2D/application/mathem/Mathem';
 
 const ModelingViewPage = () => {
 	const dispatch = useAppDispatch();
-	const { currentLevel, scale, timeData, bim, anchorCoordinates } = useAppSelector(
-		state => state.buildingViewReducer
-	);
+	const {
+		currentLevel,
+		scale,
+		timeData,
+		bim,
+		anchorCoordinates,
+		evacuationTimeStep,
+		evacuationTimeInSec
+	} = useAppSelector(state => state.buildingViewReducer);
 	const [buildingDataIsLoading, setBuildingDataIsLoading] = useState<boolean>(false);
 	const [canMove, setCanMove] = useState<boolean>(false);
 
@@ -66,13 +76,16 @@ const ModelingViewPage = () => {
 			const buildingData = JSON.parse(await readTextFile(filePath)) as BimJson;
 			try {
 				const modelingResult = await runEvacuationModeling(filePath);
+				dispatch(setModelingStep(0));
 				dispatch(setBim(buildingData));
 				dispatch(setTimeData(modelingResult.distribution_by_time_steps));
 				dispatch(setCurrentLevel(0));
 				dispatch(setPeopleOutsideBuilding(0));
 				dispatch(
 					setPeopleInsideBuilding(
-						Logic.totalNumberOfPeople(modelingResult.distribution_by_time_steps)
+						Math.floor(
+							Logic.totalNumberOfPeople(modelingResult.distribution_by_time_steps)
+						)
 					)
 				);
 			} catch (e) {
@@ -84,14 +97,15 @@ const ModelingViewPage = () => {
 
 	const drawPeople = useCallback(
 		(g: PixiGraphics) => {
+			const rooms = timeData?.items[evacuationTimeStep].rooms ?? [];
 			const peopleCoordinates = Logic.generatePeopleCoordinates(
 				bim.Level[currentLevel],
-				timeData.items
+				rooms
 			);
 			g.clear();
 			View.drawPeople(g, peopleCoordinates);
 		},
-		[bim, timeData, currentLevel]
+		[bim, timeData, currentLevel, evacuationTimeInSec]
 	);
 
 	const drawBuildingElement = useCallback(
@@ -192,18 +206,67 @@ const ModelingViewPage = () => {
 		const width = Math.abs(
 			buildingElement.XY[0].points[0].y - buildingElement.XY[0].points[2].y
 		);
+		const peopleDensity = timeData?.items[evacuationTimeStep].rooms.find(
+			room => room.uuid === buildingElement.Id
+		)?.density;
 		dispatch(
 			setBuildingElement({
-				area: Math.floor(Mathem.calculateBuildArea(buildingElement)),
+				area: Number(Mathem.calculateBuildArea(buildingElement).toFixed(1)),
 				level: currentLevel,
 				type: buildingElement.Sign,
 				name: buildingElement.Name,
 				id: buildingElement.Id,
-				numberOfPeople: 0,
+				numberOfPeople: Math.round(peopleDensity ?? 0),
 				length,
 				width
 			})
 		);
+	};
+
+	const handlePlayButtonClick = () => {
+		const {
+			buildingViewReducer: { modelingTimerId }
+		} = store.getState();
+		if (!Boolean(modelingTimerId)) {
+			const timerId = window.setInterval(() => {
+				dispatch(incrementModelingStep());
+				const {
+					buildingViewReducer: { evacuationTimeStep, timeData, evacuationTimeInSec }
+				} = store.getState();
+				const numberOfPeopleInsideBuilding =
+					timeData?.items[evacuationTimeStep].rooms
+						.filter(room => room.uuid !== '00000000-0000-0000-0000-000000000000')
+						.reduce((totalDensity, room) => totalDensity + room.density, 0) ?? 0;
+				const numberOfPeopleOutsideBuilding =
+					Logic.totalNumberOfPeople(timeData) - numberOfPeopleInsideBuilding;
+
+				dispatch(setPeopleInsideBuilding(Math.floor(numberOfPeopleInsideBuilding)));
+				dispatch(setPeopleOutsideBuilding(Math.floor(numberOfPeopleOutsideBuilding)));
+				dispatch(
+					setEvacuationTimeInSec(
+						timeData?.items[evacuationTimeStep].time ?? evacuationTimeInSec
+					)
+				);
+				if (evacuationTimeStep >= (timeData?.items.length ?? 0) - 1) {
+					stopModelingLoop();
+				}
+			}, 100);
+			dispatch(setModelingTimerId(timerId));
+		}
+	};
+
+	const handlePauseButtonClick = () => {
+		stopModelingLoop();
+	};
+
+	const stopModelingLoop = () => {
+		const {
+			buildingViewReducer: { modelingTimerId }
+		} = store.getState();
+		if (Boolean(modelingTimerId)) {
+			window.clearInterval(modelingTimerId);
+			dispatch(setModelingTimerId(undefined));
+		}
 	};
 
 	return (
@@ -246,8 +309,8 @@ const ModelingViewPage = () => {
 				</div>
 			)}
 			<ControlPanel
-				onPlayButtonClick={() => {}}
-				onPauseButtonClick={() => {}}
+				onPlayButtonClick={handlePlayButtonClick}
+				onPauseButtonClick={handlePauseButtonClick}
 				onIncrementLevelButtonClick={() => {}}
 				onDecrementLevelButtonClick={() => {}}
 			/>

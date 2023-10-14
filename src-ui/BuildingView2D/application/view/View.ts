@@ -56,7 +56,7 @@ export class View {
 	static drawBuildingRoomPixi(
 		g: PixiGraphics,
 		points: Point[],
-		color?: ColorSource = 0xffffff
+		color: ColorSource = 0xffffff
 	) {
 		g.moveTo(points[0].x, points[0].y);
 		g.beginFill(color);
