@@ -21,6 +21,7 @@ export default [
 			'src-ui/peopleTraffic/js/vendor',
 			'coverage/',
 			'test/',
+			'.storybook/',
 			'eslint.config.js',
 			'vite.config.ts',
 			'cypress.config.ts',

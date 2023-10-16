@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 
-const App: FC = () => {
+const App = () => {
 	return <RouterProvider router={router} />;
 };
 

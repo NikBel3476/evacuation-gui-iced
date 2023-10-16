@@ -80,7 +80,7 @@ export class App {
 			onModelingTick,
 			currentTimeState: this.currentTimeState.value
 		});
-		// @ts-expect-error
+		// @ts-expect-error any type
 		this.encoder = new GIFEncoder();
 
 		// Инициализация первичных настроек

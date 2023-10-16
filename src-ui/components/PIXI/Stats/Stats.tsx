@@ -9,10 +9,11 @@ const Stats = () => {
 	useEffect(() => {
 		const stats = addStats(document, pixiApp);
 		const ticker = Ticker.shared;
-		ticker.add(stats.update, stats, UPDATE_PRIORITY.UTILITY);
+		const updateCb = stats.update;
+		ticker.add(updateCb, stats, UPDATE_PRIORITY.UTILITY);
 		return () => {
 			document.getElementById('stats')?.remove();
-			ticker.remove();
+			ticker.remove(updateCb);
 		};
 	}, [pixiApp]);
 

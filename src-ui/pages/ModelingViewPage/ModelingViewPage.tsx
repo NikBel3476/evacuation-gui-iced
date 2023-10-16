@@ -52,9 +52,9 @@ const ModelingViewPage = () => {
 	const [canMove, setCanMove] = useState<boolean>(false);
 
 	useEffect(() => {
-		dispatch(setScale(8));
-		void dispatch(getConfig());
 		if (!bim) {
+			dispatch(setScale(8));
+			void dispatch(getConfig());
 			void openFileDialog();
 		}
 		window.addEventListener('keydown', handleWindowKeydown);
@@ -97,13 +97,15 @@ const ModelingViewPage = () => {
 
 	const drawPeople = useCallback(
 		(g: PixiGraphics) => {
-			const rooms = timeData?.items[evacuationTimeStep].rooms ?? [];
-			const peopleCoordinates = Logic.generatePeopleCoordinates(
-				bim.Level[currentLevel],
-				rooms
-			);
-			g.clear();
-			View.drawPeople(g, peopleCoordinates);
+			if (bim) {
+				const rooms = timeData?.items[evacuationTimeStep].rooms ?? [];
+				const peopleCoordinates = Logic.generatePeopleCoordinates(
+					bim.Level[currentLevel],
+					rooms
+				);
+				g.clear();
+				View.drawPeople(g, peopleCoordinates);
+			}
 		},
 		[bim, timeData, currentLevel, evacuationTimeInSec]
 	);
@@ -237,8 +239,9 @@ const ModelingViewPage = () => {
 					timeData?.items[evacuationTimeStep].rooms
 						.filter(room => room.uuid !== '00000000-0000-0000-0000-000000000000')
 						.reduce((totalDensity, room) => totalDensity + room.density, 0) ?? 0;
-				const numberOfPeopleOutsideBuilding =
-					Logic.totalNumberOfPeople(timeData) - numberOfPeopleInsideBuilding;
+				const numberOfPeopleOutsideBuilding = timeData
+					? Logic.totalNumberOfPeople(timeData) - numberOfPeopleInsideBuilding
+					: 0;
 
 				dispatch(setPeopleInsideBuilding(Math.floor(numberOfPeopleInsideBuilding)));
 				dispatch(setPeopleOutsideBuilding(Math.floor(numberOfPeopleOutsideBuilding)));

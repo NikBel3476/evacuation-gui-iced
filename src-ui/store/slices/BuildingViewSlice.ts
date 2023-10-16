@@ -119,7 +119,7 @@ export const buildingViewSlice = createSlice({
 		setAnchorCoordinates: (state, action: PayloadAction<Point>) => {
 			state.anchorCoordinates = action.payload;
 		},
-		setModelingTimerId: (state, action: PayloadAction<number>) => {
+		setModelingTimerId: (state, action: PayloadAction<number | undefined>) => {
 			state.modelingTimerId = action.payload;
 		},
 		setModelingStep: (state, action: PayloadAction<number>) => {
