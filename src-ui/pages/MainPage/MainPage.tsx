@@ -1,11 +1,10 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import { FC } from 'react';
 
 import styles from './MainPage.module.css';
 import RouterLink from '../../components/RouterLink';
 import Button from '../../components/Button/Button';
 
-const MainPage: FC = () => {
+const MainPage = () => {
 	const handleOpenConfigurationButtonClick = () => {
 		void invoke('open_configuration_window');
 	};
