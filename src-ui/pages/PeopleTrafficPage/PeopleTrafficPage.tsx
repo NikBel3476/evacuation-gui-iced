@@ -74,7 +74,7 @@ const PeopleTrafficPage = () => {
 		const buildingData = JSON.parse(await readTextFile(filePath)) as Building;
 		if (app && Boolean(buildingData)) {
 			try {
-				const modelingResult = await runEvacuationModeling(filePath);
+				const modelingResult = await runEvacuationModeling(filePath, config);
 				app.logic.timeData = modelingResult.distribution_by_time_steps;
 				app.setTimeData(modelingResult.distribution_by_time_steps);
 			} catch (e) {

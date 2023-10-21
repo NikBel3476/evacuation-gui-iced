@@ -8,8 +8,10 @@ import { BaseDirectory, FileEntry, readDir } from '@tauri-apps/api/fs';
 import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
 import cn from 'classnames';
 import styles from './ModelingPage.module.css';
+import { useAppSelector } from '../../hooks/redux';
 
 const ModelingPage = () => {
+	const { config } = useAppSelector(state => state.configReducer);
 	const [bimFiles, setBimFiles] = useState<FileEntry[]>([]);
 	const [selectedFilePath, setSelectedFilePath] = useState<string>('');
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -78,7 +80,7 @@ const ModelingPage = () => {
 		e: React.MouseEvent<HTMLButtonElement>
 	) => {
 		setIsLoading(true);
-		const modelingResult = await runEvacuationModeling(selectedFilePath);
+		const modelingResult = await runEvacuationModeling(selectedFilePath, config);
 		setIsLoading(false);
 		setEvacuationModelingResult(modelingResult);
 	};

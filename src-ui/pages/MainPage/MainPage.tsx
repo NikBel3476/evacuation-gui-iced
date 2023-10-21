@@ -86,9 +86,9 @@ const MainPage = () => {
 								Страница визуализации моделирования
 							</RouterLink>
 						</li>
-						<li>
+						{/*<li>
 							<Button onClick={handleRunPythonButtonClick}>Запустить python</Button>
-						</li>
+						</li>*/}
 					</ul>
 				</nav>
 			</header>

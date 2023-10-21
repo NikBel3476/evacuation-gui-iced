@@ -1,7 +1,8 @@
 use std::io::Write;
+use std::path::Path;
 use std::time::Instant;
 
-use crate::bim::bim_output::bim_output_body_detailed;
+use crate::bim::bim_output::{bim_output_body_detailed, OUTPUT_DIR};
 use crate::bim::bim_tools::EvacuationModelingResult;
 use bim_evac::{
 	evac_def_modeling_step, evac_moving_step_test_with_log_rust, get_time_m, get_time_s,
@@ -31,14 +32,6 @@ mod json_object;
 mod json_renga;
 
 pub fn run_rust(scenario_configuration: &ScenarioCfg) {
-	// TODO: remove mock file path
-	// let cli_parameters = CliParameters {
-	// 	scenario_file: String::from("../scenario.json"),
-	// };
-
-	// let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
-	// 	.expect("Error reading the scenario configuration file");
-
 	let start = Instant::now();
 	// TODO: add the logger
 	for file in &scenario_configuration.bim_files {
@@ -145,14 +138,6 @@ pub fn run_evacuation_modeling(
 	file: &str,
 	scenario_configuration: &ScenarioCfg,
 ) -> EvacuationModelingResult {
-	// TODO: remove mock file path
-	// let cli_parameters = CliParameters {
-	// 	scenario_file: String::from("../scenario.json"),
-	// };
-
-	// let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
-	// 	.expect("Error reading the scenario configuration file");
-
 	let start = Instant::now();
 	// TODO: add the logger
 	let filename = bim_basename_rust(file);
@@ -164,6 +149,12 @@ pub fn run_evacuation_modeling(
 	let output_short = bim_create_file_name_rust(&filename, OUTPUT_SHORT_FILE_RUST, OUTPUT_SUFFIX);
 	let log = bim_create_file_name_rust(&log_filename, "_rust", ".txt");
 	let time_data_path = bim_create_file_name_rust(&filename, "", ".json");
+	let result_dir_path = Path::new("..").join(OUTPUT_DIR);
+	if let Err(_) = std::fs::read_dir(&result_dir_path) {
+		println!("Result directory not found. Creating...");
+		std::fs::create_dir(&result_dir_path)
+			.expect(format!("Error creating directory {OUTPUT_DIR}").as_str());
+	}
 
 	let mut fp_detail =
 		std::fs::File::create(&output_detail).expect("Error opening the output file");

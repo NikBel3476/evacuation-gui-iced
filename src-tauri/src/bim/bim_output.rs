@@ -5,7 +5,7 @@ use std::io::{BufWriter, Write};
 use std::ops::Add;
 use std::path::Path;
 
-const OUTPUT_DIR: &str = "result";
+pub const OUTPUT_DIR: &str = "result";
 pub const OUTPUT_DETAIL_FILE_RUST: &str = "_detailed_rust";
 pub const OUTPUT_SHORT_FILE_RUST: &str = "_short_rust";
 pub const OUTPUT_SUFFIX: &str = ".csv";
