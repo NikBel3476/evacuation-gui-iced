@@ -16,7 +16,7 @@ import {
 	setPeopleInsideBuilding,
 	setPeopleOutsideBuilding
 } from '../../store/slices/BuildingViewSlice';
-import { useAppDispatch } from '../../hooks/redux';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import type { FileEntry } from '@tauri-apps/api/fs';
 import { readDir, BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
 import { Building } from '../../BuildingView2D/application/Interfaces/Building';
@@ -26,8 +26,9 @@ import { runEvacuationModeling } from '../../rustCalls';
 let app: App | null = null;
 
 const PeopleTrafficPage = () => {
-	const [bimFileEntries, setBimFileEntries] = useState<FileEntry[]>([]);
 	const dispatch = useAppDispatch();
+	const { config } = useAppSelector(state => state.configReducer);
+	const [bimFileEntries, setBimFileEntries] = useState<FileEntry[]>([]);
 	const [bimFileIsLoading, setBimFileIsLoading] = useState<boolean>(true);
 
 	const onModelingTick = (numberOfPeople: number, numberOfEvacuatedPeople: number) => {
@@ -43,7 +44,7 @@ const PeopleTrafficPage = () => {
 		setBimFileEntries(files.filter(fileEntry => fileEntry.path.endsWith('.json')));
 		const bimFile = files[2].path;
 		const buildingData = await readTextFile(bimFile);
-		const modelingResult = await runEvacuationModeling(bimFile);
+		const modelingResult = await runEvacuationModeling(bimFile, config);
 		app = new App(
 			'field',
 			'canvas_container',

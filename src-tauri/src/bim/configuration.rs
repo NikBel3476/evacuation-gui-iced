@@ -6,21 +6,21 @@ use std::io::BufWriter;
 use std::path::Path;
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum DistributionType {
 	FromBim,
 	Uniform,
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum TransitionType {
 	FromBim,
 	Users,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DistributionSpecial {
 	pub uuid: Vec<Uuid>,
@@ -28,7 +28,7 @@ pub struct DistributionSpecial {
 	pub comment: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TransitionSpecial {
 	pub uuid: Vec<Uuid>,
@@ -36,7 +36,7 @@ pub struct TransitionSpecial {
 	pub comment: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Distribution {
 	pub r#type: DistributionType,
@@ -44,7 +44,7 @@ pub struct Distribution {
 	pub special: Vec<DistributionSpecial>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Transition {
 	pub r#type: TransitionType,
@@ -53,7 +53,7 @@ pub struct Transition {
 	pub special: Vec<TransitionSpecial>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Modeling {
 	pub step: f64,
@@ -62,7 +62,7 @@ pub struct Modeling {
 	pub min_density: f64,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ScenarioCfg {
 	pub version: String,

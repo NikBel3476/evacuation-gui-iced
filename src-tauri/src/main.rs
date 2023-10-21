@@ -4,6 +4,7 @@
 )]
 
 use crate::bim::bim_tools::EvacuationModelingResult;
+use crate::bim::configuration::ScenarioCfg;
 use bim::configuration;
 use bim::{run_evacuation_modeling, run_rust};
 use python::call_python::run_python;
@@ -100,13 +101,14 @@ async fn open_building_view_window(handle: AppHandle) {
 }
 
 #[tauri::command]
-fn bim_start() {
-	run_rust();
+fn bim_start(scenario_configuration: ScenarioCfg) {
+	println!("{:#?}", &scenario_configuration);
+	run_rust(&scenario_configuration);
 }
 
 #[tauri::command]
-fn run_modeling(file_path: &str) -> EvacuationModelingResult {
-	run_evacuation_modeling(file_path)
+fn run_modeling(file_path: &str, scenario_configuration: ScenarioCfg) -> EvacuationModelingResult {
+	run_evacuation_modeling(file_path, &scenario_configuration)
 }
 
 #[tauri::command]

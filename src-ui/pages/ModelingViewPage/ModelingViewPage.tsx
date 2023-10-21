@@ -39,6 +39,7 @@ import { Mathem } from '../../BuildingView2D/application/mathem/Mathem';
 
 const ModelingViewPage = () => {
 	const dispatch = useAppDispatch();
+	const { config } = useAppSelector(state => state.configReducer);
 	const {
 		currentLevel,
 		scale,
@@ -75,7 +76,7 @@ const ModelingViewPage = () => {
 		if (filePath !== null) {
 			const buildingData = JSON.parse(await readTextFile(filePath)) as BimJson;
 			try {
-				const modelingResult = await runEvacuationModeling(filePath);
+				const modelingResult = await runEvacuationModeling(filePath, config);
 				dispatch(setModelingStep(0));
 				dispatch(setBim(buildingData));
 				dispatch(setTimeData(modelingResult.distribution_by_time_steps));

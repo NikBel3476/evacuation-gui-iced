@@ -30,14 +30,14 @@ mod graph;
 mod json_object;
 mod json_renga;
 
-pub fn run_rust() {
+pub fn run_rust(scenario_configuration: &ScenarioCfg) {
 	// TODO: remove mock file path
-	let cli_parameters = CliParameters {
-		scenario_file: String::from("../scenario.json"),
-	};
+	// let cli_parameters = CliParameters {
+	// 	scenario_file: String::from("../scenario.json"),
+	// };
 
-	let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
-		.expect("Error reading the scenario configuration file");
+	// let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
+	// 	.expect("Error reading the scenario configuration file");
 
 	let start = Instant::now();
 	// TODO: add the logger
@@ -141,14 +141,17 @@ pub fn run_rust() {
 	println!("Completed in {:.2} s", end.as_secs_f64())
 }
 
-pub fn run_evacuation_modeling(file: &str) -> EvacuationModelingResult {
+pub fn run_evacuation_modeling(
+	file: &str,
+	scenario_configuration: &ScenarioCfg,
+) -> EvacuationModelingResult {
 	// TODO: remove mock file path
-	let cli_parameters = CliParameters {
-		scenario_file: String::from("../scenario.json"),
-	};
+	// let cli_parameters = CliParameters {
+	// 	scenario_file: String::from("../scenario.json"),
+	// };
 
-	let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
-		.expect("Error reading the scenario configuration file");
+	// let scenario_configuration = load_cfg(&cli_parameters.scenario_file)
+	// 	.expect("Error reading the scenario configuration file");
 
 	let start = Instant::now();
 	// TODO: add the logger
