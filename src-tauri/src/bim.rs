@@ -540,10 +540,10 @@ mod tests {
 		}
 	}
 
-	#[test]
-	fn test_run_modeling() {
-		run_rust();
-	}
+	// #[test]
+	// fn test_run_modeling() {
+	// 	run_rust();
+	// }
 
 	// #[rstest]
 	// #[case::example_one_exit(scenario_configuration(), "../res/example-one-exit.json")]

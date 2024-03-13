@@ -495,6 +495,7 @@ pub fn time_reset() {
 #[cfg(test)]
 mod tests {
 	use super::super::bim_polygon_tools::Polygon;
+	use super::super::json_object::Point;
 	use super::*;
 	use rstest::*;
 	use uuid::uuid;
@@ -624,6 +625,123 @@ mod tests {
 		assert_eq!(
 			part_people_flow(&receiving_zone, &transmitting_zone, &transit),
 			0.8013633567871893
+		);
+	}
+
+	#[rstest]
+	fn part_people_flow_eq_1() {
+		let receiving_zone = BimZone {
+			uuid: uuid!("00000000-0000-0000-0000-000000000000"),
+			id: 6,
+			name: String::from("Outside"),
+			polygon: Polygon { points: vec![] },
+			outputs: vec![
+				uuid!("f2590703-5d39-43c7-8241-5e7dd246e3d4"),
+				uuid!("003c0e9b-2671-4e4a-bc23-31456986725c"),
+			],
+			size_z: 1.7976931348623157e+308,
+			z_level: 0.0,
+			number_of_people: 0.0,
+			potential: 0.05983352150182077,
+			area: 1.7976931348623157e+308,
+			hazard_level: 0,
+			sign: BimElementSign::Outside,
+			is_visited: false,
+			is_blocked: false,
+			is_safe: true,
+		};
+
+		let transmitting_zone = BimZone {
+			uuid: uuid!("37a611a3-b0b4-491f-b3de-f0eb7a06349c"),
+			id: 3,
+			name: String::from("Comp 5 (00 : 6349c)"),
+			polygon: Polygon {
+				points: vec![
+					Point {
+						x: 8.049085116975721,
+						y: 3.939957782245948,
+					},
+					Point {
+						x: 13.925474407478942,
+						y: 3.939957782245948,
+					},
+					Point {
+						x: 13.925474407478942,
+						y: 0.03282578402084191,
+					},
+					Point {
+						x: 8.03339382381016,
+						y: 0.03282578402084263,
+					},
+					Point {
+						x: 8.049085116975721,
+						y: 3.939957782245948,
+					},
+				],
+			},
+			outputs: vec![
+				uuid!("b0611c37-febb-44ca-b8b4-f4ed4626d007"),
+				uuid!("ad4962eb-dfd5-4295-8693-18066f5e82e3"),
+				uuid!("003c0e9b-2671-4e4a-bc23-31456986725c"),
+			],
+			size_z: 3.0,
+			z_level: 0.0,
+			number_of_people: 22.990482607762807,
+			potential: 1.7976931348623157e+308,
+			area: 22.990482607762807,
+			hazard_level: 0,
+			sign: BimElementSign::Room,
+			is_visited: false,
+			is_blocked: false,
+			is_safe: false,
+		};
+
+		let transit = BimTransit {
+			uuid: uuid!("003c0e9b-2671-4e4a-bc23-31456986725c"),
+			id: 6,
+			name: String::from("Выход (00 : 6725c) 6349c<->"),
+			outputs: vec![uuid!("37a611a3-b0b4-491f-b3de-f0eb7a06349c")],
+			polygon: Polygon {
+				points: vec![
+					Point {
+						x: 10.98923990097158,
+						y: -0.23217549927336378,
+					},
+					Point {
+						x: 10.98923990097158,
+						y: 0.3678245007266362,
+					},
+					Point {
+						x: 12.98923990097158,
+						y: 0.3678245007266362,
+					},
+					Point {
+						x: 12.98923990097158,
+						y: -0.23217549927336378,
+					},
+					Point {
+						x: 10.98923990097158,
+						y: -0.23217549927336378,
+					},
+				],
+			},
+			size_z: 2.0,
+			z_level: 0.0,
+			width: 2.0,
+			no_proceeding: 0.0,
+			sign: BimElementSign::DoorWayOut,
+			is_visited: false,
+			is_blocked: false,
+		};
+
+		unsafe {
+			EVAC_DENSITY_MIN_RUST = 0.1;
+			EVAC_DENSITY_MAX_RUST = 5.0;
+		}
+
+		assert_eq!(
+			part_people_flow(&receiving_zone, &transmitting_zone, &transit),
+			1.6027266777506448
 		);
 	}
 }
