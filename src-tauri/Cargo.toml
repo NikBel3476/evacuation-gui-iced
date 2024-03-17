@@ -1,7 +1,7 @@
 [package]
 name = "evacuation"
 version = "0.1.0"
-description = "A Tauri App"
+description = "Evacuation modeling App"
 authors = [""]
 license = ""
 repository = ""
@@ -34,6 +34,7 @@ triangle-rs = { git = "https://github.com/NikBel3476/triangle-rs.git", rev = "0a
 spade = "2.2.0"
 triangulate = { git = "https://github.com/colinjneville/triangulate.git", branch = "master" }
 pyo3 = { version = "0.18.3", features = ["auto-initialize"] }
+iced = "0.12.1"
 
 [dev-dependencies]
 insta = { version = "1.29.0", features = ["yaml"] }

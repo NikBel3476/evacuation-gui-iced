@@ -7,27 +7,33 @@ use crate::bim::bim_tools::EvacuationModelingResult;
 use crate::bim::configuration::ScenarioCfg;
 use bim::configuration;
 use bim::{run_evacuation_modeling, run_rust};
+use gui::tabs::{TabsController, TabsControllerMessage};
+use iced::widget::{button, column, text};
+use iced::{Alignment, Element, Sandbox, Settings};
 use python::call_python::run_python;
 use tauri::{AppHandle, WindowBuilder};
 
 mod bim;
+mod gui;
 mod python;
 
-fn main() {
-	tauri::Builder::default()
-		.invoke_handler(tauri::generate_handler![
-			read_config,
-			save_configuration,
-			open_configuration_window,
-			open_configuration_rescript_window,
-			open_people_traffic_window,
-			open_building_view_window,
-			bim_start,
-			python_start,
-			run_modeling
-		])
-		.run(tauri::generate_context!())
-		.expect("error while running tauri application");
+fn main() -> iced::Result {
+	EvacuationApp::run(Settings::default())
+
+	// tauri::Builder::default()
+	// 	.invoke_handler(tauri::generate_handler![
+	// 		read_config,
+	// 		save_configuration,
+	// 		open_configuration_window,
+	// 		open_configuration_rescript_window,
+	// 		open_people_traffic_window,
+	// 		open_building_view_window,
+	// 		bim_start,
+	// 		python_start,
+	// 		run_modeling
+	// 	])
+	// 	.run(tauri::generate_context!())
+	// 	.expect("error while running tauri application");
 }
 
 #[tauri::command]
@@ -114,4 +120,44 @@ fn run_modeling(file_path: &str, scenario_configuration: ScenarioCfg) -> Evacuat
 #[tauri::command]
 fn python_start() {
 	run_python().expect("Failed to run python");
+}
+
+struct EvacuationApp {
+	tabs_controller: TabsController,
+}
+
+#[derive(Debug, Clone)]
+enum Message {
+	TabsController(TabsControllerMessage),
+}
+
+impl Sandbox for EvacuationApp {
+	type Message = Message;
+
+	fn new() -> Self {
+		Self {
+			tabs_controller: TabsController::new(),
+		}
+	}
+
+	fn title(&self) -> String {
+		let mut title = String::from("Evacuation - ");
+
+		title.push_str(&self.tabs_controller.current_tab_title());
+
+		title
+	}
+
+	fn update(&mut self, message: Message) {
+		match message {
+			Message::TabsController(message) => self.tabs_controller.update(message),
+		}
+	}
+
+	fn view(&self) -> Element<Self::Message> {
+		column![self.tabs_controller.view().map(Message::TabsController)]
+			.padding(20)
+			.align_items(Alignment::Center)
+			.into()
+	}
 }
