@@ -13,6 +13,17 @@ pub enum DistributionType {
 	Uniform,
 }
 
+impl std::fmt::Display for DistributionType {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let text = match self {
+			DistributionType::FromBim => "FromBim",
+			DistributionType::Uniform => "Uniform",
+		};
+
+		write!(f, "{text}")
+	}
+}
+
 #[derive(Serialize, Deserialize, Eq, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum TransitionType {
@@ -72,6 +83,15 @@ pub struct ScenarioCfg {
 	pub transition_parameters: Transition,
 	pub modeling_parameters: Modeling,
 }
+
+// impl Default for ScenarioCfg {
+// 	fn default() -> Self {
+// 		Self {
+// 			version: String::from("1.0"),
+
+// 		}
+// 	}
+// }
 
 pub fn load_cfg(path_to_file: &str) -> Result<ScenarioCfg, String> {
 	match Path::new(path_to_file).exists() {

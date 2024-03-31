@@ -4,8 +4,7 @@
 )]
 
 use crate::bim::bim_tools::EvacuationModelingResult;
-use crate::bim::configuration::ScenarioCfg;
-use bim::configuration;
+use crate::bim::{configuration, configuration::ScenarioCfg};
 use bim::{run_evacuation_modeling, run_rust};
 use gui::tabs::{TabsController, TabsControllerMessage};
 use iced::widget::{button, column, text};

@@ -1,9 +1,14 @@
+use crate::bim::configuration::load_cfg;
 use cfg_tab::CfgTab;
 use iced::Element;
 use visualization_tab::VisualizationTab;
 
+use self::{cfg_tab::CfgTabMessage, visualization_tab::VisualizationTabMessage};
+
 pub mod cfg_tab;
 pub mod visualization_tab;
+
+const CFG_PATH: &str = "scenario.json";
 
 pub enum TabId {
 	Cfg,
@@ -21,23 +26,25 @@ impl std::fmt::Display for TabId {
 	}
 }
 
-#[derive(Debug, Clone)]
-pub enum TabsControllerMessage {
-	CfgTab,
-	VisualizationTab,
-}
-
 pub struct TabsController {
 	current_tab_id: TabId,
 	cfg_tab: CfgTab,
 	visualization_tab: VisualizationTab,
 }
 
+#[derive(Debug, Clone)]
+pub enum TabsControllerMessage {
+	VisualizationTab(VisualizationTabMessage),
+	CfgTab(CfgTabMessage),
+}
+
 impl TabsController {
 	pub fn new() -> Self {
+		let scenario_cfg = load_cfg(&CFG_PATH).expect("Failed to read scenario configuration");
+
 		Self {
 			current_tab_id: TabId::Cfg,
-			cfg_tab: CfgTab::new(),
+			cfg_tab: CfgTab::new(scenario_cfg),
 			visualization_tab: VisualizationTab::new(),
 		}
 	}
@@ -48,19 +55,29 @@ impl TabsController {
 
 	pub fn update(&mut self, message: TabsControllerMessage) {
 		match message {
-			TabsControllerMessage::CfgTab => {
-				self.current_tab_id = TabId::Cfg;
-			}
-			TabsControllerMessage::VisualizationTab => {
-				self.current_tab_id = TabId::Visualization;
+			TabsControllerMessage::VisualizationTab(message) => match message {
+				VisualizationTabMessage::CfgTab => {
+					self.current_tab_id = TabId::Cfg;
+				}
+				VisualizationTabMessage::OpenBuildingFileDialog => {
+					self.visualization_tab.update(message)
+				}
+			},
+			TabsControllerMessage::CfgTab(message) => {
+				if let CfgTabMessage::VisualizationTab = message {
+					self.current_tab_id = TabId::Visualization;
+				}
 			}
 		}
 	}
 
 	pub fn view(&self) -> Element<TabsControllerMessage> {
 		match self.current_tab_id {
-			TabId::Cfg => self.cfg_tab.view(),
-			TabId::Visualization => self.visualization_tab.view(),
+			TabId::Cfg => self.cfg_tab.view().map(TabsControllerMessage::CfgTab),
+			TabId::Visualization => self
+				.visualization_tab
+				.view()
+				.map(TabsControllerMessage::VisualizationTab),
 		}
 	}
 }
