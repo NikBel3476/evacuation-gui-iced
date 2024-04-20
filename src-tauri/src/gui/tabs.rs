@@ -1,4 +1,6 @@
-use crate::bim::configuration::load_cfg;
+use std::rc::Rc;
+
+use crate::bim::configuration::{load_cfg, ScenarioCfg};
 use cfg_tab::CfgTab;
 use iced::Element;
 use visualization_tab::VisualizationTab;
@@ -40,12 +42,13 @@ pub enum TabsControllerMessage {
 
 impl TabsController {
 	pub fn new() -> Self {
-		let scenario_cfg = load_cfg(&CFG_PATH).expect("Failed to read scenario configuration");
+		let scenario_cfg =
+			Rc::new(load_cfg(&CFG_PATH).expect("Failed to read scenario configuration"));
 
 		Self {
 			current_tab_id: TabId::Cfg,
-			cfg_tab: CfgTab::new(scenario_cfg),
-			visualization_tab: VisualizationTab::new(),
+			cfg_tab: CfgTab::new(Rc::clone(&scenario_cfg)),
+			visualization_tab: VisualizationTab::new(Rc::clone(&scenario_cfg)),
 		}
 	}
 

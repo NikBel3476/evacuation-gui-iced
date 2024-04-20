@@ -21,7 +21,7 @@ use configuration::{load_cfg, DistributionType, ScenarioCfg, TransitionType};
 mod bim_cli;
 mod bim_evac;
 mod bim_graph;
-mod bim_json_object;
+pub mod bim_json_object;
 mod bim_output;
 mod bim_polygon_tools;
 pub mod bim_tools;

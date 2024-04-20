@@ -1,9 +1,11 @@
+use std::rc::Rc;
+
 use crate::bim::configuration::ScenarioCfg;
 use iced::widget::{button, column, text, text_input};
 use iced::Element;
 
 pub struct CfgTab {
-	cfg: ScenarioCfg,
+	cfg: Rc<ScenarioCfg>,
 }
 
 #[derive(Debug, Clone)]
@@ -12,7 +14,7 @@ pub enum CfgTabMessage {
 }
 
 impl CfgTab {
-	pub fn new(cfg: ScenarioCfg) -> Self {
+	pub fn new(cfg: Rc<ScenarioCfg>) -> Self {
 		Self { cfg }
 	}
 
