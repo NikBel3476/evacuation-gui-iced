@@ -13,12 +13,14 @@ use crate::bim::run_evacuation_modeling;
 pub struct VisualizationTab {
 	cfg: Rc<ScenarioCfg>,
 	bim_json: Option<BimJsonObject>,
+	scale: f32,
 }
 
 #[derive(Debug, Clone)]
 pub enum VisualizationTabMessage {
 	CfgTab,
 	OpenBuildingFileDialog,
+	UpdateScale(f32),
 }
 
 impl VisualizationTab {
@@ -26,6 +28,7 @@ impl VisualizationTab {
 		Self {
 			cfg,
 			bim_json: None,
+			scale: 1.0,
 		}
 	}
 
@@ -51,6 +54,11 @@ impl VisualizationTab {
 				}
 			}
 			VisualizationTabMessage::CfgTab => {}
+			VisualizationTabMessage::UpdateScale(new_scale) => {
+				if new_scale > 0.0 {
+					self.scale = new_scale;
+				}
+			}
 		}
 	}
 
@@ -68,9 +76,42 @@ impl VisualizationTab {
 	}
 }
 
-// Then, we implement the `Program` trait
-impl<VisualizationTabMessage> canvas::Program<VisualizationTabMessage> for VisualizationTab {
+impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 	type State = ();
+
+	fn update(
+		&self,
+		_state: &mut Self::State,
+		event: canvas::Event,
+		bounds: Rectangle,
+		cursor: mouse::Cursor,
+	) -> (canvas::event::Status, Option<VisualizationTabMessage>) {
+		if cursor.position_in(bounds).is_none() {
+			return (canvas::event::Status::Ignored, None);
+		}
+		match event {
+			canvas::Event::Mouse(mouse_event) => match mouse_event {
+				mouse::Event::WheelScrolled { delta } => {
+					if let mouse::ScrollDelta::Lines { x, y } = delta {
+						return if y > 0.0 {
+							(
+								canvas::event::Status::Captured,
+								Some(VisualizationTabMessage::UpdateScale(self.scale + 0.5)),
+							)
+						} else {
+							(
+								canvas::event::Status::Captured,
+								Some(VisualizationTabMessage::UpdateScale(self.scale - 0.5)),
+							)
+						};
+					}
+				}
+				_ => {}
+			},
+			_ => {}
+		}
+		(canvas::event::Status::Ignored, None)
+	}
 
 	fn draw(
 		&self,
@@ -81,6 +122,7 @@ impl<VisualizationTabMessage> canvas::Program<VisualizationTabMessage> for Visua
 		_cursor: mouse::Cursor,
 	) -> Vec<Geometry> {
 		let mut frame = Frame::new(renderer, bounds.size());
+		frame.scale(self.scale);
 
 		if let Some(bim_json) = &self.bim_json {
 			let num_of_level = 0;

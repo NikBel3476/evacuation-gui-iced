@@ -17,7 +17,10 @@ mod gui;
 mod python;
 
 fn main() -> iced::Result {
-	EvacuationApp::run(Settings::default())
+	EvacuationApp::run(Settings {
+		antialiasing: true,
+		..Settings::default()
+	})
 
 	// tauri::Builder::default()
 	// 	.invoke_handler(tauri::generate_handler![

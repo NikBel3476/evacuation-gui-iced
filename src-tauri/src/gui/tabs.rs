@@ -65,6 +65,7 @@ impl TabsController {
 				VisualizationTabMessage::OpenBuildingFileDialog => {
 					self.visualization_tab.update(message)
 				}
+				VisualizationTabMessage::UpdateScale(_) => self.visualization_tab.update(message),
 			},
 			TabsControllerMessage::CfgTab(message) => {
 				if let CfgTabMessage::VisualizationTab = message {
