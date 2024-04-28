@@ -14,6 +14,9 @@ pub struct VisualizationTab {
 	cfg: Rc<ScenarioCfg>,
 	bim_json: Option<BimJsonObject>,
 	scale: f32,
+	mouse_left_button_pressed: bool,
+	cursor_coordinates: Point,
+	translation: iced::Vector,
 }
 
 #[derive(Debug, Clone)]
@@ -21,6 +24,8 @@ pub enum VisualizationTabMessage {
 	CfgTab,
 	OpenBuildingFileDialog,
 	UpdateScale(f32),
+	MouseLeftButtonState(bool),
+	MouseCursorMove(Point),
 }
 
 impl VisualizationTab {
@@ -29,6 +34,9 @@ impl VisualizationTab {
 			cfg,
 			bim_json: None,
 			scale: 1.0,
+			mouse_left_button_pressed: false,
+			cursor_coordinates: Default::default(),
+			translation: Default::default(),
 		}
 	}
 
@@ -49,16 +57,31 @@ impl VisualizationTab {
 					println!("full path: {}", file_path);
 					self.bim_json = Some(bim_json_object_new(file_path));
 					let _ = run_evacuation_modeling(file_path, &self.cfg);
+
+					self.scale = 1.0;
+					self.translation = iced::Vector { x: 0.0, y: 0.0 };
 				} else {
 					println!("Files were not selected");
 				}
 			}
-			VisualizationTabMessage::CfgTab => {}
 			VisualizationTabMessage::UpdateScale(new_scale) => {
 				if new_scale > 0.0 {
 					self.scale = new_scale;
 				}
 			}
+			VisualizationTabMessage::MouseLeftButtonState(pressed) => {
+				self.mouse_left_button_pressed = pressed;
+			}
+			VisualizationTabMessage::MouseCursorMove(point) => {
+				if self.mouse_left_button_pressed {
+					let mut translation_delta = point - self.cursor_coordinates;
+					translation_delta.x /= self.scale;
+					translation_delta.y /= self.scale;
+					self.translation = self.translation + translation_delta;
+				}
+				self.cursor_coordinates = point;
+			}
+			VisualizationTabMessage::CfgTab => {}
 		}
 	}
 
@@ -92,7 +115,7 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 		match event {
 			canvas::Event::Mouse(mouse_event) => match mouse_event {
 				mouse::Event::WheelScrolled { delta } => {
-					if let mouse::ScrollDelta::Lines { x, y } = delta {
+					if let mouse::ScrollDelta::Lines { x: _, y } = delta {
 						return if y > 0.0 {
 							(
 								canvas::event::Status::Captured,
@@ -105,6 +128,30 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 							)
 						};
 					}
+				}
+				mouse::Event::ButtonPressed(button) => match button {
+					mouse::Button::Left => {
+						return (
+							canvas::event::Status::Captured,
+							Some(VisualizationTabMessage::MouseLeftButtonState(true)),
+						);
+					}
+					_ => {}
+				},
+				mouse::Event::ButtonReleased(button) => match button {
+					mouse::Button::Left => {
+						return (
+							canvas::event::Status::Captured,
+							Some(VisualizationTabMessage::MouseLeftButtonState(false)),
+						);
+					}
+					_ => {}
+				},
+				mouse::Event::CursorMoved { position } => {
+					return (
+						canvas::event::Status::Captured,
+						Some(VisualizationTabMessage::MouseCursorMove(position)),
+					);
 				}
 				_ => {}
 			},
@@ -123,6 +170,7 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 	) -> Vec<Geometry> {
 		let mut frame = Frame::new(renderer, bounds.size());
 		frame.scale(self.scale);
+		frame.translate(self.translation);
 
 		if let Some(bim_json) = &self.bim_json {
 			let num_of_level = 0;
