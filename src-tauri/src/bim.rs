@@ -73,7 +73,7 @@ pub fn run_rust(scenario_configuration: &ScenarioCfg) {
 
 		let mut bim = bim_tools_new_rust(&bim_json);
 
-		applying_scenario_bim_params(&mut bim, &scenario_configuration);
+		applying_scenario_bim_params(&mut bim, scenario_configuration);
 
 		bim_output_head(&bim, &mut fp_detail);
 
@@ -150,15 +150,15 @@ pub fn run_evacuation_modeling(
 	let log = bim_create_file_name_rust(&log_filename, "_rust", ".txt");
 	let time_data_path = bim_create_file_name_rust(&filename, "", ".json");
 	let result_dir_path = Path::new("..").join(OUTPUT_DIR);
-	if let Err(_) = std::fs::read_dir(&result_dir_path) {
+	if std::fs::read_dir(&result_dir_path).is_err() {
 		println!("Result directory not found. Creating...");
 		std::fs::create_dir(&result_dir_path)
-			.expect(format!("Error creating directory {OUTPUT_DIR}").as_str());
+			.unwrap_or_else(|_| panic!("Error creating directory {OUTPUT_DIR}"));
 	}
 
 	let mut fp_detail =
-		std::fs::File::create(&output_detail).expect("Error opening the output file");
-	let mut fp_short = std::fs::File::create(&output_short).expect("Error opening the output file");
+		std::fs::File::create(output_detail).expect("Error opening the output file");
+	let mut fp_short = std::fs::File::create(output_short).expect("Error opening the output file");
 	let mut log_file = match std::path::Path::new(&log).exists() {
 		true => std::fs::File::options()
 			.append(true)
@@ -167,7 +167,7 @@ pub fn run_evacuation_modeling(
 		false => std::fs::File::create(&log).expect("Error create the log file"),
 	};
 	let mut time_data_file =
-		std::fs::File::create(&time_data_path).expect("Error opening time data file");
+		std::fs::File::create(time_data_path).expect("Error opening time data file");
 
 	let current_time = chrono::Local::now()
 		.format("%Y-%m-%d %H:%M:%S.%6f")
@@ -182,7 +182,7 @@ pub fn run_evacuation_modeling(
 
 	let mut bim = bim_tools_new_rust(&bim_json);
 
-	applying_scenario_bim_params(&mut bim, &scenario_configuration);
+	applying_scenario_bim_params(&mut bim, scenario_configuration);
 
 	bim_output_head(&bim, &mut fp_detail);
 
@@ -501,9 +501,19 @@ mod tests {
 
 	#[derive(Serialize)]
 	struct ModelingResult {
-		number_of_people_in_building: f64,
-		evacuation_time_in_seconds: f64,
+		number_of_people_inside_building: f64,
 		number_of_evacuated_people: f64,
+		time_in_seconds: f64,
+	}
+
+	impl From<EvacuationModelingResult> for ModelingResult {
+		fn from(value: EvacuationModelingResult) -> Self {
+			Self {
+				number_of_people_inside_building: value.number_of_people_inside_building,
+				number_of_evacuated_people: value.number_of_evacuated_people,
+				time_in_seconds: value.time_in_seconds,
+			}
+		}
 	}
 
 	#[fixture]
@@ -610,7 +620,7 @@ mod tests {
 		scenario_configuration.distribution.density = density;
 		applying_scenario_bim_params(&mut bim, &scenario_configuration);
 
-		let modeling_result = bim.run_modeling();
+		let modeling_result = ModelingResult::from(bim.run_modeling());
 
 		let file_name = Path::new(file_path).file_stem().unwrap().to_str().unwrap();
 		set_snapshot_suffix!("{file_name}-density-{density:.1}");

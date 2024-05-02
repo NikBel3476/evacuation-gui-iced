@@ -226,7 +226,7 @@ impl Bim {
 				.iter()
 				.map(|zone| RoomTimeStepData {
 					density: zone.number_of_people,
-					uuid: zone.uuid.clone(),
+					uuid: zone.uuid,
 				})
 				.collect(),
 		}

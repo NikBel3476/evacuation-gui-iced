@@ -19,10 +19,10 @@ impl CfgTab {
 	}
 
 	pub fn title(&self) -> String {
-		format!("Configuration")
+		"Configuration".to_string()
 	}
 
-	pub fn update(&mut self, message: CfgTabMessage) {}
+	pub fn update(&mut self, _message: CfgTabMessage) {}
 
 	pub fn view(&self) -> Element<CfgTabMessage> {
 		column![

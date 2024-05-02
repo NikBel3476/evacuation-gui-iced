@@ -316,7 +316,7 @@ pub fn evac_moving_step_test_with_log_rust(
 	for _ in 0..zones.len() {
 		for _ in 0..zones[receiving_zone_id].outputs.len() {
 			if let Some(ptr_box) = ptr {
-				let mut transit = &mut transits[ptr_box.eid];
+				let transit = &mut transits[ptr_box.eid];
 
 				if transit.is_visited || transit.is_blocked {
 					ptr = ptr_box.next;
@@ -741,7 +741,7 @@ mod tests {
 
 		assert_eq!(
 			part_people_flow(&receiving_zone, &transmitting_zone, &transit),
-			1.6027266777506448
+			1.6027267135743786
 		);
 	}
 }

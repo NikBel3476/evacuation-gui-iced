@@ -40,8 +40,9 @@ impl VisualizationTab {
 		}
 	}
 
+	#[allow(dead_code)]
 	pub fn title(&self) -> String {
-		format!("Visualization")
+		"Visualization".to_string()
 	}
 
 	pub fn update(&mut self, message: VisualizationTabMessage) {
@@ -50,7 +51,7 @@ impl VisualizationTab {
 				let current_dir = env::current_dir().unwrap();
 				let choosen_file = FileDialog::new()
 					.add_filter("json", &["json"])
-					.set_directory(&current_dir) // FIXME: kde always opening 'Documents' directory (rfd problem)
+					.set_directory(current_dir) // FIXME: kde always opening 'Documents' directory (rfd problem)
 					.pick_file();
 				if let Some(file) = choosen_file {
 					let file_path = file.as_path().to_str().unwrap();
@@ -112,40 +113,33 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 		if cursor.position_in(bounds).is_none() {
 			return (canvas::event::Status::Ignored, None);
 		}
-		match event {
-			canvas::Event::Mouse(mouse_event) => match mouse_event {
-				mouse::Event::WheelScrolled { delta } => {
-					if let mouse::ScrollDelta::Lines { x: _, y } = delta {
-						return if y > 0.0 {
-							(
-								canvas::event::Status::Captured,
-								Some(VisualizationTabMessage::UpdateScale(self.scale + 0.5)),
-							)
-						} else {
-							(
-								canvas::event::Status::Captured,
-								Some(VisualizationTabMessage::UpdateScale(self.scale - 0.5)),
-							)
-						};
-					}
-				}
-				mouse::Event::ButtonPressed(button) => match button {
-					mouse::Button::Left => {
-						return (
+
+		if let canvas::Event::Mouse(mouse_event) = event {
+			match mouse_event {
+				mouse::Event::WheelScrolled { delta: mouse::ScrollDelta::Lines { x: _, y } } => {
+					return if y > 0.0 {
+						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::MouseLeftButtonState(true)),
-						);
-					}
-					_ => {}
+							Some(VisualizationTabMessage::UpdateScale(self.scale + 0.5)),
+						)
+					} else {
+						(
+							canvas::event::Status::Captured,
+							Some(VisualizationTabMessage::UpdateScale(self.scale - 0.5)),
+						)
+					};
 				},
-				mouse::Event::ButtonReleased(button) => match button {
-					mouse::Button::Left => {
-						return (
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::MouseLeftButtonState(false)),
-						);
-					}
-					_ => {}
+				mouse::Event::ButtonPressed(button) => if button == mouse::Button::Left {
+					return (
+						canvas::event::Status::Captured,
+						Some(VisualizationTabMessage::MouseLeftButtonState(true)),
+					);
+				},
+				mouse::Event::ButtonReleased(button) => if button == mouse::Button::Left {
+					return (
+						canvas::event::Status::Captured,
+						Some(VisualizationTabMessage::MouseLeftButtonState(false)),
+					);
 				},
 				mouse::Event::CursorMoved { position } => {
 					return (
@@ -154,9 +148,9 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 					);
 				}
 				_ => {}
-			},
-			_ => {}
+			}
 		}
+	
 		(canvas::event::Status::Ignored, None)
 	}
 

@@ -234,6 +234,7 @@ fn sign(p1: &Point, p2: &Point, p3: &Point) -> f64 {
 	(p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn is_point_in_triangle(
 	a_ax: f64,
 	a_ay: f64,

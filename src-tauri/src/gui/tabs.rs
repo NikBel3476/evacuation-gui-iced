@@ -43,7 +43,7 @@ pub enum TabsControllerMessage {
 impl TabsController {
 	pub fn new() -> Self {
 		let scenario_cfg =
-			Rc::new(load_cfg(&CFG_PATH).expect("Failed to read scenario configuration"));
+			Rc::new(load_cfg(CFG_PATH).expect("Failed to read scenario configuration"));
 
 		Self {
 			current_tab_id: TabId::Cfg,
@@ -65,8 +65,9 @@ impl TabsController {
 				_ => self.visualization_tab.update(message),
 			},
 			TabsControllerMessage::CfgTab(message) => {
-				if let CfgTabMessage::VisualizationTab = message {
-					self.current_tab_id = TabId::Visualization;
+				match message {
+					CfgTabMessage::VisualizationTab => self.current_tab_id = TabId::Visualization,
+					_ => todo!()
 				}
 			}
 		}

@@ -22,7 +22,7 @@ where
 		self.vertices.insert(vid, vertex);
 	}
 
-	fn push_edge(self: &mut Self, from: VId, to: VId, edge: E) {
+	fn push_edge(&mut self, from: VId, to: VId, edge: E) {
 		let adjacent_to_from = self.adjacency.entry(from).or_default();
 		adjacent_to_from.push((to, edge));
 	}
@@ -32,7 +32,7 @@ impl<VId, E> Graph<VId, E, ()>
 where
 	VId: Eq + Hash,
 {
-	fn push_vid(self: &mut Self, vid: VId) {
+	fn push_vid(&mut self, vid: VId) {
 		self.vertices.insert(vid, ());
 	}
 }
@@ -43,7 +43,7 @@ where
 	V: Hash,
 	E: Clone,
 {
-	fn push_undirected_edge(self: &mut Self, from: VId, to: VId, edge: E) {
+	fn push_undirected_edge(&mut self, from: VId, to: VId, edge: E) {
 		self.push_edge(from.clone(), to.clone(), edge.clone());
 		self.push_edge(to, from, edge);
 	}
