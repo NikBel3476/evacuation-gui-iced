@@ -133,12 +133,12 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 					return if y > 0.0 {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale + 0.5)),
+							Some(VisualizationTabMessage::UpdateScale(self.scale * 1.5)),
 						)
 					} else {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale - 0.5)),
+							Some(VisualizationTabMessage::UpdateScale(self.scale / 1.5)),
 						)
 					};
 				}

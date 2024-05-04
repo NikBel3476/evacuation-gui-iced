@@ -1,11 +1,4 @@
-node_modules/
-dist/
-lib/
-src/build/
-coverage/
-coverageUi/
-
-.idea/
-*.rnp
-
 /target/
+coverage/
+
+*.rnp
