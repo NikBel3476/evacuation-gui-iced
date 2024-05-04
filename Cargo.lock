@@ -1147,24 +1147,33 @@ dependencies = [
 ]
 
 [[package]]
-name = "evacuation"
+name = "evacuation-core"
 version = "0.1.0"
+source = "git+https://github.com/NikBel3476/evacuation-core.git?rev=db74447#db74447db576f48957b64a642d47838d8cfebbfb"
 dependencies = [
  "chrono",
  "fnv",
- "iced",
- "insta",
  "petgraph",
  "pyo3",
  "rand",
- "rfd",
- "rstest",
  "serde",
  "serde_json",
  "spade",
  "triangle-rs",
  "triangulate",
  "uuid",
+]
+
+[[package]]
+name = "evacuation-iced"
+version = "0.1.0"
+dependencies = [
+ "evacuation-core",
+ "iced",
+ "insta",
+ "pyo3",
+ "rfd",
+ "rstest",
 ]
 
 [[package]]
@@ -3056,9 +3065,9 @@ checksum = "3cd14fd5e3b777a7422cca79358c57a8f6e3a703d9ac187448d0daf220c2407f"
 
 [[package]]
 name = "rstest"
-version = "0.18.1"
+version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b96577ca10cb3eade7b337eb46520108a67ca2818a24d0b63f41fd62bc9651c"
+checksum = "9d5316d2a1479eeef1ea21e7f9ddc67c191d497abc8fc3ba2467857abbb68330"
 dependencies = [
  "futures",
  "futures-timer",
@@ -3068,9 +3077,9 @@ dependencies = [
 
 [[package]]
 name = "rstest_macros"
-version = "0.18.1"
+version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "225e674cf31712b8bb15fdbca3ec0c1b9d825c5a24407ff2b7e005fb6a29ba03"
+checksum = "04a9df72cc1f67020b0d63ad9bfe4a323e459ea7eb68e03bd9824db49f9a4c25"
 dependencies = [
  "cfg-if",
  "glob",
@@ -4585,8 +4594,7 @@ dependencies = [
 [[package]]
 name = "xtaskops"
 version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "464ca5c2bac1d1fcdbef9da6c09c6a14f2c7ac6c8845f574ab12065a2b72bb8b"
+source = "git+https://github.com/jondot/xtaskops.git?rev=95153c3#95153c35af57a682ea403281b4d620a703570b10"
 dependencies = [
  "anyhow",
  "clap",

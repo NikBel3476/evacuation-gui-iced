@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-xtaskops = "0.4.1"
+xtaskops = { git = "https://github.com/jondot/xtaskops.git", rev = "95153c3"}
 anyhow = "1"

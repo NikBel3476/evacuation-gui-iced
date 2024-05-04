@@ -1,0 +1,20 @@
+[package]
+name = "evacuation-iced"
+version = "0.1.0"
+description = "Evacuation modeling App"
+authors = [""]
+license = ""
+repository = ""
+default-run = "evacuation-iced"
+edition = "2021"
+rust-version = "1.77"
+
+[dependencies]
+pyo3 = { version = "0.18.3", features = ["auto-initialize"] }
+iced = { version = "0.12.1", features = ["canvas"] }
+rfd = "0.14.1"
+evacuation-core = { git = "https://github.com/NikBel3476/evacuation-core.git", rev = "db74447" }
+
+[dev-dependencies]
+insta = { version = "1.29.0", features = ["yaml"] }
+rstest = "0.19.0"

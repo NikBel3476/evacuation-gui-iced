@@ -1,5 +1,8 @@
 [workspace]
-members = ["src-tauri", "xtask"]
+members = [
+    "evacuation-gui-iced",
+    "xtask"
+]
 resolver = "2"
 
 [profile.dev.package.insta]
