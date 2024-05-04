@@ -1,7 +1,7 @@
 # Evacuation
 
 ![test workflow](https://github.com/NikBel3476/evacuation/actions/workflows/test.yml/badge.svg)
-[![codecov](https://codecov.io/gh/NikBel3476/evacuation-core/graph/badge.svg?token=XXP6KQS1KU)](https://codecov.io/gh/NikBel3476/evacuation-core)
+[![codecov](https://codecov.io/gh/NikBel3476/evacuation-gui-iced/graph/badge.svg?token=TYZ33ISYMJ)](https://codecov.io/gh/NikBel3476/evacuation-gui-iced)
 
 **Evacuation-gui-iced** -- графический интерфейс программы моделирования движения людей при эвакуации ([evacuation-core](https://github.com/NikBel3476/evacuation-core)). 
 
