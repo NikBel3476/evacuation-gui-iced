@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use cfg_tab::CfgTab;
-use evacuation_core::bim::configuration::{load_cfg, ScenarioCfg};
+use evacuation_core::bim::configuration::load_cfg;
 use iced::Element;
 use visualization_tab::VisualizationTab;
 

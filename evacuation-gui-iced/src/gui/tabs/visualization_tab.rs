@@ -1,17 +1,14 @@
 use std::env;
 use std::rc::Rc;
 
-use iced::widget::canvas::{self, Canvas, Frame, Geometry, Path, Stroke};
+use evacuation_core::bim::bim_json_object::{bim_json_object_new, BimJsonElement, BimJsonObject};
+use evacuation_core::bim::configuration::ScenarioCfg;
+use evacuation_core::bim::json_object;
+use evacuation_core::bim::run_evacuation_modeling;
+use iced::widget::canvas::{self, Canvas, Fill, Frame, Geometry, Path, Stroke};
 use iced::widget::{button, column, container, row, Container};
 use iced::{color, mouse, Background, Color, Element, Length, Point, Rectangle, Renderer, Theme};
 use rfd::FileDialog;
-
-// use crate::bim::bim_json_object::{bim_json_object_new, BimJsonObject};
-// use crate::bim::configuration::ScenarioCfg;
-// use crate::bim::run_evacuation_modeling;
-use evacuation_core::bim::bim_json_object::{bim_json_object_new, BimJsonObject};
-use evacuation_core::bim::configuration::ScenarioCfg;
-use evacuation_core::bim::run_evacuation_modeling;
 
 pub struct VisualizationTab {
 	cfg: Rc<ScenarioCfg>,
@@ -20,6 +17,7 @@ pub struct VisualizationTab {
 	mouse_left_button_pressed: bool,
 	cursor_coordinates: Point,
 	translation: iced::Vector,
+	number_of_level: usize
 }
 
 #[derive(Debug, Clone)]
@@ -40,12 +38,34 @@ impl VisualizationTab {
 			mouse_left_button_pressed: false,
 			cursor_coordinates: Default::default(),
 			translation: Default::default(),
+			number_of_level: 0
 		}
 	}
 
-	#[allow(dead_code)]
 	pub fn title(&self) -> String {
 		"Visualization".to_string()
+	}
+
+	fn project(&self, position: Point) -> Point {
+		Point::new(
+			position.x / self.scale - self.translation.x,
+			position.y / self.scale - self.translation.y
+		)
+	}
+
+	fn object_at(&self, position: Point) -> Option<&BimJsonElement> {
+		match &self.bim_json {
+			Some(bim) =>
+				bim.levels[self.number_of_level].build_elements.iter().find(|element| {
+					element.polygon.is_point_inside(
+						&json_object::Point {
+							x: f64::from(position.x),
+							y: f64::from(position.y)
+						}
+					).unwrap()
+				}),
+			None => None
+		}
 	}
 
 	pub fn update(&mut self, message: VisualizationTabMessage) {
@@ -70,7 +90,12 @@ impl VisualizationTab {
 			}
 			VisualizationTabMessage::UpdateScale(new_scale) => {
 				if new_scale > 0.0 {
+					let scale_change = new_scale / self.scale;
 					self.scale = new_scale;
+					self.translation = iced::Vector {
+						x: self.translation.x / scale_change,
+						y: self.translation.y / scale_change,
+					}
 				}
 			}
 			VisualizationTabMessage::MouseLeftButtonState(pressed) => {
@@ -177,15 +202,14 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 		renderer: &Renderer,
 		_theme: &Theme,
 		bounds: Rectangle,
-		_cursor: mouse::Cursor,
+		cursor: mouse::Cursor,
 	) -> Vec<Geometry> {
 		let mut frame = Frame::new(renderer, bounds.size());
 		frame.scale(self.scale);
 		frame.translate(self.translation);
 
 		if let Some(bim_json) = &self.bim_json {
-			let num_of_level = 0;
-			let rooms_paths = bim_json.levels[num_of_level]
+			let rooms_paths = bim_json.levels[self.number_of_level]
 				.build_elements
 				.iter()
 				.map(|build_element| {
@@ -207,7 +231,31 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 
 			rooms_paths
 				.iter()
-				.for_each(|path| frame.stroke(path, Stroke::default()));
+				.for_each(|path| {
+					frame.fill(path, color!(0xf0ffea));
+					frame.stroke(path, Stroke::default())
+				});
+		}
+
+		let hovered_element = cursor.position_in(bounds).map(|position| {
+			self.object_at(self.project(position))
+		});
+
+		if let Some(Some(build_element)) = hovered_element {
+			let polygon_point = build_element.polygon.points[0];
+			let path =	Path::new(|p| {
+				p.move_to(Point {
+					x: polygon_point.x as f32,
+					y: polygon_point.y as f32,
+				});
+				build_element.polygon.points[1..].iter().for_each(|point| {
+					p.line_to(Point {
+						x: point.x as f32,
+						y: point.y as f32,
+					})
+				});
+			});
+			frame.fill(&path, color!(0xff0400))
 		}
 
 		vec![frame.into_geometry()]
