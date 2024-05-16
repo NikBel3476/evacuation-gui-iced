@@ -17,7 +17,8 @@ pub struct VisualizationTab {
 	mouse_left_button_pressed: bool,
 	cursor_coordinates: Point,
 	translation: iced::Vector,
-	number_of_level: usize
+	number_of_level: usize,
+	selected_element: Option<BimJsonElement>
 }
 
 #[derive(Debug, Clone)]
@@ -38,7 +39,8 @@ impl VisualizationTab {
 			mouse_left_button_pressed: false,
 			cursor_coordinates: Default::default(),
 			translation: Default::default(),
-			number_of_level: 0
+			number_of_level: 0,
+			selected_element: None
 		}
 	}
 
@@ -100,6 +102,11 @@ impl VisualizationTab {
 			}
 			VisualizationTabMessage::MouseLeftButtonState(pressed) => {
 				self.mouse_left_button_pressed = pressed;
+				if !pressed {
+					if let Some(element) = self.object_at(self.project(self.cursor_coordinates)) {
+						self.selected_element = Some((*element).clone());
+					}
+				}
 			}
 			VisualizationTabMessage::MouseCursorMove(point) => {
 				if self.mouse_left_button_pressed {
@@ -183,11 +190,13 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 						);
 					}
 				}
-				mouse::Event::CursorMoved { position } => {
-					return (
-						canvas::event::Status::Captured,
-						Some(VisualizationTabMessage::MouseCursorMove(position)),
-					);
+				mouse::Event::CursorMoved { position: _ } => {
+					if let Some(position) = cursor.position_in(bounds) {
+						return (
+							canvas::event::Status::Captured,
+							Some(VisualizationTabMessage::MouseCursorMove(position)),
+						);
+					}
 				}
 				_ => {}
 			}
@@ -232,16 +241,34 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 			rooms_paths
 				.iter()
 				.for_each(|path| {
-					frame.fill(path, color!(0xf0ffea));
+					frame.fill(path, color!(0xf0ffea, 0.5));
 					frame.stroke(path, Stroke::default())
 				});
 		}
 
+		// Change color element on hover
 		let hovered_element = cursor.position_in(bounds).map(|position| {
 			self.object_at(self.project(position))
 		});
 
 		if let Some(Some(build_element)) = hovered_element {
+			let polygon_point = build_element.polygon.points[0];
+			let path =	Path::new(|p| {
+				p.move_to(Point {
+					x: polygon_point.x as f32,
+					y: polygon_point.y as f32,
+				});
+				build_element.polygon.points[1..].iter().for_each(|point| {
+					p.line_to(Point {
+						x: point.x as f32,
+						y: point.y as f32,
+					})
+				});
+			});
+			frame.fill(&path, color!(0xf0ffea))
+		}
+
+		if let Some(build_element) = &self.selected_element {
 			let polygon_point = build_element.polygon.points[0];
 			let path =	Path::new(|p| {
 				p.move_to(Point {

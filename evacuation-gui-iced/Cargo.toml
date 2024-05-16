@@ -13,7 +13,7 @@ rust-version = "1.77"
 pyo3 = { version = "0.18.3", features = ["auto-initialize"] }
 iced = { version = "0.12.1", features = ["canvas"] }
 rfd = "0.14.1"
-evacuation-core = { git = "https://github.com/NikBel3476/evacuation-core.git", rev = "db74447" }
+evacuation-core = { git = "https://github.com/NikBel3476/evacuation-core.git", rev = "881ff69" }
 
 [dev-dependencies]
 insta = { version = "1.29.0", features = ["yaml"] }

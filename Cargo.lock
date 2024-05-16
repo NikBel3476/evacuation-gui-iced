@@ -1149,7 +1149,7 @@ dependencies = [
 [[package]]
 name = "evacuation-core"
 version = "0.1.0"
-source = "git+https://github.com/NikBel3476/evacuation-core.git?rev=db74447#db74447db576f48957b64a642d47838d8cfebbfb"
+source = "git+https://github.com/NikBel3476/evacuation-core.git?rev=881ff69#881ff69596f58ba8c6a01df38e747589fb86821e"
 dependencies = [
  "chrono",
  "fnv",
