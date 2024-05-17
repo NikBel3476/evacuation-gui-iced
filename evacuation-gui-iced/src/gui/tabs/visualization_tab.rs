@@ -6,7 +6,7 @@ use evacuation_core::bim::configuration::ScenarioCfg;
 use evacuation_core::bim::json_object;
 use evacuation_core::bim::run_evacuation_modeling;
 use iced::widget::canvas::{self, Canvas, Fill, Frame, Geometry, Path, Stroke};
-use iced::widget::{button, column, container, row, Container};
+use iced::widget::{button, column, container, row, text, Container};
 use iced::{color, mouse, Background, Color, Element, Length, Point, Rectangle, Renderer, Theme};
 use rfd::FileDialog;
 
@@ -18,7 +18,7 @@ pub struct VisualizationTab {
 	cursor_coordinates: Point,
 	translation: iced::Vector,
 	number_of_level: usize,
-	selected_element: Option<BimJsonElement>
+	selected_element: Option<BimJsonElement>,
 }
 
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ impl VisualizationTab {
 			cursor_coordinates: Default::default(),
 			translation: Default::default(),
 			number_of_level: 0,
-			selected_element: None
+			selected_element: None,
 		}
 	}
 
@@ -51,22 +51,25 @@ impl VisualizationTab {
 	fn project(&self, position: Point) -> Point {
 		Point::new(
 			position.x / self.scale - self.translation.x,
-			position.y / self.scale - self.translation.y
+			position.y / self.scale - self.translation.y,
 		)
 	}
 
 	fn object_at(&self, position: Point) -> Option<&BimJsonElement> {
 		match &self.bim_json {
-			Some(bim) =>
-				bim.levels[self.number_of_level].build_elements.iter().find(|element| {
-					element.polygon.is_point_inside(
-						&json_object::Point {
+			Some(bim) => bim.levels[self.number_of_level]
+				.build_elements
+				.iter()
+				.find(|element| {
+					element
+						.polygon
+						.is_point_inside(&json_object::Point {
 							x: f64::from(position.x),
-							y: f64::from(position.y)
-						}
-					).unwrap()
+							y: f64::from(position.y),
+						})
+						.unwrap()
 				}),
-			None => None
+			None => None,
 		}
 	}
 
@@ -122,15 +125,26 @@ impl VisualizationTab {
 	}
 
 	pub fn view(&self) -> Element<VisualizationTabMessage> {
+		let build_element_info = self.selected_element.as_ref().map(|build_element| {
+			column![
+				text(format!("Название: {}", build_element.name)).width(Length::Fill),
+				text(format!("Кол-во людей: {}", build_element.number_of_people))
+					.width(Length::Fill),
+				// text(format!("UUID: {}", build_element.uuid)).width(Length::Fill),
+				text(format!("Тип: {:?}", build_element.sign)).width(Length::Fill)
+			]
+		});
 		let control_panel = container(
 			column![
 				button("To configuration tab").on_press(VisualizationTabMessage::CfgTab),
 				button("Open file of building")
 					.on_press(VisualizationTabMessage::OpenBuildingFileDialog)
 			]
+			.push_maybe(build_element_info)
 			.spacing(10),
 		)
 		.height(Length::Fill)
+		.width(Length::Fixed(250.0))
 		.padding(20)
 		.style(|_: &_| container::Appearance {
 			background: Some(Background::Color(color!(0x3645ff, 0.1))),
@@ -238,22 +252,20 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 				})
 				.collect::<Vec<Path>>();
 
-			rooms_paths
-				.iter()
-				.for_each(|path| {
-					frame.fill(path, color!(0xf0ffea, 0.5));
-					frame.stroke(path, Stroke::default())
-				});
+			rooms_paths.iter().for_each(|path| {
+				frame.fill(path, color!(0xf0ffea, 0.1));
+				frame.stroke(path, Stroke::default())
+			});
 		}
 
 		// Change color element on hover
-		let hovered_element = cursor.position_in(bounds).map(|position| {
-			self.object_at(self.project(position))
-		});
+		let hovered_element = cursor
+			.position_in(bounds)
+			.map(|position| self.object_at(self.project(position)));
 
 		if let Some(Some(build_element)) = hovered_element {
 			let polygon_point = build_element.polygon.points[0];
-			let path =	Path::new(|p| {
+			let path = Path::new(|p| {
 				p.move_to(Point {
 					x: polygon_point.x as f32,
 					y: polygon_point.y as f32,
@@ -270,7 +282,7 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 
 		if let Some(build_element) = &self.selected_element {
 			let polygon_point = build_element.polygon.points[0];
-			let path =	Path::new(|p| {
+			let path = Path::new(|p| {
 				p.move_to(Point {
 					x: polygon_point.x as f32,
 					y: polygon_point.y as f32,
