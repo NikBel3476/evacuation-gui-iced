@@ -89,6 +89,7 @@ impl VisualizationTab {
 
 					self.scale = 1.0;
 					self.translation = iced::Vector { x: 0.0, y: 0.0 };
+					self.selected_element = None;
 				} else {
 					println!("Files were not selected");
 				}
