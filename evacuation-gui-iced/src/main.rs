@@ -3,7 +3,7 @@ use evacuation_core::bim::{configuration, configuration::ScenarioCfg};
 use evacuation_core::bim::{run_evacuation_modeling, run_rust};
 use gui::tabs::{TabsController, TabsControllerMessage};
 use iced::widget::{button, column, text};
-use iced::{Task, Alignment, Element, Settings};
+use iced::{Alignment, Element, Settings, Task};
 // use python::call_python::run_python;
 // use evacuation_core::python::call_python::run_python;
 
@@ -11,8 +11,12 @@ mod gui;
 mod python;
 
 fn main() -> iced::Result {
-	iced::application(EvacuationApp::title, EvacuationApp::update, EvacuationApp::view)
-		.run_with(|| EvacuationApp::new(()))
+	iced::application(
+		EvacuationApp::title,
+		EvacuationApp::update,
+		EvacuationApp::view,
+	)
+	.run_with(|| EvacuationApp::new(()))
 }
 
 // fn read_config() -> Result<configuration::ScenarioCfg, String> {
@@ -103,10 +107,11 @@ enum Message {
 
 impl EvacuationApp {
 	fn new(_flags: ()) -> (Self, Task<Message>) {
-		(Self {
-			tabs_controller: TabsController::new(),
-		},
-		Task::none()
+		(
+			Self {
+				tabs_controller: TabsController::new(),
+			},
+			Task::none(),
 		)
 	}
 

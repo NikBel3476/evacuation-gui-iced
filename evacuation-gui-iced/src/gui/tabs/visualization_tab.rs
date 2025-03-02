@@ -1,13 +1,13 @@
 use std::env;
 use std::rc::Rc;
 
-use evacuation_core::bim::bim_json_object::{bim_json_object_new, BimJsonElement, BimJsonObject};
+use evacuation_core::bim::bim_json_object::{BimJsonElement, BimJsonObject, bim_json_object_new};
 use evacuation_core::bim::configuration::ScenarioCfg;
 use evacuation_core::bim::json_object;
 use evacuation_core::bim::run_evacuation_modeling;
 use iced::widget::canvas::{self, Canvas, Fill, Frame, Geometry, Path, Stroke};
-use iced::widget::{button, column, container, row, text, Container};
-use iced::{color, mouse, Background, Color, Element, Length, Point, Rectangle, Renderer, Theme};
+use iced::widget::{Container, button, column, container, row, text};
+use iced::{Background, Color, Element, Length, Point, Rectangle, Renderer, Theme, color, mouse};
 use rfd::FileDialog;
 
 pub struct VisualizationTab {
