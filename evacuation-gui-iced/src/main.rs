@@ -3,7 +3,7 @@ use evacuation_core::bim::{configuration, configuration::ScenarioCfg};
 use evacuation_core::bim::{run_evacuation_modeling, run_rust};
 use gui::tabs::{TabsController, TabsControllerMessage};
 use iced::widget::{button, column, text};
-use iced::{Alignment, Element, Sandbox, Settings};
+use iced::{Alignment, Element, Settings, Task};
 // use python::call_python::run_python;
 // use evacuation_core::python::call_python::run_python;
 
@@ -11,10 +11,12 @@ mod gui;
 mod python;
 
 fn main() -> iced::Result {
-	EvacuationApp::run(Settings {
-		antialiasing: true,
-		..Settings::default()
-	})
+	iced::application(
+		EvacuationApp::title,
+		EvacuationApp::update,
+		EvacuationApp::view,
+	)
+	.run_with(|| EvacuationApp::new(()))
 }
 
 // fn read_config() -> Result<configuration::ScenarioCfg, String> {
@@ -103,13 +105,14 @@ enum Message {
 	TabsController(TabsControllerMessage),
 }
 
-impl Sandbox for EvacuationApp {
-	type Message = Message;
-
-	fn new() -> Self {
-		Self {
-			tabs_controller: TabsController::new(),
-		}
+impl EvacuationApp {
+	fn new(_flags: ()) -> (Self, Task<Message>) {
+		(
+			Self {
+				tabs_controller: TabsController::new(),
+			},
+			Task::none(),
+		)
 	}
 
 	fn title(&self) -> String {
@@ -126,9 +129,9 @@ impl Sandbox for EvacuationApp {
 		}
 	}
 
-	fn view(&self) -> Element<Self::Message> {
+	fn view(&self) -> Element<Message> {
 		column![self.tabs_controller.view().map(Message::TabsController)]
-			.align_items(Alignment::Center)
+			.align_x(Alignment::Center)
 			.into()
 	}
 }

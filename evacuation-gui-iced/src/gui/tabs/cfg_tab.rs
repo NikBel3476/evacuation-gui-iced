@@ -1,8 +1,8 @@
 use std::rc::Rc;
 
 use evacuation_core::bim::configuration::ScenarioCfg;
-use iced::widget::{button, column, text, text_input};
 use iced::Element;
+use iced::widget::{button, column, text, text_input};
 
 pub struct CfgTab {
 	cfg: Rc<ScenarioCfg>,
