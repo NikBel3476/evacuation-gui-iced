@@ -147,7 +147,7 @@ impl VisualizationTab {
 		.height(Length::Fill)
 		.width(Length::Fixed(250.0))
 		.padding(20)
-		.style(|_: &_| container::Appearance {
+		.style(|_: &_| container::Style {
 			background: Some(Background::Color(color!(0x3645ff, 0.1))),
 			..Default::default()
 		});
