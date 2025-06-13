@@ -10,6 +10,8 @@ use iced::widget::{Container, button, column, container, row, text};
 use iced::{Background, Color, Element, Length, Point, Rectangle, Renderer, Theme, color, mouse};
 use rfd::FileDialog;
 
+const SCALE_DELTA_MULTIPLIER: f32 = 1.2;
+
 pub struct VisualizationTab {
 	cfg: Rc<ScenarioCfg>,
 	bim_json: Option<BimJsonObject>,
@@ -180,12 +182,12 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 					return if y > 0.0 {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale * 1.5)),
+							Some(VisualizationTabMessage::UpdateScale(self.scale * SCALE_DELTA_MULTIPLIER)),
 						)
 					} else {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale / 1.5)),
+							Some(VisualizationTabMessage::UpdateScale(self.scale / SCALE_DELTA_MULTIPLIER)),
 						)
 					};
 				}
