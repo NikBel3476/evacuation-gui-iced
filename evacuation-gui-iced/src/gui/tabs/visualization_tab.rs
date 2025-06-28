@@ -182,12 +182,16 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 					return if y > 0.0 {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale * SCALE_DELTA_MULTIPLIER)),
+							Some(VisualizationTabMessage::UpdateScale(
+								self.scale * SCALE_DELTA_MULTIPLIER,
+							)),
 						)
 					} else {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale / SCALE_DELTA_MULTIPLIER)),
+							Some(VisualizationTabMessage::UpdateScale(
+								self.scale / SCALE_DELTA_MULTIPLIER,
+							)),
 						)
 					};
 				}
