@@ -5,10 +5,14 @@ use evacuation_core::bim::bim_json_object::{BimJsonElement, BimJsonObject, bim_j
 use evacuation_core::bim::configuration::ScenarioCfg;
 use evacuation_core::bim::json_object;
 use evacuation_core::bim::run_evacuation_modeling;
-use iced::widget::canvas::{self, Canvas, Fill, Frame, Geometry, Path, Stroke};
-use iced::widget::{Container, button, column, container, row, text};
-use iced::{Background, Color, Element, Length, Point, Rectangle, Renderer, Theme, color, mouse};
+use iced::widget::canvas::{self, Canvas, Frame, Geometry, Path, Stroke};
+use iced::widget::{button, column, container, row, text};
+use iced::{
+	Background, Element, Length, Point, Rectangle, Renderer, Theme, color, keyboard, mouse,
+};
 use rfd::FileDialog;
+
+const SCALE_DELTA_MULTIPLIER: f32 = 1.2;
 
 pub struct VisualizationTab {
 	cfg: Rc<ScenarioCfg>,
@@ -28,6 +32,7 @@ pub enum VisualizationTabMessage {
 	UpdateScale(f32),
 	MouseLeftButtonState(bool),
 	MouseCursorMove(Point),
+	ChangeCurrentLevel(usize),
 }
 
 impl VisualizationTab {
@@ -42,10 +47,6 @@ impl VisualizationTab {
 			number_of_level: 0,
 			selected_element: None,
 		}
-	}
-
-	pub fn title(&self) -> String {
-		"Visualization".to_string()
 	}
 
 	fn project(&self, position: Point) -> Point {
@@ -121,6 +122,9 @@ impl VisualizationTab {
 				}
 				self.cursor_coordinates = point;
 			}
+			VisualizationTabMessage::ChangeCurrentLevel(level) => {
+				self.number_of_level = level;
+			}
 			VisualizationTabMessage::CfgTab => {}
 		}
 	}
@@ -172,20 +176,24 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 			return (canvas::event::Status::Ignored, None);
 		}
 
-		if let canvas::Event::Mouse(mouse_event) = event {
-			match mouse_event {
+		match event {
+			canvas::Event::Mouse(mouse_event) => match mouse_event {
 				mouse::Event::WheelScrolled {
 					delta: mouse::ScrollDelta::Lines { x: _, y },
 				} => {
 					return if y > 0.0 {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale * 1.5)),
+							Some(VisualizationTabMessage::UpdateScale(
+								self.scale * SCALE_DELTA_MULTIPLIER,
+							)),
 						)
 					} else {
 						(
 							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(self.scale / 1.5)),
+							Some(VisualizationTabMessage::UpdateScale(
+								self.scale / SCALE_DELTA_MULTIPLIER,
+							)),
 						)
 					};
 				}
@@ -214,7 +222,40 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 					}
 				}
 				_ => {}
-			}
+			},
+			canvas::Event::Keyboard(keyboard::Event::KeyPressed {
+				key: keyboard::Key::Named(named_key),
+				modified_key: _,
+				physical_key: _,
+				location: _,
+				modifiers: _,
+				text: _,
+			}) => match named_key {
+				keyboard::key::Named::ArrowUp => {
+					if let Some(bim_json) = &self.bim_json {
+						if self.number_of_level < bim_json.levels.len() - 1 {
+							return (
+								canvas::event::Status::Captured,
+								Some(VisualizationTabMessage::ChangeCurrentLevel(
+									self.number_of_level + 1,
+								)),
+							);
+						}
+					}
+				}
+				keyboard::key::Named::ArrowDown => {
+					if self.number_of_level > 0 {
+						return (
+							canvas::event::Status::Captured,
+							Some(VisualizationTabMessage::ChangeCurrentLevel(
+								self.number_of_level - 1,
+							)),
+						);
+					}
+				}
+				_ => {}
+			},
+			_ => {}
 		}
 
 		(canvas::event::Status::Ignored, None)

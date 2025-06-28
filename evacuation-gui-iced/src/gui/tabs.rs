@@ -66,7 +66,6 @@ impl TabsController {
 			},
 			TabsControllerMessage::CfgTab(message) => match message {
 				CfgTabMessage::VisualizationTab => self.current_tab_id = TabId::Visualization,
-				_ => todo!(),
 			},
 		}
 	}

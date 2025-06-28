@@ -1,9 +1,6 @@
-use evacuation_core::bim::bim_tools::EvacuationModelingResult;
-use evacuation_core::bim::{configuration, configuration::ScenarioCfg};
-use evacuation_core::bim::{run_evacuation_modeling, run_rust};
 use gui::tabs::{TabsController, TabsControllerMessage};
-use iced::widget::{button, column, text};
-use iced::{Alignment, Element, Settings, Task};
+use iced::widget::column;
+use iced::{Alignment, Element, Task};
 // use python::call_python::run_python;
 // use evacuation_core::python::call_python::run_python;
 
