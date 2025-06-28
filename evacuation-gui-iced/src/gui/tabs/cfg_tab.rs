@@ -18,12 +18,6 @@ impl CfgTab {
 		Self { cfg }
 	}
 
-	pub fn title(&self) -> String {
-		"Configuration".to_string()
-	}
-
-	pub fn update(&mut self, _message: CfgTabMessage) {}
-
 	pub fn view(&self) -> Element<CfgTabMessage> {
 		column![
 			button("To visualization tab").on_press(CfgTabMessage::VisualizationTab),
