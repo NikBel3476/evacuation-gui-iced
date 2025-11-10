@@ -11,9 +11,9 @@ edition = "2024"
 [dependencies]
 # pyo3 = { version = "0.18.3", features = ["auto-initialize"] }
 iced = { version = "0.13.1", features = ["canvas"] }
-rfd = "0.15.3"
-evacuation-core = { git = "https://github.com/NikBel3476/evacuation-core.git", rev = "85e556e" }
+rfd = "0.15.4"
+evacuation-core = { git = "https://github.com/NikBel3476/evacuation-core.git", rev = "50772aa" }
 
 [dev-dependencies]
-insta = { version = "1.43.1", features = ["yaml"] }
-rstest = "0.25.0"
+insta = { version = "1.43.2", features = ["yaml"] }
+rstest = "0.26.1"
