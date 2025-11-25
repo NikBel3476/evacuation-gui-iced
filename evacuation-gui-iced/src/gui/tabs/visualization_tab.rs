@@ -1,5 +1,5 @@
 use std::env;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use evacuation_core::bim::bim_json_object::{BimJsonElement, BimJsonObject, bim_json_object_new};
 use evacuation_core::bim::configuration::ScenarioCfg;
@@ -15,7 +15,7 @@ use rfd::FileDialog;
 const SCALE_DELTA_MULTIPLIER: f32 = 1.2;
 
 pub struct VisualizationTab {
-	cfg: Rc<ScenarioCfg>,
+	cfg: Arc<ScenarioCfg>,
 	bim_json: Option<BimJsonObject>,
 	scale: f32,
 	mouse_left_button_pressed: bool,
@@ -23,6 +23,7 @@ pub struct VisualizationTab {
 	translation: iced::Vector,
 	number_of_level: usize,
 	selected_element: Option<BimJsonElement>,
+	selected_element_level: Option<usize>,
 }
 
 #[derive(Debug, Clone)]
@@ -36,7 +37,7 @@ pub enum VisualizationTabMessage {
 }
 
 impl VisualizationTab {
-	pub fn new(cfg: Rc<ScenarioCfg>) -> Self {
+	pub fn new(cfg: Arc<ScenarioCfg>) -> Self {
 		Self {
 			cfg,
 			bim_json: None,
@@ -46,6 +47,7 @@ impl VisualizationTab {
 			translation: Default::default(),
 			number_of_level: 0,
 			selected_element: None,
+			selected_element_level: None,
 		}
 	}
 
@@ -86,7 +88,11 @@ impl VisualizationTab {
 					let file_path = file.as_path().to_str().unwrap();
 					println!("full path: {}", file_path);
 					self.bim_json = Some(bim_json_object_new(file_path));
-					let _ = run_evacuation_modeling(file_path, &self.cfg);
+					let cfg = Arc::clone(&self.cfg);
+					let bim_file_path = String::from(file_path);
+					std::thread::spawn(move || {
+						let _ = run_evacuation_modeling(&bim_file_path, &cfg);
+					});
 
 					self.scale = 1.0;
 					self.translation = iced::Vector { x: 0.0, y: 0.0 };
@@ -110,6 +116,7 @@ impl VisualizationTab {
 				if !pressed {
 					if let Some(element) = self.object_at(self.project(self.cursor_coordinates)) {
 						self.selected_element = Some((*element).clone());
+						self.selected_element_level = Some(self.number_of_level);
 					}
 				}
 			}
@@ -136,14 +143,16 @@ impl VisualizationTab {
 				text(format!("Кол-во людей: {}", build_element.number_of_people))
 					.width(Length::Fill),
 				// text(format!("UUID: {}", build_element.uuid)).width(Length::Fill),
-				text(format!("Тип: {:?}", build_element.sign)).width(Length::Fill)
+				text(format!("Тип: {:?}", build_element.sign)).width(Length::Fill),
+				text(format!("Уровень: {}", build_element.z_level)).width(Length::Fill)
 			]
 		});
 		let control_panel = container(
 			column![
 				button("To configuration tab").on_press(VisualizationTabMessage::CfgTab),
 				button("Open file of building")
-					.on_press(VisualizationTabMessage::OpenBuildingFileDialog)
+					.on_press(VisualizationTabMessage::OpenBuildingFileDialog),
+				text(format!("Этаж: {}", self.number_of_level)).width(Length::Fill),
 			]
 			.push_maybe(build_element_info)
 			.spacing(10),
@@ -322,21 +331,25 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 			frame.fill(&path, color!(0xf0ffea))
 		}
 
-		if let Some(build_element) = &self.selected_element {
-			let polygon_point = build_element.polygon.points[0];
-			let path = Path::new(|p| {
-				p.move_to(Point {
-					x: polygon_point.x as f32,
-					y: polygon_point.y as f32,
+		if let (Some(build_element), Some(build_element_level)) =
+			(&self.selected_element, self.selected_element_level)
+		{
+			if build_element_level == self.number_of_level {
+				let polygon_point = build_element.polygon.points[0];
+				let path = Path::new(|p| {
+					p.move_to(Point {
+						x: polygon_point.x as f32,
+						y: polygon_point.y as f32,
+					});
+					build_element.polygon.points[1..].iter().for_each(|point| {
+						p.line_to(Point {
+							x: point.x as f32,
+							y: point.y as f32,
+						})
+					});
 				});
-				build_element.polygon.points[1..].iter().for_each(|point| {
-					p.line_to(Point {
-						x: point.x as f32,
-						y: point.y as f32,
-					})
-				});
-			});
-			frame.fill(&path, color!(0xff0400))
+				frame.fill(&path, color!(0xff0400))
+			}
 		}
 
 		vec![frame.into_geometry()]

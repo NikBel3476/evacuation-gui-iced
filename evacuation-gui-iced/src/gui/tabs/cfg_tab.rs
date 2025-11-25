@@ -1,11 +1,11 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use evacuation_core::bim::configuration::ScenarioCfg;
 use iced::Element;
 use iced::widget::{button, column, text, text_input};
 
 pub struct CfgTab {
-	cfg: Rc<ScenarioCfg>,
+	cfg: Arc<ScenarioCfg>,
 }
 
 #[derive(Debug, Clone)]
@@ -14,7 +14,7 @@ pub enum CfgTabMessage {
 }
 
 impl CfgTab {
-	pub fn new(cfg: Rc<ScenarioCfg>) -> Self {
+	pub fn new(cfg: Arc<ScenarioCfg>) -> Self {
 		Self { cfg }
 	}
 

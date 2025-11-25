@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use cfg_tab::CfgTab;
 use evacuation_core::bim::configuration::load_cfg;
@@ -43,12 +43,12 @@ pub enum TabsControllerMessage {
 impl TabsController {
 	pub fn new() -> Self {
 		let scenario_cfg =
-			Rc::new(load_cfg(CFG_PATH).expect("Failed to read scenario configuration"));
+			Arc::new(load_cfg(CFG_PATH).expect("Failed to read scenario configuration"));
 
 		Self {
 			current_tab_id: TabId::Cfg,
-			cfg_tab: CfgTab::new(Rc::clone(&scenario_cfg)),
-			visualization_tab: VisualizationTab::new(Rc::clone(&scenario_cfg)),
+			cfg_tab: CfgTab::new(Arc::clone(&scenario_cfg)),
+			visualization_tab: VisualizationTab::new(Arc::clone(&scenario_cfg)),
 		}
 	}
 
