@@ -9,11 +9,12 @@ mod python;
 
 fn main() -> iced::Result {
 	iced::application(
-		EvacuationApp::title,
+		|| EvacuationApp::new(()),
 		EvacuationApp::update,
 		EvacuationApp::view,
 	)
-	.run_with(|| EvacuationApp::new(()))
+	.title(EvacuationApp::title)
+	.run()
 }
 
 // fn read_config() -> Result<configuration::ScenarioCfg, String> {
@@ -122,11 +123,13 @@ impl EvacuationApp {
 
 	fn update(&mut self, message: Message) {
 		match message {
-			Message::TabsController(message) => self.tabs_controller.update(message),
+			Message::TabsController(message) => {
+				self.tabs_controller.update(message);
+			}
 		}
 	}
 
-	fn view(&self) -> Element<Message> {
+	fn view(&'_ self) -> Element<'_, Message> {
 		column![self.tabs_controller.view().map(Message::TabsController)]
 			.align_x(Alignment::Center)
 			.into()

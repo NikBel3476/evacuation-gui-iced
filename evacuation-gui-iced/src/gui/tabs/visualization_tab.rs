@@ -5,10 +5,13 @@ use evacuation_core::bim::bim_json_object::{BimJsonElement, BimJsonObject, bim_j
 use evacuation_core::bim::configuration::ScenarioCfg;
 use evacuation_core::bim::json_object;
 use evacuation_core::bim::run_evacuation_modeling;
-use iced::widget::canvas::{self, Canvas, Frame, Geometry, Path, Stroke};
-use iced::widget::{button, column, container, row, text};
 use iced::{
 	Background, Element, Length, Point, Rectangle, Renderer, Theme, color, keyboard, mouse,
+	widget::{
+		button,
+		canvas::{self, Canvas, Frame, Geometry, Path, Stroke},
+		column, container, row, text,
+	},
 };
 use rfd::FileDialog;
 
@@ -113,11 +116,11 @@ impl VisualizationTab {
 			}
 			VisualizationTabMessage::MouseLeftButtonState(pressed) => {
 				self.mouse_left_button_pressed = pressed;
-				if !pressed {
-					if let Some(element) = self.object_at(self.project(self.cursor_coordinates)) {
-						self.selected_element = Some((*element).clone());
-						self.selected_element_level = Some(self.number_of_level);
-					}
+				if !pressed
+					&& let Some(element) = self.object_at(self.project(self.cursor_coordinates))
+				{
+					self.selected_element = Some((*element).clone());
+					self.selected_element_level = Some(self.number_of_level);
 				}
 			}
 			VisualizationTabMessage::MouseCursorMove(point) => {
@@ -125,7 +128,7 @@ impl VisualizationTab {
 					let mut translation_delta = point - self.cursor_coordinates;
 					translation_delta.x /= self.scale;
 					translation_delta.y /= self.scale;
-					self.translation = self.translation + translation_delta;
+					self.translation += translation_delta;
 				}
 				self.cursor_coordinates = point;
 			}
@@ -136,7 +139,7 @@ impl VisualizationTab {
 		}
 	}
 
-	pub fn view(&self) -> Element<VisualizationTabMessage> {
+	pub fn view(&'_ self) -> Element<'_, VisualizationTabMessage> {
 		let build_element_info = self.selected_element.as_ref().map(|build_element| {
 			column![
 				text(format!("Название: {}", build_element.name)).width(Length::Fill),
@@ -154,7 +157,7 @@ impl VisualizationTab {
 					.on_press(VisualizationTabMessage::OpenBuildingFileDialog),
 				text(format!("Этаж: {}", self.number_of_level)).width(Length::Fill),
 			]
-			.push_maybe(build_element_info)
+			.push(build_element_info.unwrap_or(column![]))
 			.spacing(10),
 		)
 		.height(Length::Fill)
@@ -177,56 +180,54 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 	fn update(
 		&self,
 		_state: &mut Self::State,
-		event: canvas::Event,
+		event: &iced::Event,
 		bounds: Rectangle,
 		cursor: mouse::Cursor,
-	) -> (canvas::event::Status, Option<VisualizationTabMessage>) {
-		if cursor.position_in(bounds).is_none() {
-			return (canvas::event::Status::Ignored, None);
-		}
+	) -> Option<canvas::Action<VisualizationTabMessage>> {
+		cursor.position_in(bounds)?;
 
 		match event {
 			canvas::Event::Mouse(mouse_event) => match mouse_event {
 				mouse::Event::WheelScrolled {
 					delta: mouse::ScrollDelta::Lines { x: _, y },
 				} => {
-					return if y > 0.0 {
-						(
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(
+					return Some(
+						if *y > 0.0 {
+							canvas::Action::publish(VisualizationTabMessage::UpdateScale(
 								self.scale * SCALE_DELTA_MULTIPLIER,
-							)),
-						)
-					} else {
-						(
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::UpdateScale(
+							))
+						} else {
+							canvas::Action::publish(VisualizationTabMessage::UpdateScale(
 								self.scale / SCALE_DELTA_MULTIPLIER,
-							)),
-						)
-					};
+							))
+						}
+						.and_capture(),
+					);
 				}
 				mouse::Event::ButtonPressed(button) => {
-					if button == mouse::Button::Left {
-						return (
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::MouseLeftButtonState(true)),
+					if *button == mouse::Button::Left {
+						return Some(
+							canvas::Action::publish(VisualizationTabMessage::MouseLeftButtonState(
+								true,
+							))
+							.and_capture(),
 						);
 					}
 				}
 				mouse::Event::ButtonReleased(button) => {
-					if button == mouse::Button::Left {
-						return (
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::MouseLeftButtonState(false)),
-						);
+					if *button == mouse::Button::Left {
+						return Some(canvas::Action::publish(
+							VisualizationTabMessage::MouseLeftButtonState(false),
+						));
 					}
 				}
 				mouse::Event::CursorMoved { position: _ } => {
 					if let Some(position) = cursor.position_in(bounds) {
-						return (
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::MouseCursorMove(position)),
+						return Some(
+							canvas::Action::publish(VisualizationTabMessage::MouseCursorMove(
+								position,
+							))
+							.and_capture(),
 						);
 					}
 				}
@@ -239,26 +240,27 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 				location: _,
 				modifiers: _,
 				text: _,
+				repeat: _,
 			}) => match named_key {
 				keyboard::key::Named::ArrowUp => {
-					if let Some(bim_json) = &self.bim_json {
-						if self.number_of_level < bim_json.levels.len() - 1 {
-							return (
-								canvas::event::Status::Captured,
-								Some(VisualizationTabMessage::ChangeCurrentLevel(
-									self.number_of_level + 1,
-								)),
-							);
-						}
+					if let Some(bim_json) = &self.bim_json
+						&& self.number_of_level < bim_json.levels.len() - 1
+					{
+						return Some(
+							canvas::Action::publish(VisualizationTabMessage::ChangeCurrentLevel(
+								self.number_of_level + 1,
+							))
+							.and_capture(),
+						);
 					}
 				}
 				keyboard::key::Named::ArrowDown => {
 					if self.number_of_level > 0 {
-						return (
-							canvas::event::Status::Captured,
-							Some(VisualizationTabMessage::ChangeCurrentLevel(
+						return Some(
+							canvas::Action::publish(VisualizationTabMessage::ChangeCurrentLevel(
 								self.number_of_level - 1,
-							)),
+							))
+							.and_capture(),
 						);
 					}
 				}
@@ -267,7 +269,7 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 			_ => {}
 		}
 
-		(canvas::event::Status::Ignored, None)
+		None
 	}
 
 	fn draw(
@@ -333,23 +335,22 @@ impl canvas::Program<VisualizationTabMessage> for VisualizationTab {
 
 		if let (Some(build_element), Some(build_element_level)) =
 			(&self.selected_element, self.selected_element_level)
+			&& build_element_level == self.number_of_level
 		{
-			if build_element_level == self.number_of_level {
-				let polygon_point = build_element.polygon.points[0];
-				let path = Path::new(|p| {
-					p.move_to(Point {
-						x: polygon_point.x as f32,
-						y: polygon_point.y as f32,
-					});
-					build_element.polygon.points[1..].iter().for_each(|point| {
-						p.line_to(Point {
-							x: point.x as f32,
-							y: point.y as f32,
-						})
-					});
+			let polygon_point = build_element.polygon.points[0];
+			let path = Path::new(|p| {
+				p.move_to(Point {
+					x: polygon_point.x as f32,
+					y: polygon_point.y as f32,
 				});
-				frame.fill(&path, color!(0xff0400))
-			}
+				build_element.polygon.points[1..].iter().for_each(|point| {
+					p.line_to(Point {
+						x: point.x as f32,
+						y: point.y as f32,
+					})
+				});
+			});
+			frame.fill(&path, color!(0xff0400))
 		}
 
 		vec![frame.into_geometry()]

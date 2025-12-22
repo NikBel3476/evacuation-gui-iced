@@ -70,7 +70,7 @@ impl TabsController {
 		}
 	}
 
-	pub fn view(&self) -> Element<TabsControllerMessage> {
+	pub fn view(&'_ self) -> Element<'_, TabsControllerMessage> {
 		match self.current_tab_id {
 			TabId::Cfg => self.cfg_tab.view().map(TabsControllerMessage::CfgTab),
 			TabId::Visualization => self

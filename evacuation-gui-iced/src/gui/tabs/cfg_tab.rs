@@ -18,7 +18,7 @@ impl CfgTab {
 		Self { cfg }
 	}
 
-	pub fn view(&self) -> Element<CfgTabMessage> {
+	pub fn view(&'_ self) -> Element<'_, CfgTabMessage> {
 		column![
 			button("To visualization tab").on_press(CfgTabMessage::VisualizationTab),
 			column![text("Version"), text_input("", self.cfg.version.as_str())],
